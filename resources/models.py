@@ -43,6 +43,11 @@ class Resource(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     counting = models.FloatField(default=0, help_text="Counting value")
 
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Uncheck to deactivate this resource instead of deleting."
+    )
+
     class Meta:
         db_table = 'resources'
         ordering = ['-year', '-month', 'resource_name']

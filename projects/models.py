@@ -33,6 +33,14 @@ class Project(models.Model):
         help_text="Enter the month for this project report (1–12)"
     )
 
+    #project profile which only has one resource
+    project_profile = models.ForeignKey(
+        Resource,
+        on_delete=models.PROTECT,
+        related_name='profiled_projects',
+        help_text="Main profile/resource for this project"
+    )
+
     resources = models.ManyToManyField(
         Resource,
         related_name='assigned_projects',

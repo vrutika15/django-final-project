@@ -4,6 +4,8 @@ from datetime import datetime
 from .models import Project
 from .forms import ProjectForm
 from resources.models import Resource
+from django.db.models import ProtectedError
+from django.contrib import messages
 
 
 def team_dashboard_redirect(request):
@@ -18,6 +20,7 @@ def dashboard_home(request):
     ]
     # Get year and month from GET params, fallback to current year/month
     now = datetime.now()
+    active_tab = request.GET.get('tab', 'projects') #default to projects tab
     year_param = request.GET.get('year')
     month_param = request.GET.get('month')
     try:
@@ -44,20 +47,26 @@ def dashboard_home(request):
         'month': month,
         'projects': projects,
         'resources': resources,
+        'active_tab': active_tab,
         'current_year': now.year,
         'current_month': now.month,
     })
 
 def project_list(request):
-    years = list(Project.objects.values_list('year', flat=True).distinct())
-    months = list(Project.objects.values_list('month', flat=True).distinct())
     selected_year = request.GET.get('year')
     selected_month = request.GET.get('month')
+
     projects = Project.objects.all()
+
     if selected_year:
         projects = projects.filter(year=selected_year)
     if selected_month:
         projects = projects.filter(month=selected_month)
+
+    #get distinct years and months for filters
+    years = Project.objects.values_list('year', flat=True).distinct().order_by('year')
+    months = Project.objects.values_list('month', flat=True).distinct().order_by('month')
+
     return render(request, 'projects/project_list.html', {
         'projects': projects,
         'years': years,

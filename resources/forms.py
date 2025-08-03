@@ -4,7 +4,7 @@ from .models import Resource as ResourceModel
 class ResourceForm(forms.ModelForm):
     class Meta:
         model = ResourceModel
-        fields = ['resource_name', 'working_days', 'present_day', 'present_hours']
+        fields = ['resource_name', 'working_days', 'present_day', 'present_hours', 'is_active']
         widgets = {
             'resource_name': forms.TextInput(attrs={'class': 'form-control'}),
             'working_days': forms.NumberInput(attrs={
@@ -13,12 +13,14 @@ class ResourceForm(forms.ModelForm):
                 'placeholder': 'Leave blank for auto-calculation'
             }),
             'present_day': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
-            'present_hours': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'})
+            'present_hours': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'})
         }
         labels = {
             'resource_name': 'Resource Name',
             'present_day': 'Days Present',
             'present_hours': 'Hours Present',
+            'is_active': 'Active Resource'
         }
 
     def __init__(self, *args, **kwargs):
