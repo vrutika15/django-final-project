@@ -46,3 +46,19 @@ class ProjectForm(forms.ModelForm):
             self.initial['month'] = date.today().month
         # Optional: order resources by name
         self.fields['resources'].queryset = Resource.objects.order_by('resource_name')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        billable = cleaned_data.get('billable_days') or 0
+        non_billable = cleaned_data.get('non_billable_days') or 0
+        present = cleaned_data.get('present_day') or 0
+
+        #ensure no negative values for days
+        if billable < 0 or non_billable < 0 or present < 0:
+            raise forms.ValidationError("Days cannot be negative.")
+
+        #sum of billable + non-billable days does not exceed present days
+        if billable > present:
+            raise forms.ValidationError("Billable days cannot be more than present days.")
+
+        return cleaned_data
