@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Production Report  {% block title %}{% endblock %}</title>
+    <title>Team Production Report {% block title %}{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -33,6 +33,12 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'resources:resource_list' %}">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'interns:intern_list' %}">Interns</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'interns:technology_list' %}">Technologies</a>
                     </li>
                 </ul>
 

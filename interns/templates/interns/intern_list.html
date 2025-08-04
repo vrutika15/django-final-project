@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Interns</h2>
+    <a href="{% url 'interns:intern_add' %}" class="btn btn-primary mb-3">Add Intern</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Tech Stack</th>
+                <th>Communication</th>
+                <th>Attitude</th>
+                <th>Overall</th>
+                <th>Tasks</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for intern in interns %}
+            <tr>
+                <td>{{ intern.name }}</td>
+                <td>
+                    {% for tech in intern.tech_stack.all %}
+                        <span class="badge bg-info text-dark">{{ tech.name }}</span>
+                    {% endfor %}
+                </td>
+                <td>{{ intern.communication_rating }}</td>
+                <td>{{ intern.attitude_rating }}</td>
+                <td>{{ intern.overall_rating }}</td>
+                <td>
+                    {% if intern.task_provided %}
+                        {{ intern.task_frequency }}
+                    {% else %}
+                        Not Assigned
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'interns:intern_edit' intern.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'interns:intern_delete' intern.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No interns found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
