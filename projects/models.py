@@ -119,6 +119,6 @@ class Project(models.Model):
     class Meta:
         db_table = 'projects'
         ordering = ['-year', '-month', 'project_name']
-        unique_together = ('project_name', 'year', 'month')
+        # unique_together = ('project_name', 'year', 'month')
         verbose_name = 'Project'
         verbose_name_plural = 'Projects'

@@ -117,13 +117,14 @@ def project_edit(request, pk):
         'title': 'Edit Project'
     })
 
-
 def project_delete(request, pk):
     project = get_object_or_404(Project, pk=pk)
     if request.method == 'POST':
-        project.delete()
+        project.is_active = False
+        project.save()
+        messages.success(request, f"Project '{project.project_name}' was marked as inactive.")
         return redirect('projects:project_list')
-    return render(request, 'projects/project_confirm_delete.html', {'project':project})
+    return render(request, 'projects/project_confirm_delete.html', {'project': project})
 
 
 def attendance_home(request):

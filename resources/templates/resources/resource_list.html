@@ -17,7 +17,8 @@
             <select class="form-select" id="year" name="year">
                 <option value="">All</option>
                 {% for y in years %}
-                <option value="{{ y }}" {% if y|stringformat:"s" == request.GET.year %}selected{% endif %}>{{ y }}</option>
+                <option value="{{ y }}" {% if y|stringformat:"s" == request.GET.year %}selected{% endif %}>{{ y }}
+                </option> 
                 {% endfor %}
             </select>
         </div>
@@ -26,7 +27,8 @@
             <select class="form-select" id="month" name="month">
                 <option value="">All</option>
                 {% for m in months %}
-                <option value="{{ m.0 }}" {% if m.0|stringformat:"s" == request.GET.month %}selected{% endif %}>{{ m.1 }}</option>
+                <option value="{{ m.0 }}" {% if m.0|stringformat:"s" == request.GET.month %}selected{% endif %}>{{ m.1 }}
+                </option>
                 {% endfor %}
             </select>
         </div>
@@ -39,11 +41,11 @@
 
     <!-- Messages -->
     {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                <i class="far fa-info-circle"></i> {{ message }}
-            </div>
-        {% endfor %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        <i class="far fa-info-circle"></i> {{ message }}
+    </div>
+    {% endfor %}
     {% endif %}
 
     <!-- Resources Table -->
@@ -58,6 +60,7 @@
                     <th>Hours Present</th>
                     <th>Year</th>
                     <th>Month</th>
+                    <th>Active</th>
                     <th class="text-center">Actions</th>
                 </tr>
             </thead>
@@ -70,8 +73,16 @@
                     <td>{{ r.present_hours }}</td>
                     <td>{{ r.year }}</td>
                     <td>{{ r.get_month_display }}</td>
+                    <td>
+                    {% if r.is_active %}
+                    <span class="badge bg-success">Active</span>
+                    {% else %}
+                    <span class="badge bg-danger">Inactive</span>
+                    {% endif %}
+                    </td>
                     <td class="text-center">
-                        <a href="{% url 'resources:resource_update' r.pk %}" class="btn btn-sm btn-outline-warning me-1">
+                        <a href="{% url 'resources:resource_update' r.pk %}"
+                            class="btn btn-sm btn-outline-warning me-1">
                             <i class="far fa-edit"></i>
                         </a>
                         <a href="{% url 'resources:resource_delete' r.pk %}" class="btn btn-sm btn-outline-danger">
@@ -84,7 +95,7 @@
         </table>
     </div>
     {% else %}
-        <div class="alert alert-info"><i class="far fa-folder-open"></i> No resources found.</div>
+    <div class="alert alert-info"><i class="far fa-folder-open"></i> No resources found.</div>
     {% endif %}
 </div>
 
