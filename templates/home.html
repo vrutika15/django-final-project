@@ -20,11 +20,17 @@
         z-index: 1030;
         padding: 0.5rem 0;
     }
+
+   #productivityChart {
+   max-width: 300px;
+   max-height: 300px;
+   margin: 20px auto;
+  }
 </style>
 
 <div class="container-fluid">
     <!-- Top Tabs: Projects, Resources, Charts -->
-    <ul class="nav nav-tabs mb-3" id="topTabs">
+    <ul class="nav nav-tabs mt-3" id="topTabs">
         <li class="nav-item">
             <a class="nav-link {% if active_tab == 'projects' or not active_tab %}active{% endif %}" href="#" data-tab="projects">Projects</a>
         </li>
@@ -36,8 +42,8 @@
         </li>
     </ul>
 
-    <div class="tab-content-area mt-3" id="mainContent">
-        <h2>Project & Resource Calendar</h2>
+    <div class="tab-content-area mt-3 mb-5" id="mainContent">
+       <!-- <h2>Project & Resource Calendar</h2> -->
 
         {% if active_tab == 'resources' %}
             {% if resources %}
@@ -71,7 +77,9 @@
             {% endif %}
 
         {% elif active_tab == 'charts' %}
-            <p>Charts will be displayed here in the future.</p>
+       
+       {% include "attendance/chart_tab.html" %}
+          
 
         {% else %}
             {% if projects %}
@@ -125,6 +133,43 @@
     </ul>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+     const productivity = parseFloat(
+      "{{ team_productivity_percentage|floatformat:2 }}"
+    );
+    const unproductive = 100 - productivity;
+
+    const ctx = document.getElementById("productivityChart").getContext("2d");
+    const productivityChart = new Chart(ctx, {
+      type: "pie",
+      data: {
+        labels: ["Productive", "Unproductive"],
+        datasets: [
+          {
+            data: [productivity, unproductive],
+            backgroundColor: ["#28a745", "#dc3545"],
+            borderColor: ["#ffffff", "#ffffff"],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              font: {
+                size: 10,
+              },
+            },
+          },
+        },
+      },
+    });
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const yearSelect = document.getElementById('yearSelectNavbar');

@@ -20,7 +20,7 @@ def dashboard_home(request):
     ]
     # Get year and month from GET params, fallback to current year/month
     now = datetime.now()
-    active_tab = request.GET.get('tab', 'projects') #default to projects tab
+    tab = request.GET.get('tab', 'projects') #default to projects tab
     year_param = request.GET.get('year')
     month_param = request.GET.get('month')
     try:
@@ -40,6 +40,13 @@ def dashboard_home(request):
     from .models import Project
     projects = Project.objects.filter(year=year, month=month)
     resources = Resource.objects.filter(year=year, month=month)
+
+    team_productivity_percentage = None
+    if tab == 'charts':
+        total_present_hours = sum(r.present_hours for r in resources)
+        total_billable_hours = sum(p.billable_hours for p in projects)
+        team_productivity_percentage = (100 * total_billable_hours / total_present_hours) if total_present_hours > 0 else 0
+
     return render(request, 'home.html', {
         'years': years,
         'months': months,
@@ -47,9 +54,11 @@ def dashboard_home(request):
         'month': month,
         'projects': projects,
         'resources': resources,
-        'active_tab': active_tab,
+       # 'active_tab': active_tab,
         'current_year': now.year,
         'current_month': now.month,
+        'active_tab': tab,
+        'team_productivity_percentage': team_productivity_percentage
     })
 
 def project_list(request):
@@ -133,13 +142,6 @@ def attendance_home(request):
     total_billable_hours = sum(p.billable_hours for p in projects)
     total_non_billable_hours = sum(p.non_billable_hours for p in projects)
 
-    # team productivity perc
-    if total_present_hours > 0:
-        team_productivity_percentage = (100 * total_billable_hours) / total_present_hours
-    else:
-        team_productivity_percentage = 0
-
-
     context = {
         'resources': resources,
         'projects': projects,
@@ -150,8 +152,8 @@ def attendance_home(request):
         'total_non_billable_days': total_non_billable_days,
         'total_billable_hours': total_billable_hours,
         'total_non_billable_hours': total_non_billable_hours,
-        'presence_percentage' : presence_percentage,
-        'team_productivity_percentage' : team_productivity_percentage
+        'presence_percentage' : presence_percentage
     }
 
     return render(request, 'attendance/attendance_home.html', context)
+

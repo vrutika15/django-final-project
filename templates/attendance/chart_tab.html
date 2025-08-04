@@ -1,0 +1,9 @@
+<div class="my-4 text-center">
+  <h5>Team Productivity</h5>
+
+  {% if team_productivity_percentage == 0 %}
+    <p class="text-danger fw-bold">0% productivity — All hours unproductive.</p>
+  {% endif %}
+
+  <canvas id="productivityChart" width="300" height="300" style="max-width: 100%; height: auto;"></canvas>
+</div>
