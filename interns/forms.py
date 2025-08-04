@@ -21,6 +21,7 @@ class InternForm(forms.ModelForm):
             'attitude_rating',
             'task_provided',
             'task_frequency',
+            'task_description',
         ]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -29,4 +30,5 @@ class InternForm(forms.ModelForm):
             'attitude_rating': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.1', 'min': 0, 'max': 10}),
             'task_provided': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'task_frequency': forms.Select(attrs={'class': 'form-select'}),
+            'task_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
