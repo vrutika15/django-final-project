@@ -1,0 +1,76 @@
+{% for key, child in node.children.items %}
+<li class="tree-item">
+    <div class="tree-content" onclick="toggleNode(this)">
+        {% if child.children %}
+            <div class="tree-toggle">
+                <i class="fas fa-plus"></i>
+            </div>
+        {% else %}
+            <div class="tree-toggle" style="background: #6c757d; cursor: default;">
+                <i class="fas fa-circle"></i>
+            </div>
+        {% endif %}
+        
+        <div class="tree-icon {{ child.type }}">
+            {% if child.type == 'root' %}
+                <i class="fas fa-tree"></i>
+            {% elif child.type == 'year' %}
+                <i class="fas fa-calendar"></i>
+            {% elif child.type == 'month' %}
+                <i class="fas fa-calendar-alt"></i>
+            {% elif child.type == 'project' %}
+                <i class="fas fa-project-diagram"></i>
+            {% elif child.type == 'profile' %}
+                <i class="fas fa-user-tie"></i>
+            {% elif child.type == 'resource' %}
+                <i class="fas fa-user"></i>
+            {% endif %}
+        </div>
+        
+        <div class="tree-name">{{ child.name }}</div>
+        
+        <div class="tree-details">
+            {% if child.type == 'project' and child.data %}
+                {{ child.data.get_project_type_display }}
+            {% elif child.type == 'profile' and child.data %}
+                {{ child.data.present_day|floatformat:1 }}d
+            {% elif child.type == 'resource' and child.data %}
+                {{ child.data.present_day|floatformat:1 }}d
+            {% elif child.type == 'year' %}
+                {{ child.children|length }} month{{ child.children|length|pluralize }}
+            {% elif child.type == 'month' %}
+                {{ child.children|length }} project{{ child.children|length|pluralize }}
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if child.type == 'project' and child.data %}
+        <div class="project-stats">
+            <div class="stat-item">
+                <div class="stat-value">{{ child.data.present_day|floatformat:1 }}</div>
+                <div class="stat-label">Present Days</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ child.data.billable_days|floatformat:1 }}</div>
+                <div class="stat-label">Billable Days</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ child.data.billable_hours|floatformat:0 }}</div>
+                <div class="stat-label">Billable Hours</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ child.data.utilization_percentage|floatformat:1 }}%</div>
+                <div class="stat-label">Utilization</div>
+            </div>
+        </div>
+    {% endif %}
+    
+    {% if child.children %}
+        <div class="tree-children">
+            <ul class="tree-node">
+                {% include "projects/tree_node.html" with node=child level=level|add:1 %}
+            </ul>
+        </div>
+    {% endif %}
+</li>
+{% endfor %} 

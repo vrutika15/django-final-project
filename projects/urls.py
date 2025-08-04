@@ -12,4 +12,5 @@ urlpatterns = [
     path("projects/create/", views.project_create, name="project_create"),
     path("projects/edit/<int:pk>/", views.project_edit, name="project_edit"),
     path("projects/delete/<int:pk>/", views.project_delete, name="project_delete"),
+    path("tree-structure/", views.tree_structure_view, name="tree_structure"),
 ]
