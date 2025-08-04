@@ -1,9 +1,33 @@
-<div class="my-4 text-center">
-  <h5>Team Productivity</h5>
+<div class="container py-4">
+  <div class="row justify-content-center g-4">
+    <!-- Team Productivity -->
+    <div class="col-md-6">
+      <div class="card shadow-sm chart-card">
+        <div class="card-body text-center">
+          <div class="chart-title text-success">Team Productivity</div>
+          {% if team_productivity_percentage == 0 %}
+            <p class="text-danger fw-bold mb-2">0% productivity — All hours unproductive.</p>
+          {% endif %}
+          <div class="chart-container">
+            <canvas id="productivityChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  {% if team_productivity_percentage == 0 %}
-    <p class="text-danger fw-bold">0% productivity — All hours unproductive.</p>
-  {% endif %}
-
-  <canvas id="productivityChart" width="300" height="300" style="max-width: 100%; height: auto;"></canvas>
+    <!-- Presence Percentage -->
+    <div class="col-md-6">
+      <div class="card shadow-sm chart-card">
+        <div class="card-body text-center">
+          <div class="chart-title text-primary">Presence Percentage</div>
+          {% if presence_percentage == 0 %}
+            <p class="text-danger fw-bold mb-2">0% presence — No working days present.</p>
+          {% endif %}
+          <div class="chart-container">
+            <canvas id="presenceChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

@@ -54,9 +54,15 @@ def dashboard_home(request):
     total_billable_hours = 0
     total_non_billable_hours = 0
     if tab == 'charts':
+        #team prouctivity percentage 
         total_present_hours = sum(r.present_hours for r in resources)
         total_billable_hours = sum(p.billable_hours for p in projects)
         team_productivity_percentage = (100 * total_billable_hours / total_present_hours) if total_present_hours > 0 else 0
+
+        # presence percentage
+        total_present_days = sum(r.present_day for r in resources)
+        total_working_days = sum(r.working_days for r in resources)
+        presence_percentage = (100 * total_present_days)/total_working_days if total_working_days else 0
 
      # Totals for resource
     if tab == 'resources':   

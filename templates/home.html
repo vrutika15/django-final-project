@@ -28,10 +28,25 @@
         padding: 0.5rem 0;
     }
 
-   #productivityChart {
-   max-width: 300px;
-   max-height: 300px;
-   margin: 20px auto;
+    .chart-container {
+    max-width: 260px;
+    max-height: 260px;
+    margin: 0 auto;
+  }
+
+  .chart-card {
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+  }
+
+  .chart-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
   }
 </style>
 
@@ -185,9 +200,7 @@
 <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-     const productivity = parseFloat(
-      "{{ team_productivity_percentage|floatformat:2 }}"
-    );
+    const productivity = parseFloat("{{ team_productivity_percentage|floatformat:2 }}");
     const unproductive = 100 - productivity;
 
     const ctx = document.getElementById("productivityChart").getContext("2d");
@@ -195,14 +208,42 @@
       type: "pie",
       data: {
         labels: ["Productive", "Unproductive"],
-        datasets: [
-          {
-            data: [productivity, unproductive],
-            backgroundColor: ["#28a745", "#dc3545"],
-            borderColor: ["#ffffff", "#ffffff"],
-            borderWidth: 1,
+        datasets: [{
+          data: [productivity, unproductive],
+          backgroundColor: ["#28a745", "#dc3545"],
+          borderColor: ["#ffffff", "#ffffff"],
+          borderWidth: 1,
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              font: {
+                size: 10,
+              },
+            },
           },
-        ],
+        },
+      },
+    });
+
+    const presence = parseFloat("{{ presence_percentage|floatformat:2 }}");
+    const absence = 100 - presence;
+
+    const ctxPresence = document.getElementById("presenceChart").getContext("2d");
+    const presenceChart = new Chart(ctxPresence, {
+      type: "pie",
+      data: {
+        labels: ["Present", "Absent"],
+        datasets: [{
+          data: [presence, absence],
+          backgroundColor: ["#007bff", "#ffc107"],
+          borderColor: ["#ffffff", "#ffffff"],
+          borderWidth: 1,
+        }],
       },
       options: {
         responsive: true,
@@ -219,6 +260,7 @@
       },
     });
 </script>
+
  <script>
     $(document).ready(function () {
       $("#resourceTable").DataTable();
