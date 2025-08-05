@@ -239,6 +239,36 @@ def tree_structure_view(request):
     
     # Sort periods chronologically
     sorted_periods = sorted(projects_by_period.keys(), reverse=True)
+
+    #resorces
+    resources = Resource.objects.filter(is_active=True).order_by('-year', '-month', 'resource_name')
+    selected_resource_id = request.GET.get('resource')
+    selected_resource = None
+
+    if selected_resource_id:
+        try:
+            selected_resource = Resource.objects.get(id=selected_resource_id, is_active=True)
+        except Resource.DoesNotExist:
+            selected_resource = None
+
+    if not selected_resource and resources.exists():
+        selected_resource = resources.first()
+
+    # Group resources by year and month
+    resources_by_period = {}
+    for resource in resources:
+        period_key = f"{resource.year}-{resource.month:02d}"
+        if period_key not in resources_by_period:
+            resources_by_period[period_key] = {
+                'year': resource.year,
+                'month': resource.month,
+                'month_name': resource.get_month_display(),
+                'resources': []
+            }
+        resources_by_period[period_key]['resources'].append(resource)
+
+    sorted_resource_periods = sorted(resources_by_period.keys(), reverse=True)
+
     
     # Calculate summary statistics
     total_projects = projects.count()
@@ -248,9 +278,17 @@ def tree_structure_view(request):
     total_hours = total_billable_hours + total_non_billable_hours
     
     context = {
+        #projects
         'projects_by_period': projects_by_period,
         'sorted_periods': sorted_periods,
         'selected_project': selected_project,
+
+        #resorces
+        'resources_by_period': resources_by_period,
+        'sorted_resource_periods': sorted_resource_periods,
+        'selected_resource': selected_resource,
+
+        #stats
         'total_projects': total_projects,
         'total_resources': total_resources,
         'total_billable_hours': total_billable_hours,
