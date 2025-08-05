@@ -43,6 +43,12 @@ class Intern(models.Model):
         null=True
     )
 
+    task_description = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Description of the task assigned to the intern"
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):

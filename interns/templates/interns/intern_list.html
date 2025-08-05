@@ -1,52 +1,81 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <h2>Interns</h2>
-    <a href="{% url 'interns:intern_add' %}" class="btn btn-primary mb-3">Add Intern</a>
+<div class="container mt-4">
+    <h2 class="mb-4">Interns</h2>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Tech Stack</th>
-                <th>Communication</th>
-                <th>Attitude</th>
-                <th>Overall</th>
-                <th>Tasks</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for intern in interns %}
-            <tr>
-                <td>{{ intern.name }}</td>
-                <td>
-                    {% for tech in intern.tech_stack.all %}
-                        <span class="badge bg-info text-dark">{{ tech.name }}</span>
-                    {% endfor %}
-                </td>
-                <td>{{ intern.communication_rating }}</td>
-                <td>{{ intern.attitude_rating }}</td>
-                <td>{{ intern.overall_rating }}</td>
-                <td>
-                    {% if intern.task_provided %}
-                        {{ intern.task_frequency }}
-                    {% else %}
-                        Not Assigned
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'interns:intern_edit' intern.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                    <a href="{% url 'interns:intern_delete' intern.pk %}" class="btn btn-sm btn-danger">Delete</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="7">No interns found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="d-flex align-items-center mb-3 gap-3 flex-wrap">
+        <a href="{% url 'interns:intern_add' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Add Intern
+        </a>
+
+        {# Optional: filters form here if needed #}
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Tech Stack</th>
+                            <th>Communication</th>
+                            <th>Attitude</th>
+                            <th>Overall</th>
+                            <th>Task Frequency</th>
+                            <th>Task Description</th>
+                            <th class="text-center" style="width: 120px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for intern in interns %}
+                        <tr>
+                            <td>{{ intern.name }}</td>
+                            <td>
+                                {% for tech in intern.tech_stack.all %}
+                                    <span>{{ tech.name }}</span>
+                                {% empty %}
+                                    <span>None</span>
+                                {% endfor %}
+                            </td>
+                            <td>{{ intern.communication_rating }}</td>
+                            <td>{{ intern.attitude_rating }}</td>
+                            <td>{{ intern.overall_rating }}</td>
+                            <td>
+                                {% if intern.task_provided %}
+                                    {{ intern.task_frequency }}
+                                {% else %}
+                                    <span class="text-muted">Not Assigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if intern.task_description %}
+                                    {{ intern.task_description|linebreaksbr }}
+                                {% else %}
+                                    <span class="text-muted">No Description</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <a href="{% url 'interns:intern_edit' intern.pk %}" 
+                                   class="btn btn-sm btn-outline-warning me-1" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'interns:intern_delete' intern.pk %}" 
+                                   class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-3">No interns found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
