@@ -11,7 +11,7 @@
         border-radius: 10px;
         padding: 20px;
         margin: 20px 0;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
     .tree-header {
@@ -64,14 +64,14 @@
         padding: 20px;
         border-radius: 10px;
         text-align: center;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         border-left: 4px solid #2c3e50;
         transition: all 0.3s ease;
     }
 
     .stat-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
     }
 
     .stat-number {
@@ -98,9 +98,13 @@
     .sidebar {
         background: white;
         border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         overflow: hidden;
     }
+    .badge-dark-text {
+        color: black !important;
+    }
+
 
     .sidebar-header {
         background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
@@ -208,7 +212,7 @@
     .detail-panel {
         background: white;
         border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         overflow: hidden;
     }
 
@@ -224,7 +228,7 @@
     .detail-icon {
         width: 40px;
         height: 40px;
-        background: rgba(255,255,255,0.2);
+        background: rgba(255, 255, 255, 0.2);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -382,8 +386,13 @@
         flex-shrink: 0;
     }
 
-    .tree-icon.profile { background: #2c3e50; }
-    .tree-icon.resource { background: #34495e; }
+    .tree-icon.profile {
+        background: #2c3e50;
+    }
+
+    .tree-icon.resource {
+        background: #34495e;
+    }
 
     .tree-name {
         font-weight: 500;
@@ -465,36 +474,37 @@
         color: white;
         text-decoration: none;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     @media (max-width: 768px) {
         .main-layout {
             grid-template-columns: 1fr;
         }
-        
+
         .tree-header h1 {
             font-size: 2rem;
         }
-        
+
         .stats-grid {
             grid-template-columns: repeat(2, 1fr);
         }
-        
+
         .project-stats {
             grid-template-columns: repeat(2, 1fr);
         }
-        
+
         .tree-node ul {
             padding-left: 20px;
         }
     }
+
     .tree-container {
         background: #f8f9fa;
         border-radius: 10px;
         padding: 20px;
         margin: 20px 0;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
     .nav-tabs {
@@ -505,7 +515,7 @@
         background-color: #fff;
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
     }
 
     .tab-pane {
@@ -518,27 +528,149 @@
 <div class="tree-container">
     <ul class="nav nav-tabs" id="tabSelector" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="resources-tab" data-toggle="tab" href="#resources" role="tab" aria-controls="resources" aria-selected="true">Resources</a>
+            <a class="nav-link active" id="resources-tab" data-toggle="tab" href="#resources" role="tab"
+                aria-controls="resources" aria-selected="true">Resources</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="projects-tab" data-toggle="tab" href="#projects" role="tab" aria-controls="projects" aria-selected="false">Projects</a>
+            <a class="nav-link" id="projects-tab" data-toggle="tab" href="#projects" role="tab" aria-controls="projects"
+                aria-selected="false">Projects</a>
         </li>
     </ul>
 
     <div class="tab-content" id="tabContent">
         <!-- Resources Tab -->
         <div class="tab-pane fade show active" id="resources" role="tabpanel" aria-labelledby="resources-tab">
-             <div class="card-header bg-primary text-white" style="border-radius:10px;">
-          <h5 class="mb-0 p-3">Resource Tree Structure</h5>
-        </div>
-         <div class="main-layout mt-3"> <p>This is the Resources tab. Content will be added here later.</p></div>
+            <div class="card-header bg-primary text-white" style="border-radius:10px;">
+                <h5 class="mb-0 p-3">Resource Tree Structure</h5>
+            </div>
+            <div class="main-layout mt-3">
+                <!-- Left Sidebar -->
+                <div class="sidebar">
+                    <div class="sidebar-header">
+                        {% if not total_resources %}All Resources{% else %}<i class="fas fa-list"></i> All Resources ({{ total_resources }}){% endif %}
+                    </div>
+                    <div class="project-list">
+                        {% if sorted_resource_periods %}
+                        {% for period_key in sorted_resource_periods %}
+                        {% with period=resources_by_period|get_item:period_key %}
+                        <div class="period-section">
+                            <div class="period-header" onclick="togglePeriod(this)">
+                                <i class="fas fa-chevron-right toggle-icon"></i>
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ period.month_name }} {{ period.year }}
+                                <span style="margin-left: auto;" class="badge badge-light">{{ period.resources|length }}</span>
+                            </div>
+                            <div class="period-projects">
+                                {% for resource in period.resources %}
+                                <div class="project-item {% if selected_resource.id == resource.id %}active{% endif %}"
+                                    onclick="selectResource({{ resource.id }})">
+                                    <div class="project-icon"><i class="fas fa-user"></i></div>
+                                    <div class="project-name">{{ resource.resource_name }}</div>
+                                    <div class="project-type">{{ resource.get_resource_type_display|slice:":3" }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endwith %}
+                        {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <h5>No Resources Found</h5>
+                            <p>Add your first resource to get started.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Right Panel -->
+                <div class="detail-panel">
+                    {% if selected_resource %}
+                    <div class="detail-header">
+                        <div class="detail-icon"><i class="fas fa-user"></i></div>
+                        <div class="detail-title">
+                            <h2>{{ selected_resource.resource_name }}</h2>
+                            <p>{{ selected_resource.get_resource_type_display }} • {{ selected_resource.get_month_display }} {{ selected_resource.year }}</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-content">
+                        {% if selected_resource.resource_profile %}
+                        <div class="section-title"><i class="fas fa-id-badge"></i> Resource Profile</div>
+                        <div class="tree-structure">
+                            <ul class="tree-node">
+                                <li class="tree-item">
+                                    <div class="tree-content" onclick="toggleNode(this)">
+                                        <div class="tree-toggle"><i class="fas fa-plus"></i></div>
+                                        <div class="tree-icon profile"><i class="fas fa-id-badge"></i></div>
+                                        <div class="tree-name">{{ selected_resource.resource_profile.profile_name }}
+                                        </div>
+                                    </div>
+                                    <div class="tree-children">
+                                        <div class="resource-stats">
+                                            <div class="resource-stat-item">
+                                                <div class="resource-stat-value">{{
+                                                    selected_resource.resource_profile.present_day|floatformat:1 }}
+                                                </div>
+                                                <div class="resource-stat-label">Present Days</div>
+                                            </div>
+                                            <div class="resource-stat-item">
+                                                <div class="resource-stat-value">{{
+                                                    selected_resource.resource_profile.present_hours|floatformat:0 }}
+                                                </div>
+                                                <div class="resource-stat-label">Present Hours</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        {% if selected_resource.projects.all %}
+                        <div class="section-title"><i class="fas fa-project-diagram"></i> Assigned Projects ({{ selected_resource.projects.count }})</div>
+                        <div class="tree-structure">
+                            <ul class="tree-node">
+                                {% for project in selected_resource.projects.all %}
+                                <li class="tree-item">
+                                    <div class="tree-content" onclick="toggleNode(this)">
+                                        <div class="tree-toggle"><i class="fas fa-plus"></i></div>
+                                        <div class="tree-icon resource"><i class="fas fa-project-diagram"></i></div>
+                                        <div class="tree-name">{{ project.project_name }}</div>
+                                    </div>
+                                    <div class="tree-children">
+                                        <div class="resource-stats">
+                                            <div class="resource-stat-item">
+                                                <div class="resource-stat-value">{{ project.present_day|floatformat:1 }}
+                                                </div>
+                                                <div class="resource-stat-label">Present Days</div>
+                                            </div>
+                                            <div class="resource-stat-item">
+                                                <div class="resource-stat-value">{{ project.present_hours|floatformat:0 }}</div>
+                                                <div class="resource-stat-label">Present Hours</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <h5>Select a Resource</h5>
+                        <p>Choose a resource from the left sidebar to view its detailed structure.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
         <!-- Projects Tab -->
         <div class="tab-pane fade" id="projects" role="tabpanel" aria-labelledby="projects-tab">
-             <div class="card-header bg-primary text-white" style="border-radius:10px;">
-          <h5 class="mb-0 p-3">Project Tree Structure</h5>
-        </div>
+            <div class="card-header bg-primary text-white" style="border-radius:10px;">
+                <h5 class="mb-0 p-3">Project Tree Structure</h5>
+            </div>
             <div class="main-layout mt-3">
                 <!-- Left Sidebar -->
                 <div class="sidebar">
@@ -547,32 +679,33 @@
                     </div>
                     <div class="project-list">
                         {% if sorted_periods %}
-                            {% for period_key in sorted_periods %}
-                                {% with period=projects_by_period|get_item:period_key %}
-                                <div class="period-section">
-                                    <div class="period-header" onclick="togglePeriod(this)">
-                                        <i class="fas fa-chevron-right toggle-icon"></i>
-                                        <i class="fas fa-calendar-alt"></i>
-                                        {{ period.month_name }} {{ period.year }}
-                                        <span style="margin-left: auto;" class="badge badge-light">{{ period.projects|length }}</span>
-                                    </div>
-                                    <div class="period-projects">
-                                        {% for project in period.projects %}
-                                        <div class="project-item {% if selected_project.id == project.id %}active{% endif %}" onclick="selectProject({{ project.id }})">
-                                            <div class="project-icon"><i class="fas fa-project-diagram"></i></div>
-                                            <div class="project-name">{{ project.project_name }}</div>
-                                            <div class="project-type">{{ project.get_project_type_display|slice:":3" }}</div>
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                                {% endwith %}
-                            {% endfor %}
-                        {% else %}
-                            <div class="empty-state">
-                                <h5>No Projects Found</h5>
-                                <p>Create your first project to get started.</p>
+                        {% for period_key in sorted_periods %}
+                        {% with period=projects_by_period|get_item:period_key %}
+                        <div class="period-section">
+                            <div class="period-header" onclick="togglePeriod(this)">
+                                <i class="fas fa-chevron-right toggle-icon"></i>
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ period.month_name }} {{ period.year }}
+                                <span style="margin-left: auto;" class="badge badge-light badge-dark-text">{{ period.projects|length }}</span>
                             </div>
+                            <div class="period-projects">
+                                {% for project in period.projects %}
+                                <div class="project-item {% if selected_project.id == project.id %}active{% endif %}"
+                                    onclick="selectProject({{ project.id }})">
+                                    <div class="project-icon"><i class="fas fa-project-diagram"></i></div>
+                                    <div class="project-name">{{ project.project_name }}</div>
+                                    <div class="project-type">{{ project.get_project_type_display|slice:":3" }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endwith %}
+                        {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <h5>No Projects Found</h5>
+                            <p>Create your first project to get started.</p>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
@@ -580,76 +713,78 @@
                 <!-- Right Panel -->
                 <div class="detail-panel">
                     {% if selected_project %}
-                        <div class="detail-header">
-                            <div class="detail-icon"><i class="fas fa-project-diagram"></i></div>
-                            <div class="detail-title">
-                                <h2>{{ selected_project.project_name }}</h2>
-                                <p>{{ selected_project.get_project_type_display }} • {{ selected_project.get_month_display }} {{ selected_project.year }}</p>
-                            </div>
+                    <div class="detail-header">
+                        <div class="detail-icon"><i class="fas fa-project-diagram"></i></div>
+                        <div class="detail-title">
+                            <h2>{{ selected_project.project_name }}</h2>
+                            <p>{{ selected_project.get_project_type_display }} • {{ selected_project.get_month_display }} {{ selected_project.year }}</p>
                         </div>
+                    </div>
 
-                        <div class="detail-content">
-                            {% if selected_project.project_profile %}
-                            <div class="section-title"><i class="fas fa-user-tie"></i> Project Profile</div>
-                            <div class="tree-structure">
-                                <ul class="tree-node">
-                                    <li class="tree-item">
-                                        <div class="tree-content" onclick="toggleNode(this)">
-                                            <div class="tree-toggle"><i class="fas fa-plus"></i></div>
-                                            <div class="tree-icon profile"><i class="fas fa-user-tie"></i></div>
-                                            <div class="tree-name">{{ selected_project.project_profile.resource_name }}</div>
+                    <div class="detail-content">
+                        {% if selected_project.project_profile %}
+                        <div class="section-title"><i class="fas fa-user-tie"></i> Project Profile</div>
+                        <div class="tree-structure">
+                            <ul class="tree-node">
+                                <li class="tree-item">
+                                    <div class="tree-content" onclick="toggleNode(this)">
+                                        <div class="tree-toggle"><i class="fas fa-plus"></i></div>
+                                        <div class="tree-icon profile"><i class="fas fa-user-tie"></i></div>
+                                        <div class="tree-name">{{ selected_project.project_profile.resource_name }}
                                         </div>
-                                        <div class="tree-children">
-                                            <div class="resource-stats">
-                                                <div class="resource-stat-item">
-                                                    <div class="resource-stat-value">{{ selected_project.project_profile.present_day|floatformat:1 }}</div>
-                                                    <div class="resource-stat-label">Present Days</div>
+                                    </div>
+                                    <div class="tree-children">
+                                        <div class="resource-stats">
+                                            <div class="resource-stat-item">
+                                                <div class="resource-stat-value">{{ selected_project.project_profile.present_day|floatformat:1 }}</div>
+                                                <div class="resource-stat-label">Present Days</div>
+                                            </div>
+                                            <div class="resource-stat-item">
+                                                <div class="resource-stat-value">{{ selected_project.project_profile.present_hours|floatformat:0 }}
                                                 </div>
-                                                <div class="resource-stat-item">
-                                                    <div class="resource-stat-value">{{ selected_project.project_profile.present_hours|floatformat:0 }}</div>
-                                                    <div class="resource-stat-label">Present Hours</div>
-                                                </div>
+                                                <div class="resource-stat-label">Present Hours</div>
                                             </div>
                                         </div>
-                                    </li>
-                                </ul>
-                            </div>
-                            {% endif %}
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        {% endif %}
 
-                            {% if selected_project.resources.all %}
-                            <div class="section-title"><i class="fas fa-users"></i> Assigned Resources ({{ selected_project.resources.count }})</div>
-                            <div class="tree-structure">
-                                <ul class="tree-node">
-                                    {% for resource in selected_project.resources.all %}
-                                    <li class="tree-item">
-                                        <div class="tree-content" onclick="toggleNode(this)">
-                                            <div class="tree-toggle"><i class="fas fa-plus"></i></div>
-                                            <div class="tree-icon resource"><i class="fas fa-user"></i></div>
-                                            <div class="tree-name">{{ resource.resource_name }}</div>
-                                        </div>
-                                        <div class="tree-children">
-                                            <div class="resource-stats">
-                                                <div class="resource-stat-item">
-                                                    <div class="resource-stat-value">{{ resource.present_day|floatformat:1 }}</div>
-                                                    <div class="resource-stat-label">Present Days</div>
-                                                </div>
-                                                <div class="resource-stat-item">
-                                                    <div class="resource-stat-value">{{ resource.present_hours|floatformat:0 }}</div>
-                                                    <div class="resource-stat-label">Present Hours</div>
-                                                </div>
+                        {% if selected_project.resources.all %}
+                        <div class="section-title"><i class="fas fa-users"></i> Assigned Resources ({{ selected_project.resources.count }})</div>
+                        <div class="tree-structure">
+                            <ul class="tree-node">
+                                {% for resource in selected_project.resources.all %}
+                                <li class="tree-item">
+                                    <div class="tree-content" onclick="toggleNode(this)">
+                                        <div class="tree-toggle"><i class="fas fa-plus"></i></div>
+                                        <div class="tree-icon resource"><i class="fas fa-user"></i></div>
+                                        <div class="tree-name">{{ resource.resource_name }}</div>
+                                    </div>
+                                    <div class="tree-children">
+                                        <div class="resource-stats">
+                                            <div class="resource-stat-item">
+                                                <div class="resource-stat-value">{{ resource.present_day|floatformat:1 }}</div>
+                                                <div class="resource-stat-label">Present Days</div>
+                                            </div>
+                                            <div class="resource-stat-item">
+                                                <div class="resource-stat-value">{{ resource.present_hours|floatformat:0 }}</div>
+                                                <div class="resource-stat-label">Present Hours</div>
                                             </div>
                                         </div>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            {% endif %}
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
                         </div>
+                        {% endif %}
+                    </div>
                     {% else %}
-                        <div class="empty-state">
-                            <h5>Select a Project</h5>
-                            <p>Choose a project from the left sidebar to view its detailed structure.</p>
-                        </div>
+                    <div class="empty-state">
+                        <h5>Select a Project</h5>
+                        <p>Choose a project from the left sidebar to view its detailed structure.</p>
+                    </div>
                     {% endif %}
                 </div>
             </div>
