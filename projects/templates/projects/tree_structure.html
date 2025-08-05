@@ -104,8 +104,7 @@
     .badge-dark-text {
         color: black !important;
     }
-
-
+    
     .sidebar-header {
         background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
         color: white;
@@ -562,11 +561,10 @@
                             </div>
                             <div class="period-projects">
                                 {% for resource in period.resources %}
-                                <div class="project-item {% if selected_resource.id == resource.id %}active{% endif %}"
-                                    onclick="selectResource({{ resource.id }})">
+                                <div class="project-item {% if selected_resource.id == resource.id %}active{% endif %}" onclick="selectResource('{{ resource.id }}')">
                                     <div class="project-icon"><i class="fas fa-user"></i></div>
                                     <div class="project-name">{{ resource.resource_name }}</div>
-                                    <div class="project-type">{{ resource.get_resource_type_display|slice:":3" }}</div>
+                                    <!-- <div class="project-type">{{ resource.get_resource_type_display|slice:":3" }}</div> -->
                                 </div>
                                 {% endfor %}
                             </div>
@@ -690,8 +688,7 @@
                             </div>
                             <div class="period-projects">
                                 {% for project in period.projects %}
-                                <div class="project-item {% if selected_project.id == project.id %}active{% endif %}"
-                                    onclick="selectProject({{ project.id }})">
+                                <div class="project-item {% if selected_project.id == project.id %}active{% endif %}" onclick="selectProject('{{ project.id }}')">
                                     <div class="project-icon"><i class="fas fa-project-diagram"></i></div>
                                     <div class="project-name">{{ project.project_name }}</div>
                                     <div class="project-type">{{ project.get_project_type_display|slice:":3" }}</div>
@@ -823,6 +820,7 @@
     function selectProject(projectId) {
         const url = new URL(window.location);
         url.searchParams.set('project', projectId);
+        url.searchParams.set('tab', 'projects');
         window.location.href = url;
     }
 </script>
