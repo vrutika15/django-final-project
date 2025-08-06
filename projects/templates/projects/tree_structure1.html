@@ -100,12 +100,12 @@
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         overflow: hidden;
-       
+        
     }
     .badge-dark-text {
         color: black !important;
     }
-   
+    
     .sidebar-header {
         background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
         color: white;
@@ -251,7 +251,7 @@
     }
 
     .detail-content {
-        padding: 0px 20px
+        padding-left: 20px;
     }
 
     .project-stats {
@@ -405,9 +405,9 @@
     }
 
     .tree-children {
-        max-height: 0;
+       /** max-height: 0;
         overflow: hidden;
-        transition: max-height 0.3s ease;
+        transition: max-height 0.3s ease;**/
     }
 
     .tree-children.expanded {
@@ -564,7 +564,8 @@
                                 <div class="project-item {% if selected_resource.id == resource.id %}active{% endif %}" onclick="selectResource('{{ resource.id }}')">
                                     <div class="project-icon"><i class="fas fa-user"></i></div>
                                     <div class="project-name">{{ resource.resource_name }}</div>
-                             </div>
+                                    <!-- <div class="project-type">{{ resource.get_resource_type_display|slice:":3" }}</div> -->
+                                </div>
                                 {% endfor %}
                             </div>
                         </div>
@@ -579,137 +580,126 @@
                     </div>
                 </div>
 
+               
                 <!-- Right Panel -->
-                <div class="detail-panel" id="resource-detail-panel">
-                    {% if selected_resource %}
-                    <div class="detail-header">
-                        <div class="detail-icon"><i class="fas fa-user"></i></div>
-                        <div class="detail-title">
-                            <h2>{{ selected_resource.resource_name }}</h2>
-                            <p>{{ selected_resource.get_month_display }} • {{ selected_resource.year }}</p>
-                        </div>
-                    </div>
-
-                    <div class="detail-content">
-                        {% if selected_resource.project_name %}
-                        <div class="section-title"><i class="fas fa-id-badge"></i> Resource Profile</div>
-                        <div class="tree-structure">
-                            <ul class="tree-node">
-                                <li class="tree-item">
-                                    <div class="tree-content" onclick="toggleNode(this)">
-                                        <div class="tree-toggle"><i class="fas fa-plus"></i></div>
-                                        <div class="tree-icon profile"><i class="fas fa-id-badge"></i></div>
-                                        <div class="tree-name">{{ selected_resource.resource_profile.profile_name }}
-                                        </div>
-                                    </div>
-                                    <div class="tree-children">
-                                        <div class="resource-stats">
-                                            <div class="resource-stat-item">
-                                                <div class="resource-stat-value">{{
-                                                    selected_resource.resource_profile.present_day|floatformat:1 }}
-                                                </div>
-                                                <div class="resource-stat-label">Present Days</div>
-                                            </div>
-                                            <div class="resource-stat-item">
-                                                <div class="resource-stat-value">{{
-                                                    selected_resource.resource_profile.present_hours|floatformat:0 }}
-                                                </div>
-                                                <div class="resource-stat-label">Present Hours</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                        {% endif %}
-
-                        {% if selected_resource.assigned_projects.all %}
-                        <div class="section-title"><i class="fas fa-project-diagram"></i> Assigned Projects ({{ selected_resource.assigned_projects.count }})</div>
-                        <div class="tree-structure">
-                            <ul class="tree-node">
-                               <!-- {% for project in selected_resource.projects.all %}
-                                <li class="tree-item">
-                                    <div class="tree-content" onclick="toggleNode(this)">
-                                        <div class="tree-toggle"><i class="fas fa-plus"></i></div>
-                                        <div class="tree-icon resource"><i class="fas fa-project-diagram"></i></div>
-                                        <div class="tree-name">{{ project.project_name }}</div>
-                                    </div>
-                                    <div class="tree-children">
-                                        <div class="resource-stats">
-                                            <div class="resource-stat-item">
-                                                <div class="resource-stat-value">{{ project.present_day|floatformat:1 }}
-                                                </div>
-                                                <div class="resource-stat-label">Present Days</div>
-                                            </div>
-                                            <div class="resource-stat-item">
-                                                <div class="resource-stat-value">{{ project.present_hours|floatformat:0 }}</div>
-                                                <div class="resource-stat-label">Present Hours</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                {% endfor %}-->
-                                {% for project in selected_resource.assigned_projects.all %}
-<li class="tree-item">
-  <div class="tree-content" onclick="toggleNode(this)">
-    <div class="tree-toggle"><i class="fas fa-plus"></i></div>
-    <div class="tree-icon resource"><i class="fas fa-project-diagram"></i></div>
-    <div class="tree-name">{{ project.project_name }}</div>
-  </div>
-  <div class="tree-children">
-    <div class="resource-stats">
-        <div class="resource-stat-item">
-            <div class="resource-stat-value">{{ project.present_day|floatformat:1 }}</div>
-                    <div class="resource-stat-label">Present Days</div>
+<div class="detail-panel" id="resource-detail-panel">
+    {% if selected_resource %}
+    <div class="detail-header">
+        <div class="detail-icon"><i class="fas fa-user"></i></div>
+        <div class="detail-title">
+            <h2>{{ selected_resource.resource_name }}</h2>
+            <p>{{ selected_resource.get_month_display }} • {{ selected_resource.year }}</p>
         </div>
-       <!-- <div class="resource-stat-item">
-            <div class="resource-stat-value">{{ project.present_hours|floatformat:0 }}</div>
-            <div class="resource-stat-label">Present Hours</div>
-        </div>-->
     </div>
 
-    <!-- Project Profile -->
-   {% if project.project_profile.all %}
-  <div class="section-title"><i class="fas fa-id-badge"></i> Project Profile</div>
-  <div class="resource-stats">
-    {% for profile_resource in project.project_profile.all %}
-      <div class="resource-stat-item">
-        <div class="resource-stat-value">{{ profile_resource.resource_name }}</div>
-        <div class="resource-stat-label">Profile</div>
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
-
-
-    <!-- Resources working in this project -->
-    <div class="section-title"><i class="fas fa-users"></i> Resources in Project</div>
-    <div class="resource-stats">
-      {% for res in project.resources.all %}
-      <div class="resource-stat-item">
-        <div class="resource-stat-value">{{ res.resource_name }}</div>
-        <div class="resource-stat-label">{{ res.get_resource_type_display }}</div>
-      </div>
-      {% endfor %}
-    </div>
-
-  </div>
-</li>
-{% endfor %}
-
-                            </ul>
+    <div class="detail-content">
+        <!-- Resource Profile Section (Optional block) -->
+        {% if selected_resource.project_name %}
+        <div class="section-title"><i class="fas fa-id-badge"></i> Resource Profile</div>
+        <div class="tree-structure">
+            <ul class="tree-node">
+                <li class="tree-item">
+                    <div class="tree-content" onclick="toggleNode(this)">
+                        <div class="tree-toggle"><i class="fas fa-plus"></i></div>
+                        <div class="tree-icon profile"><i class="fas fa-id-badge"></i></div>
+                        <div class="tree-name">{{ selected_resource.resource_profile.profile_name }}</div>
+                    </div>
+                    <div class="tree-children">
+                        <div class="resource-stats">
+                            <div class="resource-stat-item">
+                                <div class="resource-stat-value">{{ selected_resource.resource_profile.present_day|floatformat:1 }}</div>
+                                <div class="resource-stat-label">Present Days</div>
+                            </div>
+                            <div class="resource-stat-item">
+                                <div class="resource-stat-value">{{ selected_resource.resource_profile.present_hours|floatformat:0 }}</div>
+                                <div class="resource-stat-label">Present Hours</div>
+                            </div>
                         </div>
-                        {% endif %}
                     </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <h5>Select a Resource</h5>
-                        <p>Choose a resource from the left sidebar to view its detailed structure.</p>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Assigned Projects Section -->
+        {% if selected_resource.assigned_projects.exists %}
+        <div class="section-title"><i class="fas fa-project-diagram"></i> Assigned Projects ({{ selected_resource.assigned_projects.count }})</div>
+        <div class="tree-structure">
+            <ul class="tree-node">
+                {% for project in selected_resource.assigned_projects.all %}
+                <li class="tree-item">
+                    <div class="tree-content" onclick="toggleNode(this)">
+                        <div class="tree-toggle"><i class="fas fa-plus"></i></div>
+                        <div class="tree-icon resource"><i class="fas fa-project-diagram"></i></div>
+                        <div class="tree-name">{{ project.project_name }}</div>
                     </div>
-                    {% endif %}
+                    <div class="tree-children">
+                        <div class="resource-stats">
+                            <div class="resource-stat-item">
+                                <div class="resource-stat-value">{{ project.present_day|floatformat:1 }}</div>
+                                <div class="resource-stat-label">Present Days</div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Project Profiles Section -->
+        {% with has_profiles=False %}
+        {% for project in selected_resource.assigned_projects.all %}
+            {% if project.project_profile.exists %}
+                {% if not has_profiles %}
+                <div class="section-title"><i class="fas fa-id-badge"></i> Project Profiles</div>
+                <div class="resource-stats">
+                {% endif %}
+                {% for profile in project.project_profile.all %}
+                <div class="resource-stat-item">
+                    <div class="resource-stat-value">{{ profile.resource_name }}</div>
+                    <div class="resource-stat-label">Present: {{ profile.present_day|floatformat:1 }} Days / {{ profile.present_hours|floatformat:0 }} Hrs</div>
                 </div>
-            </div>
+                {% endfor %}
+                {% with has_profiles=True %}
+                {% endwith %}
+            {% endif %}
+        {% endfor %}
+        {% if has_profiles %}
         </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Resources in Project Section -->
+        {% with has_team=False %}
+        {% for project in selected_resource.assigned_projects.all %}
+            {% if project.resources.exists %}
+                {% if not has_team %}
+                <div class="section-title"><i class="fas fa-users"></i> Resources in Project</div>
+                <div class="resource-stats">
+                {% endif %}
+                {% for res in project.resources.all %}
+                <div class="resource-stat-item">
+                    <div class="resource-stat-value">{{ res.resource_name }}</div>
+                    <div class="resource-stat-label">{{ res.get_month_display }} {{ res.year }}</div>
+                </div>
+                {% endfor %}
+                {% with has_team=True %}
+                {% endwith %}
+            {% endif %}
+        {% endfor %}
+        {% if has_team %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h5>Select a Resource</h5>
+        <p>Choose a resource from the left sidebar to view its detailed structure.</p>
+    </div>
+    {% endif %}
+</div>
 
         <!-- Projects Tab -->
         <div class="tab-pane fade" id="projects" role="tabpanel" aria-labelledby="projects-tab">
@@ -788,12 +778,13 @@
                                 <div class="resource-stat-label">Present Hours</div>
                             </div>
                         </div>
-                    </div>
+                    </div> 
                 </li>
             {% endfor %}
         </ul>
     </div>
 {% endif %}
+
 
                         {% if selected_project.resources.all %}
                         <div class="section-title"><i class="fas fa-users"></i> Assigned Resources ({{ selected_project.resources.count }})</div>
@@ -929,7 +920,7 @@
         });
 }
 
-    /**function selectResource(resourceId) {
+    function selectResource(resourceId) {
     const url = new URL(window.location.origin + window.location.pathname);
     url.searchParams.set('resource', resourceId);
 
@@ -945,38 +936,7 @@
             document.querySelectorAll('.project-item').forEach(item => item.classList.remove('active'));
             document.querySelector(`.project-item[onclick="selectResource('${resourceId}')"]`)?.classList.add('active');
         });
-}**/
-
-/**function selectResource(resourceId) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('resource', resourceId);
-    url.searchParams.set('tab', 'resources'); // maintain tab
-
-    window.location.href = url;  // Full reload with new resource
-}**/
-
-function selectResource(resourceId) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('resource', resourceId);
-    url.searchParams.set('tab', 'resources');
-
-    fetch(url)
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-
-            // Update right panel
-            const newDetail = doc.querySelector('#resource-detail-panel');
-            document.querySelector('#resource-detail-panel').innerHTML = newDetail.innerHTML;
-
-            // Update left panel active highlight
-            document.querySelectorAll('.project-item').forEach(item => item.classList.remove('active'));
-            document.querySelector(`.project-item[onclick="selectResource('${resourceId}')"]`)?.classList.add('active');
-        });
 }
-
 
 </script>
 {% endblock %}
-
