@@ -135,6 +135,7 @@
                             <th>Project Name</th>
                             <th>Type</th>
                             <th>Resources</th>
+                            <th>Extra Hours</th>
                             <th>Present Days</th>
                             <th>Billable Days</th>
                             <th>Non-Billable Days</th>
@@ -154,6 +155,7 @@
                                 {{ resource.resource_name }}{% if not forloop.last %}, {% endif %}
                               {% endfor %}
                             </td>
+                            <td>{{ project.extra_hours }}</td>
                              <td>{{ project.present_day }}</td>
                             <td>{{ project.billable_days }}</td>
                             <td>{{ project.non_billable_days }}</td>
@@ -166,7 +168,7 @@
                     </tbody>
                     <tfoot>
                 <tr class="table-secondary fw-bold">
-                  <td colspan="3">Total</td>
+                  <td colspan="4">Total</td>
                   <td>{{ total_present_days }}</td>
                   <td>{{ total_billable_days }}</td>
                   <td>{{ total_non_billable_days }}</td>
