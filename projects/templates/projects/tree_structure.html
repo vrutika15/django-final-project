@@ -100,6 +100,7 @@
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         overflow: hidden;
+        
     }
     .badge-dark-text {
         color: black !important;
@@ -116,10 +117,7 @@
         gap: 10px;
     }
 
-    .project-list {
-        max-height: 500px;
-        overflow-y: auto;
-    }
+
 
     .period-section {
         border-bottom: 1px solid #e9ecef;
@@ -151,13 +149,14 @@
     }
 
     .period-projects {
-        max-height: 0;
-        overflow: hidden;
         transition: max-height 0.3s ease;
+        max-height: 500px;
+        overflow:auto;
     }
 
     .period-projects.expanded {
         max-height: 500px;
+        overflow:auto;
     }
 
     .project-item {
@@ -406,9 +405,9 @@
     }
 
     .tree-children {
-        max-height: 0;
+       /** max-height: 0;
         overflow: hidden;
-        transition: max-height 0.3s ease;
+        transition: max-height 0.3s ease;**/
     }
 
     .tree-children.expanded {
@@ -420,12 +419,12 @@
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         gap: 10px;
         margin-top: 10px;
-        padding-left: 34px;
+        padding-left: 30px;
     }
 
     .resource-stat-item {
         background: #f8f9fa;
-        padding: 8px;
+        padding: 5px;
         border-radius: 6px;
         text-align: center;
         border-left: 3px solid #2c3e50;
@@ -558,7 +557,7 @@
                                 <i class="fas fa-chevron-right toggle-icon"></i>
                                 <i class="fas fa-calendar-alt"></i>
                                 {{ period.month_name }} {{ period.year }}
-                                <span style="margin-left: auto;" class="badge badge-light">{{ period.resources|length }}</span>
+                                <span style="margin-left: auto;" class="badge badge-light badge-dark-text">{{ period.resources|length }}</span>
                             </div>
                             <div class="period-projects">
                                 {% for resource in period.resources %}
@@ -582,18 +581,18 @@
                 </div>
 
                 <!-- Right Panel -->
-                <div class="detail-panel">
+                <div class="detail-panel" id="resource-detail-panel">
                     {% if selected_resource %}
                     <div class="detail-header">
                         <div class="detail-icon"><i class="fas fa-user"></i></div>
                         <div class="detail-title">
                             <h2>{{ selected_resource.resource_name }}</h2>
-                            <p>{{ selected_resource.get_resource_type_display }} • {{ selected_resource.get_month_display }} {{ selected_resource.year }}</p>
+                            <p>{{ selected_resource.get_month_display }} • {{ selected_resource.year }}</p>
                         </div>
                     </div>
 
                     <div class="detail-content">
-                        {% if selected_resource.resource_profile %}
+                        {% if selected_resource.project_name %}
                         <div class="section-title"><i class="fas fa-id-badge"></i> Resource Profile</div>
                         <div class="tree-structure">
                             <ul class="tree-node">
@@ -625,11 +624,11 @@
                         </div>
                         {% endif %}
 
-                        {% if selected_resource.projects.all %}
-                        <div class="section-title"><i class="fas fa-project-diagram"></i> Assigned Projects ({{ selected_resource.projects.count }})</div>
+                        {% if selected_resource.assigned_projects.all %}
+                        <div class="section-title"><i class="fas fa-project-diagram"></i> Assigned Projects ({{ selected_resource.assigned_projects.count }})</div>
                         <div class="tree-structure">
                             <ul class="tree-node">
-                                {% for project in selected_resource.projects.all %}
+                               <!-- {% for project in selected_resource.projects.all %}
                                 <li class="tree-item">
                                     <div class="tree-content" onclick="toggleNode(this)">
                                         <div class="tree-toggle"><i class="fas fa-plus"></i></div>
@@ -650,7 +649,52 @@
                                         </div>
                                     </div>
                                 </li>
-                                {% endfor %}
+                                {% endfor %}-->
+                                {% for project in selected_resource.assigned_projects.all %}
+<li class="tree-item">
+  <div class="tree-content" onclick="toggleNode(this)">
+    <div class="tree-toggle"><i class="fas fa-plus"></i></div>
+    <div class="tree-icon resource"><i class="fas fa-project-diagram"></i></div>
+    <div class="tree-name">{{ project.project_name }}</div>
+  </div>
+  <div class="tree-children">
+    <div class="resource-stats">
+        <div class="resource-stat-item">
+            <div class="resource-stat-value">{{ project.present_day|floatformat:1 }}</div>
+                    <div class="resource-stat-label">Present Days</div>
+        </div>
+       <!-- <div class="resource-stat-item">
+            <div class="resource-stat-value">{{ project.present_hours|floatformat:0 }}</div>
+            <div class="resource-stat-label">Present Hours</div>
+        </div>-->
+    </div>
+
+    <!-- Project Profile -->
+    {% if project.project_profile %}
+    <div class="section-title"><i class="fas fa-id-badge"></i> Project Profile</div>
+    <div class="resource-stats">
+      <div class="resource-stat-item">
+        <div class="resource-stat-value">{{ project.project_profile.profile_name }}</div>
+        <div class="resource-stat-label">Profile</div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Resources working in this project -->
+    <div class="section-title"><i class="fas fa-users"></i> Resources in Project</div>
+    <div class="resource-stats">
+      {% for res in project.resources.all %}
+      <div class="resource-stat-item">
+        <div class="resource-stat-value">{{ res.resource_name }}</div>
+        <div class="resource-stat-label">{{ res.get_resource_type_display }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</li>
+{% endfor %}
+
                             </ul>
                         </div>
                         {% endif %}
@@ -709,7 +753,7 @@
                 </div>
 
                 <!-- Right Panel -->
-                <div class="detail-panel">
+                <div class="detail-panel" id="project-detail-panel">
                     {% if selected_project %}
                     <div class="detail-header">
                         <div class="detail-icon"><i class="fas fa-project-diagram"></i></div>
@@ -792,7 +836,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
+<!--<script>
     // Enable Bootstrap tab functionality if not already
     document.addEventListener('DOMContentLoaded', function () {
         $('#tabSelector a').click(function (e) {
@@ -824,5 +868,83 @@
         url.searchParams.set('tab', 'projects');
         window.location.href = url;
     }
+</script>-->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle tab activation from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const tab = urlParams.get('tab');
+
+        if (tab === 'projects') {
+            $('#projects-tab').tab('show');
+        } else {
+            $('#resources-tab').tab('show'); // default
+        }
+
+        // Allow tab switching via click
+        $('#tabSelector a').click(function (e) {
+            e.preventDefault();
+            const clickedTab = $(this).attr('href').substring(1);
+            const url = new URL(window.location);
+            url.searchParams.set('tab', clickedTab);
+            window.location.href = url;
+        });
+
+        const firstPeriod = document.querySelector('.period-header');
+        if (firstPeriod) firstPeriod.click();
+    });
+
+    function togglePeriod(header) {
+        const projects = header.nextElementSibling;
+        header.classList.toggle('expanded');
+        projects.classList.toggle('expanded');
+    }
+
+    function toggleNode(button) {
+        const children = button.closest('.tree-item').querySelector('.tree-children');
+        const toggle = button.querySelector('.tree-toggle');
+        children.classList.toggle('expanded');
+        toggle.classList.toggle('expanded');
+        toggle.innerHTML = children.classList.contains('expanded') ? '<i class="fas fa-minus"></i>' : '<i class="fas fa-plus"></i>';
+    }
+
+    function selectProject(projectId) {
+    const url = new URL(window.location.origin + window.location.pathname);
+    url.searchParams.set('project', projectId);
+
+    fetch(url)
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newDetail = doc.querySelector('#project-detail-panel');
+            document.querySelector('#project-detail-panel').innerHTML = newDetail.innerHTML;
+
+            // Update active sidebar item
+            document.querySelectorAll('.project-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`.project-item[onclick="selectProject('${projectId}')"]`)?.classList.add('active');
+        });
+}
+
+
+    function selectResource(resourceId) {
+    const url = new URL(window.location.origin + window.location.pathname);
+    url.searchParams.set('resource', resourceId);
+
+    fetch(url)
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newDetail = doc.querySelector('#resource-detail-panel');
+            document.querySelector('#resource-detail-panel').innerHTML = newDetail.innerHTML;
+
+            // Update active sidebar item
+            document.querySelectorAll('.project-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`.project-item[onclick="selectResource('${resourceId}')"]`)?.classList.add('active');
+        });
+}
+
 </script>
 {% endblock %}
