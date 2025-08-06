@@ -4,7 +4,7 @@ from datetime import datetime
 from .models import Project
 from .forms import ProjectForm
 from resources.models import Resource
-from django.db.models import ProtectedError
+from django.db.models import ProtectedError,Prefetch
 from django.contrib import messages
 
 
@@ -247,7 +247,9 @@ def tree_structure_view(request):
 
     if selected_resource_id:
         try:
-            selected_resource = Resource.objects.get(id=selected_resource_id, is_active=True)
+             selected_resource = Resource.objects.prefetch_related(
+            Prefetch('assigned_projects', queryset=Project.objects.select_related('project_profile').prefetch_related('resources'))
+        ).get(id=selected_resource_id, is_active=True)
         except Resource.DoesNotExist:
             selected_resource = None
 
@@ -294,7 +296,6 @@ def tree_structure_view(request):
         'total_billable_hours': total_billable_hours,
         'total_non_billable_hours': total_non_billable_hours,
         'total_hours': total_hours,
-        'utilization_percentage': (total_billable_hours / total_hours * 100) if total_hours > 0 else 0,
     }
     
     return render(request, 'projects/tree_structure.html', context)  
