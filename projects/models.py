@@ -33,12 +33,11 @@ class Project(models.Model):
         help_text="Enter the month for this project report (1–12)"
     )
 
-    #project profile which only has one resource
-    project_profile = models.ForeignKey(
+    #project profile which can be selected multiple
+    project_profile = models.ManyToManyField(
         Resource,
-        on_delete=models.PROTECT,
         related_name='profiled_projects',
-        help_text="Main profile/resource for this project"
+        help_text="Main profiles/resources for this project"
     )
 
     resources = models.ManyToManyField(
@@ -75,6 +74,13 @@ class Project(models.Model):
         default=0,
         editable=False,
         help_text="Auto-calculated from non_billable_days × 8"
+    )   
+
+    extra_hours = models.FloatField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
+        help_text="Any additional hours (optional)"
     )
 
     is_active = models.BooleanField(default=True, help_text="For soft deletion")
@@ -89,7 +95,7 @@ class Project(models.Model):
 
     @property
     def total_hours(self):
-        return self.billable_hours + self.non_billable_hours
+        return self.billable_hours + self.non_billable_hours + self.extra_hours
 
     @property
     def total_days(self):

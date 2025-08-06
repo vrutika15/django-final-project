@@ -9,7 +9,7 @@ class ProjectForm(forms.ModelForm):
         # Exclude auto-calculated and system fields
         fields = [
             'project_name', 'project_type', 'year', 'month', 'project_profile', 'resources',
-            'present_day', 'billable_days', 'non_billable_days', 'is_active'
+            'present_day', 'billable_days', 'non_billable_days', 'extra_hours', 'is_active'
         ]
         widgets = {
             'project_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -17,11 +17,12 @@ class ProjectForm(forms.ModelForm):
             'year': forms.NumberInput(attrs={
                 'class': 'form-control', 'min': 2000, 'max': 2100, 'placeholder': 'Year (e.g. 2025)'}),
             'month': forms.Select(attrs={'class': 'form-select'}),
-            'project_profile': forms.Select(attrs={'class': 'form-select'}),
+            'project_profile': forms.SelectMultiple(attrs={'class': 'form-select'}),
             'resources': forms.SelectMultiple(attrs={'class': 'form-select'}),
             'present_day': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
             'billable_days': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
             'non_billable_days': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
+            'extra_hours': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         labels = {
@@ -30,7 +31,8 @@ class ProjectForm(forms.ModelForm):
             'present_day': 'Days Present',
             'billable_days': 'Billable Days',
             'non_billable_days': 'Non-Billable Days',
-            'project_profile': 'Project Profile',
+            'extra_hours': 'Extra Hours',
+            'project_profile': 'Project Profile(s)',
             'resources': 'Assigned Resources',
             'is_active': 'Active?',
         }
@@ -69,10 +71,12 @@ class ProjectForm(forms.ModelForm):
 
     #func if the inactive project profile is selected
     def clean_project_profile(self):
-        project_profile = self.cleaned_data.get('project_profile')
-        if project_profile and not project_profile.is_active:
-            raise forms.ValidationError("Selected project profile resource is inactive.")
-        return project_profile
+        profiles = self.cleaned_data.get('project_profile')
+        if profiles:
+            inactive_profiles = profiles.filter(is_active=False)
+            if inactive_profiles.exists():
+                raise forms.ValidationError("One or more selected project profiles are inactive.")
+        return profiles
     
     #func if inactive resources are selected
     def clean_resources(self):
