@@ -34,10 +34,11 @@ class Project(models.Model):
     )
 
     #project profile which can be selected multiple
-    project_profile = models.ManyToManyField(
+    project_profile = models.ForeignKey(
         Resource,
+        on_delete=models.PROTECT,
         related_name='profiled_projects',
-        help_text="Main profiles/resources for this project"
+        help_text="Main profile/resource for this project"
     )
 
     resources = models.ManyToManyField(
@@ -79,6 +80,7 @@ class Project(models.Model):
     extra_hours = models.FloatField(
         null=True,
         blank=True,
+        default=0,
         validators=[MinValueValidator(0)],
         help_text="Any additional hours (optional)"
     )
