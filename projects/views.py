@@ -247,9 +247,16 @@ def tree_structure_view(request):
 
     if selected_resource_id:
         try:
-             selected_resource = Resource.objects.prefetch_related(
+             """selected_resource = Resource.objects.prefetch_related(
             Prefetch('assigned_projects', queryset=Project.objects.select_related('project_profile').prefetch_related('resources'))
-        ).get(id=selected_resource_id, is_active=True)
+        ).get(id=selected_resource_id, is_active=True)"""
+             selected_resource = Resource.objects.prefetch_related(
+    Prefetch(
+        'assigned_projects',
+        queryset=Project.objects.prefetch_related('project_profile', 'resources')
+    )
+).get(id=selected_resource_id, is_active=True)
+
         except Resource.DoesNotExist:
             selected_resource = None
 
