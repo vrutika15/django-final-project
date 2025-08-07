@@ -83,7 +83,7 @@ def dashboard_home(request):
         total_billable_hours = sum(p.billable_hours for p in projects)
         total_non_billable_hours = sum(p.non_billable_hours for p in projects)
 
-    if tab == 'resourcesmanagement': 
+    if tab == 'resourcesmanagement':
         for resource in resources:
             poc_projects = resource.poc_projects.all()
             assigned_projects = resource.assigned_projects.all()
@@ -94,8 +94,10 @@ def dashboard_home(request):
             total_dev_count = 0
 
             for project in all_projects:
-                total_poc_count += project.poc.count()
-                total_dev_count += project.resources.count()
+                if resource in project.poc.all():
+                    total_poc_count += 1
+                if resource in project.resources.all():
+                    total_dev_count += 1
 
             if total_poc_count >= 5 and total_dev_count == 0:
                 status = "Highly packed"
@@ -121,6 +123,10 @@ def dashboard_home(request):
             'status': status
             })
 
+     #dashboard card
+    resource_count = Resource.objects.filter(is_active=True,year=year, month=month).values('resource_name').count()
+    project_count = Project.objects.filter(is_active=True,year=year, month=month).values('project_name').count()
+    
     return render(request, 'home.html', {
         'years': years,
         'months': months,
@@ -141,7 +147,9 @@ def dashboard_home(request):
         'total_non_billable_days': total_non_billable_days,
         'total_billable_hours': total_billable_hours,
         'total_non_billable_hours': total_non_billable_hours,
-        'resource_status' : resource_status
+        'resource_status' : resource_status,
+        'resource_count': resource_count,
+        'project_count': project_count
     })
 
 def project_list(request):

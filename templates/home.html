@@ -48,6 +48,36 @@
     font-weight: 600;
     margin-bottom: 10px;
   }
+
+  .dashboard-card {
+  min-width: 220px;
+  flex: 1 1 220px;
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card h5 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  color: #495057;
+}
+
+.card-value {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #0d6efd; /* Bootstrap primary color */
+}
+
 </style>
 
 <div class="container-fluid">
@@ -59,7 +89,18 @@
             </a>
         </div>
     </div> -->
-    
+    <!--dashboard cards-->
+    <div class="d-flex justify-content-around flex-wrap gap-3 mt-4">
+  <div class="dashboard-card">
+    <h5>Total Number of Resources</h5>
+    <p class="card-value">{{ resource_count }}</p>
+  </div>
+  <div class="dashboard-card">
+    <h5>Total Number of Projects</h5>
+    <p class="card-value">{{ project_count }}</p>
+  </div>
+</div>
+
     <!-- Top Tabs: Projects, Resources, Charts -->
     <ul class="nav nav-tabs mt-3" id="topTabs">
         <li class="nav-item">
