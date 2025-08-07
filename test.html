@@ -1,44 +1,21 @@
-i have resource model :
-class Resource(models.Model):
-    resource_name = models.CharField(
-        max_length=100,
-        help_text="Enter the full name of the resource"
-    )
+view:
+resource_count = Resource.objects.filter(is_active=True,year=year, month=month).count()
+project_count = Project.objects.filter(is_active=True,year=year, month=month).count()
 
-    year = models.PositiveIntegerField(
-        help_text="Enter the year manually (e.g., 2025)"
-    )
+html:
+<!--dashboard cards-->
+    <div class="d-flex justify-content-around flex-wrap gap-3 mt-4">
+  <div class="dashboard-card">
+    <h5>Total Number of Resources</h5>
+    <p class="card-value">{{ resource_count }}</p>
+  </div>
+  <div class="dashboard-card">
+    <h5>Total Number of Projects</h5>
+    <p class="card-value">{{ project_count }}</p>
+  </div>
+</div>
 
-    month = models.PositiveSmallIntegerField(
-        choices=[(i, calendar.month_name[i]) for i in range(1, 13)],
-        help_text="Enter the month manually (1-12)"
-    )
-
-    working_days = models.FloatField(
-        null=True,
-        blank=True,
-        help_text="Leave blank to auto-calculate (Mon-Fri + 1st Saturday)"
-    )
-
-    present_day = models.FloatField(
-        default=0,
-        help_text="Days resource was present"
-    )
-
-    present_hours = models.FloatField(
-        default=0,
-        help_text="Auto-calculated as present_day * 8 hours if not set"
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    counting = models.FloatField(default=0, help_text="Counting value")
-
-    is_active = models.BooleanField(
-        default=True,
-        help_text="Uncheck to deactivate this resource instead of deleting."
-    )
-
-project- model:
+projects-model:
 class Project(models.Model):
     PROJECT_TYPE_CHOICES = [
         ('REGULAR', 'Regular Project'),
@@ -72,6 +49,7 @@ class Project(models.Model):
     resources = models.ManyToManyField(
         Resource,
         related_name='assigned_projects',
+        blank=True,
         help_text="Multiple resources can be assigned to this project"
     )
 
@@ -126,63 +104,47 @@ class Project(models.Model):
     counting = models.FloatField(default=0, help_text="Counting value")
     updated_at = models.DateTimeField(auto_now=True)
 
-home.html:
-{% else %}
-          <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Project Name</th>
-                <th>POC Count</th>
-                <th>Resource Count</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in project_status %}
-                <tr>
-                    <td>{{ item.project.name }}</td>
-                    <td>{{ item.poc_count }}</td>
-                    <td>{{ item.dev_count }}</td>
-                    <td>{{ item.status }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="4">No project data available.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-        {% endif %}
 
-    view.py:
-    if tab == 'resourcesmanagement':
-        # resource management
-        project_status = []
-        for project in projects:
-            poc_count = project.poc.count()
-            dev_count = project.resources.count()
+resources-model:
+class Resource(models.Model):
+    resource_name = models.CharField(
+        max_length=100,
+        help_text="Enter the full name of the resource"
+    )
 
-            if poc_count > 5 and dev_count == 0:
-                status = "Highly packed"
-            elif poc_count > 2 and dev_count == 1:
-                status = "Occupied"
-            elif poc_count > 2 and dev_count == 0:
-                status = "Partially packed"
-            elif poc_count == 0 and dev_count == 1:
-                status = "Partially occupied"
-            elif poc_count >= 1 and dev_count > 2:
-                status = "Occupied"
-            elif poc_count == 1 and dev_count == 0:
-                status = "Bench"
-            elif poc_count == 0 and dev_count == 0:
-                status = "Bench"
+    year = models.PositiveIntegerField(
+        help_text="Enter the year manually (e.g., 2025)"
+    )
 
-            project_status.append({
-                'project' : project,
-                'status' : status,
-                'poc_count': poc_count,
-                'dev_count': dev_count,
-            })
+    month = models.PositiveSmallIntegerField(
+        choices=[(i, calendar.month_name[i]) for i in range(1, 13)],
+        help_text="Enter the month manually (1-12)"
+    )
 
-    +
-    i want a table where there should be resource name and its poc count , dev count and then the status
+    working_days = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Leave blank to auto-calculate (Mon-Fri + 1st Saturday)"
+    )
+
+    present_day = models.FloatField(
+        default=0,
+        help_text="Days resource was present"
+    )
+
+    present_hours = models.FloatField(
+        default=0,
+        help_text="Auto-calculated as present_day * 8 hours if not set"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    counting = models.FloatField(default=0, help_text="Counting value")
+
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Uncheck to deactivate this resource instead of deleting."
+    )
+
++
+
+check this.. it shows 0 resources and 41 projects in every month
