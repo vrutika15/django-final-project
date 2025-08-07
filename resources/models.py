@@ -5,11 +5,6 @@ from datetime import date
 # Create your models here.
 
 class Resource(models.Model):
-    """
-    Stores resource (developer/employee) data for a specific year and month.
-    Working days are auto-calculated (Mon–Fri + 1st Saturday) unless provided.
-    """
-
     resource_name = models.CharField(
         max_length=100,
         help_text="Enter the full name of the resource"
@@ -21,13 +16,13 @@ class Resource(models.Model):
 
     month = models.PositiveSmallIntegerField(
         choices=[(i, calendar.month_name[i]) for i in range(1, 13)],
-        help_text="Enter the month manually (1–12)"
+        help_text="Enter the month manually (1-12)"
     )
 
     working_days = models.FloatField(
         null=True,
         blank=True,
-        help_text="Leave blank to auto-calculate (Mon–Fri + 1st Saturday)"
+        help_text="Leave blank to auto-calculate (Mon-Fri + 1st Saturday)"
     )
 
     present_day = models.FloatField(
@@ -37,7 +32,7 @@ class Resource(models.Model):
 
     present_hours = models.FloatField(
         default=0,
-        help_text="Auto-calculated as present_day × 8 hours if not set"
+        help_text="Auto-calculated as present_day * 8 hours if not set"
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -72,7 +67,7 @@ class Resource(models.Model):
     @staticmethod
     def get_working_days(year, month):
         """
-        Calculates working days (Mon–Fri + 1st Saturday) for a given year and month.
+        Calculates working days (Mon-Fri + 1st Saturday) for a given year and month.
         """
         if year is None or month is None:
             return 0

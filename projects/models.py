@@ -7,11 +7,6 @@ import calendar
 # Create your models here.
 
 class Project(models.Model):
-    """
-    Represents a project with multiple resources assigned to it,
-    with full time-tracking and project classification for a specific year and month.
-    """
-
     PROJECT_TYPE_CHOICES = [
         ('REGULAR', 'Regular Project'),
         ('FIXED_COST', 'Fixed Cost Project'),

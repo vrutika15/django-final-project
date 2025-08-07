@@ -71,6 +71,9 @@
         <li class="nav-item">
             <a class="nav-link {% if active_tab == 'charts' %}active{% endif %}" href="#" data-tab="charts">Charts</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'resourcesmanagement' %}active{% endif %}" href="#" data-tab="resourcesmanagement">Resource Management</a>
+        </li>
     </ul>
 
     <div class="tab-content-area mt-3 mb-5" id="mainContent">
@@ -126,7 +129,7 @@
        {% include "attendance/chart_tab.html" %}
           
 
-        {% else %}
+        {% elif active_tab == 'projects' %}
             {% if projects %}
                 <h4>Projects ({{ projects|length }})</h4>
                 <table id="projectTable" class="table table-bordered table-striped">
@@ -155,7 +158,7 @@
                                 {{ resource.resource_name }}{% if not forloop.last %}, {% endif %}
                               {% endfor %}
                             </td>
-                            <td>{{ project.extra_hours }}</td>
+                            <td>{{ project.extra_hours|default_if_none:0 }}</td>
                              <td>{{ project.present_day }}</td>
                             <td>{{ project.billable_days }}</td>
                             <td>{{ project.non_billable_days }}</td>
@@ -179,6 +182,32 @@
             {% else %}
                 <p>No projects found for the selected year and month.</p>
             {% endif %}
+
+          {% else %}
+          <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Resource Name</th>
+                <th>POC Count</th>
+                <th>Resource Count</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in resource_status %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.poc_count }}</td>
+                    <td>{{ item.dev_count }}</td>
+                    <td>{{ item.status }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No resources available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
         {% endif %}
     </div>
 </div>

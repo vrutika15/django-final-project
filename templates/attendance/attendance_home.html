@@ -207,7 +207,7 @@
                     {% if not forloop.last %}, {% endif %} 
                     {% endfor %}
                   </td>
-                  <td>{{ proj.extra_hours }}</td>
+                  <td>{{ proj.extra_hours|default_if_none:0 }}</td>
                   <td>{{ proj.present_day }}</td>
                   <td>{{ proj.billable_days }}</td>
                   <td>{{ proj.non_billable_days }}</td>
