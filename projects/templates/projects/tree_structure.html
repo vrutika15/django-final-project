@@ -100,8 +100,8 @@
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         overflow: hidden;
-       
     }
+    
     .badge-dark-text {
         color: black !important;
     }
@@ -116,8 +116,6 @@
         align-items: center;
         gap: 10px;
     }
-
-
 
     .period-section {
         border-bottom: 1px solid #e9ecef;
@@ -150,13 +148,13 @@
 
     .period-projects {
         transition: max-height 0.3s ease;
-        max-height: 500px;
-        overflow:auto;
+        max-height: 0;
+        overflow: hidden;
     }
 
     .period-projects.expanded {
         max-height: 500px;
-        overflow:auto;
+        overflow: auto;
     }
 
     .project-item {
@@ -251,7 +249,7 @@
     }
 
     .detail-content {
-        padding: 0px 20px
+        padding: 20px;
     }
 
     .project-stats {
@@ -295,151 +293,244 @@
         border-bottom: 2px solid #e9ecef;
     }
 
-    /* Tree Structure Styles */
+    /* Vertical Tree Structure - Like Organizational Chart */
     .tree-structure {
         margin: 20px 0;
+        font-family: 'Arial', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 400px;
     }
 
-    .tree-node {
-        margin: 0;
-        padding: 0;
-        list-style: none;
+    .tree-container-vertical {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
     }
 
-    .tree-node ul {
-        margin: 0;
-        padding-left: 30px;
-        list-style: none;
-        border-left: 2px solid #e9ecef;
-    }
-
-    .tree-item {
+    .tree-level {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 40px;
         position: relative;
-        padding: 8px 0;
+        width: 100%;
     }
 
-    .tree-item::before {
+    .tree-level::after {
         content: '';
         position: absolute;
-        left: -32px;
-        top: 50%;
-        width: 20px;
-        height: 2px;
-        background: #e9ecef;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 20px;
+        background: #2c3e50;
+        z-index: 1;
     }
 
-    .tree-item:first-child::before {
+    .tree-level:first-child::after {
         display: none;
     }
 
-    .tree-content {
+    .tree-node {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 10px;
-        padding: 8px 12px;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
         position: relative;
+        margin: 0 20px;
     }
 
-    .tree-content:hover {
-        background: #f8f9fa;
-        transform: translateX(5px);
+    .tree-node-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 15px 25px;
+        border-radius: 25px;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+        min-width: 180px;
+        text-align: center;
+        z-index: 2;
     }
 
-    .tree-toggle {
-        width: 20px;
+    .tree-node-content.resource {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+    }
+
+    .tree-node-content.project {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+    }
+
+    .tree-node-content.profile {
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+    }
+
+    .tree-node-content.poc {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    }
+
+    .tree-node-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    .tree-node-name {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .tree-node-type {
+        font-size: 12px;
+        opacity: 0.9;
+    }
+
+    /* Connecting lines */
+    .tree-connector {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
         height: 20px;
-        border-radius: 50%;
         background: #2c3e50;
-        color: white;
+        z-index: 1;
+    }
+
+    /* Only show connector if there are children */
+    .tree-connector.no-children {
+        display: none;
+    }
+
+    .tree-connector.horizontal {
+        width: 100px;
+        height: 2px;
+        top: 50%;
+        left: 100%;
+        transform: translateY(-50%);
+    }
+
+    .tree-connector.horizontal-left {
+        width: 100px;
+        height: 2px;
+        top: 50%;
+        right: 100%;
+        transform: translateY(-50%);
+    }
+
+    /* Dynamic Multiple children layout */
+    .tree-children {
         display: flex;
-        align-items: center;
         justify-content: center;
-        font-size: 12px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        flex-shrink: 0;
+        align-items: flex-start;
+        gap: 30px;
+        margin-top: 20px;
+        position: relative;
+        flex-wrap: wrap;
+        max-width: 100%;
     }
 
-    .tree-toggle:hover {
-        background: #34495e;
-        transform: scale(1.1);
-    }
-
-    .tree-toggle.expanded {
-        background: #27ae60;
-    }
-
-    .tree-icon {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        color: white;
-        flex-shrink: 0;
-    }
-
-    .tree-icon.profile {
+    .tree-children::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 20px;
         background: #2c3e50;
     }
 
-    .tree-icon.resource {
-        background: #34495e;
-    }
-
-    .tree-name {
-        font-weight: 500;
-        color: #2c3e50;
+    .tree-child {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        min-width: 200px;
+        max-width: 250px;
         flex: 1;
     }
 
-    .tree-details {
-        font-size: 0.8rem;
-        color: #6c757d;
-        margin-left: auto;
+    .tree-child::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 20px;
+        background: #2c3e50;
     }
 
-    .tree-children {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease;
+    /* Ensure proper line connections */
+    .tree-children-grid::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 20px;
+        background: #2c3e50;
     }
 
-    .tree-children.expanded {
-        max-height: 2000px;
+    /* Dynamic grid for multiple items */
+    .tree-children-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+        width: 100%;
+        max-width: 800px;
     }
 
+    .tree-children-grid .tree-child {
+        min-width: unset;
+        max-width: unset;
+        flex: unset;
+    }
+
+    /* Resource stats display */
     .resource-stats {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         gap: 10px;
-        margin-top: 10px;
-        padding-left: 30px;
+        margin-top: 15px;
+        max-width: 300px;
     }
 
     .resource-stat-item {
         background: #f8f9fa;
-        padding: 5px;
-        border-radius: 6px;
+        padding: 8px;
+        border-radius: 8px;
         text-align: center;
         border-left: 3px solid #2c3e50;
-        font-size: 0.8rem;
+        font-size: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .resource-stat-value {
         font-weight: 600;
         color: #2c3e50;
+        font-size: 14px;
     }
 
     .resource-stat-label {
         color: #6c757d;
-        font-size: 0.7rem;
+        font-size: 10px;
         text-transform: uppercase;
+        margin-top: 2px;
     }
 
     .empty-state {
@@ -492,8 +583,54 @@
             grid-template-columns: repeat(2, 1fr);
         }
 
-        .tree-node ul {
-            padding-left: 20px;
+        .tree-children {
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tree-children-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .tree-node-content {
+            min-width: 150px;
+            padding: 12px 20px;
+        }
+
+        .tree-child {
+            min-width: unset;
+            max-width: unset;
+        }
+
+        .resource-stats {
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .tree-children-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .tree-node-content {
+            min-width: 120px;
+            padding: 10px 15px;
+        }
+
+        .tree-node-name {
+            font-size: 12px;
+        }
+
+        .tree-node-type {
+            font-size: 10px;
+        }
+
+        .resource-stats {
+            grid-template-columns: 1fr;
+            gap: 8px;
         }
     }
 
@@ -564,7 +701,7 @@
                                 <div class="project-item {% if selected_resource.id == resource.id %}active{% endif %}" onclick="selectResource('{{ resource.id }}')">
                                     <div class="project-icon"><i class="fas fa-user"></i></div>
                                     <div class="project-name">{{ resource.resource_name }}</div>
-                             </div>
+                                </div>
                                 {% endfor %}
                             </div>
                         </div>
@@ -591,115 +728,98 @@
                     </div>
 
                     <div class="detail-content">
-                        {% if selected_resource.project_name %}
-                        <div class="section-title"><i class="fas fa-id-badge"></i> Resource Profile</div>
+                        <!-- Resource Tree Structure -->
+                        <div class="section-title"><i class="fas fa-sitemap"></i> Resource Hierarchy</div>
                         <div class="tree-structure">
-                            <ul class="tree-node">
-                                <li class="tree-item">
-                                    <div class="tree-content" onclick="toggleNode(this)">
-                                        <div class="tree-toggle"><i class="fas fa-plus"></i></div>
-                                        <div class="tree-icon profile"><i class="fas fa-id-badge"></i></div>
-                                        <div class="tree-name">{{ selected_resource.resource_profile.profile_name }}
+                            <div class="tree-container-vertical">
+                                <!-- Root Level: Resource Name -->
+                                <div class="tree-level">
+                                    <div class="tree-node">
+                                        <div class="tree-node-content resource">
+                                            <div class="tree-node-icon"><i class="fas fa-user"></i></div>
+                                            <div class="tree-node-name">{{ selected_resource.resource_name }}</div>
+                                            <div class="tree-node-type">Resource</div>
                                         </div>
+                                        {% if selected_resource.assigned_projects.all %}
+                                        <div class="tree-connector"></div>
+                                        {% else %}
+                                        <div class="tree-connector no-children"></div>
+                                        {% endif %}
                                     </div>
+                                </div>
+                                
+                                <!-- Second Level: Project Profile -->
+                                {% if selected_resource.assigned_projects.all %}
+                                <div class="tree-level">
                                     <div class="tree-children">
-                                        <div class="resource-stats">
-                                            <div class="resource-stat-item">
-                                                <div class="resource-stat-value">{{
-                                                    selected_resource.resource_profile.present_day|floatformat:1 }}
-                                                </div>
-                                                <div class="resource-stat-label">Present Days</div>
+                                        {% for project in selected_resource.assigned_projects.all %}
+                                        <div class="tree-child">
+                                            <div class="tree-node-content profile">
+                                                <div class="tree-node-icon"><i class="fas fa-id-badge"></i></div>
+                                                <div class="tree-node-name">{{ project.project_name }}</div>
+                                                <div class="tree-node-type">Project Profile</div>
                                             </div>
-                                            <div class="resource-stat-item">
-                                                <div class="resource-stat-value">{{
-                                                    selected_resource.resource_profile.present_hours|floatformat:0 }}
+                                            {% if project.resources.all or project.poc.all %}
+                                            <div class="tree-connector"></div>
+                                            {% else %}
+                                            <div class="tree-connector no-children"></div>
+                                            {% endif %}
+                                            
+                                            <!-- Third Level: Resources and POCs -->
+                                            {% if project.resources.all or project.poc.all %}
+                                            <div class="tree-children-grid">
+                                                <!-- Resources in this project -->
+                                                {% if project.resources.all %}
+                                                <div class="tree-child">
+                                                    <div class="tree-node-content resource">
+                                                        <div class="tree-node-icon"><i class="fas fa-users"></i></div>
+                                                        <div class="tree-node-name">Resources ({{ project.resources.count }})</div>
+                                                        <div class="tree-node-type">Assigned</div>
+                                                    </div>
+                                                    
+                                                    <div class="resource-stats">
+                                                        {% for res in project.resources.all %}
+                                                        <div class="resource-stat-item">
+                                                            <div class="resource-stat-value">{{ res.resource_name }}</div>
+                                                            <div class="resource-stat-label">Resource</div>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
                                                 </div>
-                                                <div class="resource-stat-label">Present Hours</div>
+                                                {% endif %}
+                                                
+                                                <!-- POCs -->
+                                                {% if project.poc.all %}
+                                                <div class="tree-child">
+                                                    <div class="tree-node-content poc">
+                                                        <div class="tree-node-icon"><i class="fas fa-user-tie"></i></div>
+                                                        <div class="tree-node-name">POCs ({{ project.poc.count }})</div>
+                                                        <div class="tree-node-type">Point of Contact</div>
+                                                    </div>
+                                                    
+                                                    <div class="resource-stats">
+                                                        {% for poc in project.poc.all %}
+                                                        <div class="resource-stat-item">
+                                                            <div class="resource-stat-value">{{ poc.resource_name }}</div>
+                                                            <div class="resource-stat-label">POC</div>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                {% endif %}
                                             </div>
+                                            {% endif %}
                                         </div>
+                                        {% endfor %}
                                     </div>
-                                </li>
-                            </ul>
+                                </div>
+                                {% else %}
+                                <div class="empty-state" style="padding: 20px;">
+                                    <p>No projects assigned to this resource.</p>
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
-                        {% endif %}
-
-                        {% if selected_resource.assigned_projects.all %}
-                        <div class="section-title"><i class="fas fa-project-diagram"></i> Assigned Projects ({{ selected_resource.assigned_projects.count }})</div>
-                        <div class="tree-structure">
-                            <ul class="tree-node">
-                               <!-- {% for project in selected_resource.projects.all %}
-                                <li class="tree-item">
-                                    <div class="tree-content" onclick="toggleNode(this)">
-                                        <div class="tree-toggle"><i class="fas fa-plus"></i></div>
-                                        <div class="tree-icon resource"><i class="fas fa-project-diagram"></i></div>
-                                        <div class="tree-name">{{ project.project_name }}</div>
-                                    </div>
-                                    <div class="tree-children">
-                                        <div class="resource-stats">
-                                            <div class="resource-stat-item">
-                                                <div class="resource-stat-value">{{ project.present_day|floatformat:1 }}
-                                                </div>
-                                                <div class="resource-stat-label">Present Days</div>
-                                            </div>
-                                            <div class="resource-stat-item">
-                                                <div class="resource-stat-value">{{ project.present_hours|floatformat:0 }}</div>
-                                                <div class="resource-stat-label">Present Hours</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                {% endfor %}-->
-                                {% for project in selected_resource.assigned_projects.all %}
-<li class="tree-item">
-  <div class="tree-content" onclick="toggleNode(this)">
-    <div class="tree-toggle"><i class="fas fa-plus"></i></div>
-    <div class="tree-icon resource"><i class="fas fa-project-diagram"></i></div>
-    <div class="tree-name">{{ project.project_name }}</div>
-  </div>
-  <div class="tree-children">
-    <div class="resource-stats">
-        <div class="resource-stat-item">
-            <div class="resource-stat-value">{{ project.present_day|floatformat:1 }}</div>
-                    <div class="resource-stat-label">Present Days</div>
-        </div>
-       <!-- <div class="resource-stat-item">
-            <div class="resource-stat-value">{{ project.present_hours|floatformat:0 }}</div>
-            <div class="resource-stat-label">Present Hours</div>
-        </div>-->
-    </div>
-
-    <!-- Project Profile -->
-   {% if project.project_profile.all %}
-  <div class="section-title"><i class="fas fa-id-badge"></i> Project Profile</div>
-  <div class="resource-stats">
-    {% for profile_resource in project.project_profile.all %}
-      <div class="resource-stat-item">
-        <div class="resource-stat-value">{{ profile_resource.resource_name }}</div>
-        <div class="resource-stat-label">Profile</div>
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
-
-
-    <!-- Resources working in this project -->
-    <div class="section-title"><i class="fas fa-users"></i> Resources in Project</div>
-    <div class="resource-stats">
-      {% for res in project.resources.all %}
-      <div class="resource-stat-item">
-        <div class="resource-stat-value">{{ res.resource_name }}</div>
-        <div class="resource-stat-label">{{ res.get_resource_type_display }}</div>
-      </div>
-      {% endfor %}
-    </div>
-
-  </div>
-</li>
-{% endfor %}
-
-                            </ul>
-                        </div>
-                        {% endif %}
                     </div>
                     {% else %}
                     <div class="empty-state">
@@ -766,63 +886,88 @@
                     </div>
 
                     <div class="detail-content">
-                        {% if selected_project.project_profile.exists %}
-    <div class="section-title"><i class="fas fa-user-tie"></i> Project Profile</div>
-    <div class="tree-structure">
-        <ul class="tree-node">
-            {% for profile in selected_project.project_profile.all %}
-                <li class="tree-item">
-                    <div class="tree-content" onclick="toggleNode(this)">
-                        <div class="tree-toggle"><i class="fas fa-plus"></i></div>
-                        <div class="tree-icon profile"><i class="fas fa-user-tie"></i></div>
-                        <div class="tree-name">{{ profile.resource_name }}</div>
-                    </div>
-                    <div class="tree-children">
-                        <div class="resource-stats">
-                            <div class="resource-stat-item">
-                                <div class="resource-stat-value">{{ profile.present_day|floatformat:1 }}</div>
-                                <div class="resource-stat-label">Present Days</div>
-                            </div>
-                            <div class="resource-stat-item">
-                                <div class="resource-stat-value">{{ profile.present_hours|floatformat:0 }}</div>
-                                <div class="resource-stat-label">Present Hours</div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-{% endif %}
-
-                        {% if selected_project.resources.all %}
-                        <div class="section-title"><i class="fas fa-users"></i> Assigned Resources ({{ selected_project.resources.count }})</div>
+                        <!-- Project Tree Structure -->
+                        <div class="section-title"><i class="fas fa-sitemap"></i> Project Hierarchy</div>
                         <div class="tree-structure">
-                            <ul class="tree-node">
-                                {% for resource in selected_project.resources.all %}
-                                <li class="tree-item">
-                                    <div class="tree-content" onclick="toggleNode(this)">
-                                        <div class="tree-toggle"><i class="fas fa-plus"></i></div>
-                                        <div class="tree-icon resource"><i class="fas fa-user"></i></div>
-                                        <div class="tree-name">{{ resource.resource_name }}</div>
+                            <div class="tree-container-vertical">
+                                <!-- Root Level: Project Name -->
+                                <div class="tree-level">
+                                    <div class="tree-node">
+                                        <div class="tree-node-content project">
+                                            <div class="tree-node-icon"><i class="fas fa-project-diagram"></i></div>
+                                            <div class="tree-node-name">{{ selected_project.project_name }}</div>
+                                            <div class="tree-node-type">Project</div>
+                                        </div>
+                                        {% if selected_project.resources.all or selected_project.project_profile or selected_project.poc.all %}
+                                        <div class="tree-connector"></div>
+                                        {% else %}
+                                        <div class="tree-connector no-children"></div>
+                                        {% endif %}
                                     </div>
-                                    <div class="tree-children">
-                                        <div class="resource-stats">
-                                            <div class="resource-stat-item">
-                                                <div class="resource-stat-value">{{ resource.present_day|floatformat:1 }}</div>
-                                                <div class="resource-stat-label">Present Days</div>
-                                            </div>
-                                            <div class="resource-stat-item">
-                                                <div class="resource-stat-value">{{ resource.present_hours|floatformat:0 }}</div>
-                                                <div class="resource-stat-label">Present Hours</div>
+                                </div>
+                                
+                                <!-- Second Level: Resources, Profile, POCs -->
+                                {% if selected_project.resources.all or selected_project.project_profile or selected_project.poc.all %}
+                                <div class="tree-level">
+                                    <div class="tree-children-grid">
+                                        <!-- Resources -->
+                                        {% if selected_project.resources.all %}
+                                        <div class="tree-child">
+                                                                                         <div class="tree-node-content resource">
+                                                 <div class="tree-node-icon"><i class="fas fa-users"></i></div>
+                                                 <div class="tree-node-name">Resources ({{ selected_project.resources.count }})</div>
+                                                 <div class="tree-node-type">Assigned</div>
+                                             </div>
+                                             <div class="tree-connector no-children"></div>
+                                            
+                                            <div class="resource-stats">
+                                                {% for resource in selected_project.resources.all %}
+                                                <div class="resource-stat-item">
+                                                    <div class="resource-stat-value">{{ resource.resource_name }}</div>
+                                                    <div class="resource-stat-label">Resource</div>
+                                                </div>
+                                                {% endfor %}
                                             </div>
                                         </div>
+                                        {% endif %}
+                                        
+                                                                                 <!-- Project Profile -->
+                                         {% if selected_project.project_profile %}
+                                         <div class="tree-child">
+                                             <div class="tree-node-content profile">
+                                                 <div class="tree-node-icon"><i class="fas fa-id-badge"></i></div>
+                                                 <div class="tree-node-name">{{ selected_project.project_profile.resource_name }}</div>
+                                                 <div class="tree-node-type">Project Profile</div>
+                                             </div>
+                                             <div class="tree-connector no-children"></div>
+                                         </div>
+                                         {% endif %}
+                                        
+                                        <!-- POCs -->
+                                        {% if selected_project.poc.all %}
+                                        <div class="tree-child">
+                                                                                         <div class="tree-node-content poc">
+                                                 <div class="tree-node-icon"><i class="fas fa-user-tie"></i></div>
+                                                 <div class="tree-node-name">POCs ({{ selected_project.poc.count }})</div>
+                                                 <div class="tree-node-type">Point of Contact</div>
+                                             </div>
+                                             <div class="tree-connector no-children"></div>
+                                            
+                                            <div class="resource-stats">
+                                                {% for poc in selected_project.poc.all %}
+                                                <div class="resource-stat-item">
+                                                    <div class="resource-stat-value">{{ poc.resource_name }}</div>
+                                                    <div class="resource-stat-label">POC</div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
                                     </div>
-                                </li>
-                                {% endfor %}
-                            </ul>
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
-                        {% endif %}
                     </div>
                     {% else %}
                     <div class="empty-state">
@@ -838,40 +983,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<!--<script>
-    // Enable Bootstrap tab functionality if not already
-    document.addEventListener('DOMContentLoaded', function () {
-        $('#tabSelector a').click(function (e) {
-            e.preventDefault();
-            $(this).tab('show');
-        });
-
-        const firstPeriod = document.querySelector('.period-header');
-        if (firstPeriod) firstPeriod.click();
-    });
-
-    function togglePeriod(header) {
-        const projects = header.nextElementSibling;
-        header.classList.toggle('expanded');
-        projects.classList.toggle('expanded');
-    }
-
-    function toggleNode(button) {
-        const children = button.closest('.tree-item').querySelector('.tree-children');
-        const toggle = button.querySelector('.tree-toggle');
-        children.classList.toggle('expanded');
-        toggle.classList.toggle('expanded');
-        toggle.innerHTML = children.classList.contains('expanded') ? '<i class="fas fa-minus"></i>' : '<i class="fas fa-plus"></i>';
-    }
-
-    function selectProject(projectId) {
-        const url = new URL(window.location);
-        url.searchParams.set('project', projectId);
-        url.searchParams.set('tab', 'projects');
-        window.location.href = url;
-    }
-</script>-->
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Handle tab activation from URL
@@ -893,90 +1004,122 @@
             window.location.href = url;
         });
 
+        // Initialize first period as expanded
         const firstPeriod = document.querySelector('.period-header');
-        if (firstPeriod) firstPeriod.click();
+        if (firstPeriod) {
+            firstPeriod.classList.add('expanded');
+            firstPeriod.nextElementSibling.classList.add('expanded');
+        }
     });
 
     function togglePeriod(header) {
         const projects = header.nextElementSibling;
-        header.classList.toggle('expanded');
-        projects.classList.toggle('expanded');
-    }
-
-    function toggleNode(button) {
-        const children = button.closest('.tree-item').querySelector('.tree-children');
-        const toggle = button.querySelector('.tree-toggle');
-        children.classList.toggle('expanded');
-        toggle.classList.toggle('expanded');
-        toggle.innerHTML = children.classList.contains('expanded') ? '<i class="fas fa-minus"></i>' : '<i class="fas fa-plus"></i>';
+        const isExpanded = header.classList.contains('expanded');
+        
+        if (isExpanded) {
+            header.classList.remove('expanded');
+            projects.classList.remove('expanded');
+        } else {
+            header.classList.add('expanded');
+            projects.classList.add('expanded');
+        }
     }
 
     function selectProject(projectId) {
-    const url = new URL(window.location.origin + window.location.pathname);
-    url.searchParams.set('project', projectId);
+        const url = new URL(window.location.origin + window.location.pathname);
+        url.searchParams.set('project', projectId);
 
-    fetch(url)
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const newDetail = doc.querySelector('#project-detail-panel');
-            document.querySelector('#project-detail-panel').innerHTML = newDetail.innerHTML;
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newDetail = doc.querySelector('#project-detail-panel');
+                document.querySelector('#project-detail-panel').innerHTML = newDetail.innerHTML;
 
-            // Update active sidebar item
-            document.querySelectorAll('.project-item').forEach(item => item.classList.remove('active'));
-            document.querySelector(`.project-item[onclick="selectProject('${projectId}')"]`)?.classList.add('active');
+                // Update active sidebar item
+                document.querySelectorAll('.project-item').forEach(item => item.classList.remove('active'));
+                document.querySelector(`.project-item[onclick="selectProject('${projectId}')"]`)?.classList.add('active');
+            });
+    }
+
+    function selectResource(resourceId) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('resource', resourceId);
+        url.searchParams.set('tab', 'resources');
+
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                // Update right panel
+                const newDetail = doc.querySelector('#resource-detail-panel');
+                document.querySelector('#resource-detail-panel').innerHTML = newDetail.innerHTML;
+
+                // Update left panel active highlight
+                document.querySelectorAll('.project-item').forEach(item => item.classList.remove('active'));
+                document.querySelector(`.project-item[onclick="selectResource('${resourceId}')"]`)?.classList.add('active');
+
+                // Reinitialize any dynamic elements
+                initializeTreeStructure();
+            });
+    }
+
+    function selectProject(projectId) {
+        const url = new URL(window.location.origin + window.location.pathname);
+        url.searchParams.set('project', projectId);
+
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newDetail = doc.querySelector('#project-detail-panel');
+                document.querySelector('#project-detail-panel').innerHTML = newDetail.innerHTML;
+
+                // Update active sidebar item
+                document.querySelectorAll('.project-item').forEach(item => item.classList.remove('active'));
+                document.querySelector(`.project-item[onclick="selectProject('${projectId}')"]`)?.classList.add('active');
+
+                // Reinitialize any dynamic elements
+                initializeTreeStructure();
+            });
+    }
+
+    function initializeTreeStructure() {
+        // Add smooth animations for tree nodes
+        const treeNodes = document.querySelectorAll('.tree-node-content');
+        treeNodes.forEach((node, index) => {
+            node.style.opacity = '0';
+            node.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                node.style.transition = 'all 0.5s ease';
+                node.style.opacity = '1';
+                node.style.transform = 'translateY(0)';
+            }, index * 100);
         });
-}
 
-    /**function selectResource(resourceId) {
-    const url = new URL(window.location.origin + window.location.pathname);
-    url.searchParams.set('resource', resourceId);
-
-    fetch(url)
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const newDetail = doc.querySelector('#resource-detail-panel');
-            document.querySelector('#resource-detail-panel').innerHTML = newDetail.innerHTML;
-
-            // Update active sidebar item
-            document.querySelectorAll('.project-item').forEach(item => item.classList.remove('active'));
-            document.querySelector(`.project-item[onclick="selectResource('${resourceId}')"]`)?.classList.add('active');
+        // Add hover effects for resource stats
+        const statItems = document.querySelectorAll('.resource-stat-item');
+        statItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+            });
         });
-}**/
+    }
 
-/**function selectResource(resourceId) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('resource', resourceId);
-    url.searchParams.set('tab', 'resources'); // maintain tab
-
-    window.location.href = url;  // Full reload with new resource
-}**/
-
-function selectResource(resourceId) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('resource', resourceId);
-    url.searchParams.set('tab', 'resources');
-
-    fetch(url)
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-
-            // Update right panel
-            const newDetail = doc.querySelector('#resource-detail-panel');
-            document.querySelector('#resource-detail-panel').innerHTML = newDetail.innerHTML;
-
-            // Update left panel active highlight
-            document.querySelectorAll('.project-item').forEach(item => item.classList.remove('active'));
-            document.querySelector(`.project-item[onclick="selectResource('${resourceId}')"]`)?.classList.add('active');
-        });
-}
-
-
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeTreeStructure();
+    });
 </script>
 {% endblock %}
 
