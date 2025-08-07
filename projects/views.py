@@ -255,11 +255,7 @@ def tree_structure_view(request):
         queryset=Project.objects.prefetch_related('project_profile', 'resources')
     )
 ).get(id=selected_resource_id, is_active=True)
-<<<<<<< HEAD
  
-=======
-
->>>>>>> 4e22a2f6858e2d7b46b7118769a93b1f3fdd21f5
         except Resource.DoesNotExist:
             selected_resource = None
  
