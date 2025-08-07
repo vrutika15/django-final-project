@@ -258,10 +258,10 @@ def tree_structure_view(request):
     # Get all projects with their resources prefetched for efficiency
     projects = Project.objects.prefetch_related('resources', 'project_profile', 'poc').filter(is_active=True).order_by('project_name')
    
-    # Get all resources for reference
+    #get all active resources for reference
     resources = Resource.objects.filter(is_active=True).order_by('resource_name')
    
-    # Get selected project from URL parameter
+    #get selected project from url parameter
     selected_project_id = request.GET.get('project')
     selected_project = None
    
@@ -269,13 +269,14 @@ def tree_structure_view(request):
         try:
             selected_project = Project.objects.prefetch_related('resources', 'project_profile', 'poc').get(id=selected_project_id, is_active=True)
         except Project.DoesNotExist:
+            #if project not found or not is active then set selected project to none
             selected_project = None
    
-    # If no project is selected, select the first one
+    #if no project is selected, select the first one
     if not selected_project and projects.exists():
         selected_project = projects.first()
    
-    # Group projects by year and month for the left sidebar
+    #group projects by year and month for the left sidebar, print most recent first
     projects_by_period = {}
     for project in projects:
         period_key = f"{project.year}-{project.month:02d}"
@@ -291,11 +292,12 @@ def tree_structure_view(request):
     # Sort periods chronologically
     sorted_periods = sorted(projects_by_period.keys(), reverse=True)
  
-    #resources
+    # refetch resources ordered by month and year descending, then my name
     resources = Resource.objects.filter(is_active=True).order_by('-year', '-month', 'resource_name')
     selected_resource_id = request.GET.get('resource')
     selected_resource = None
- 
+    
+    #same as project, tries to fetch the specific resource
     if selected_resource_id:
         try:
              """selected_resource = Resource.objects.prefetch_related(
@@ -331,12 +333,18 @@ def tree_structure_view(request):
  
    
     # Calculate summary statistics
+    #total no of projects
     total_projects = projects.count()
+    #total no of resorces
     total_resources = resources.count()
+    #sum of total billable hours
     total_billable_hours = sum(p.billable_hours for p in projects)
+    #sum of total non billable hours
     total_non_billable_hours = sum(p.non_billable_hours for p in projects)
+    #sum of total hours that is billable + non-billable
     total_hours = total_billable_hours + total_non_billable_hours
-   
+    
+    #pass data for display
     context = {
         #projects
         'projects_by_period': projects_by_period,
