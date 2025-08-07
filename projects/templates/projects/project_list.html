@@ -47,6 +47,7 @@
           <th>Type</th>
           <th>Project Profile</th>
           <th>Resources</th>
+          <th>POC</th>
           <th>Present Days</th>
           <th>Billable Days</th>
           <th>Non-Billable Days</th>
@@ -70,6 +71,13 @@
               <span>{{ resource.resource_name }}</span>{% if not forloop.last %}, {% endif %}
             {% empty %}
               <em>No resources</em>
+            {% endfor %}
+          </td>
+          <td>
+            {% for poc in project.poc.all %}
+              <span>{{ poc.resource_name }}</span>{% if not forloop.last %}, {% endif %}
+            {% empty %}
+              <em>No POC</em>
             {% endfor %}
           </td>
           <td>{{ project.present_day }}</td>

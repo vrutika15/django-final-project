@@ -44,6 +44,7 @@ class Project(models.Model):
     resources = models.ManyToManyField(
         Resource,
         related_name='assigned_projects',
+        blank=True,
         help_text="Multiple resources can be assigned to this project"
     )
 

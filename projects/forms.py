@@ -47,6 +47,11 @@ class ProjectForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        #optional fields
+        self.fields['resources'].required=False
+        self.fields['poc'].required=False
+        
         # Set initial year/month to current if not provided
         if not self.initial.get('year'):
             self.initial['year'] = date.today().year

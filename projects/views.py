@@ -4,7 +4,7 @@ from datetime import datetime
 from .models import Project
 from .forms import ProjectForm
 from resources.models import Resource
-from django.db.models import ProtectedError,Prefetch
+from django.db.models import Prefetch
 from django.contrib import messages
 
 
@@ -129,7 +129,9 @@ def project_create(request):
     if request.method == 'POST':
         project_form = ProjectForm(request.POST)
         if project_form.is_valid():
+            project = project_form.save(commit=False)
             project_form.save()
+            project_form.save_m2m()
             return redirect('projects:project_list')
     else:
         year = request.session.get('selected_year')
@@ -147,7 +149,9 @@ def project_edit(request, pk):
     if request.method == 'POST':
         project_form = ProjectForm(request.POST, instance=project)
         if project_form.is_valid():
+            project = project_form.save(commit=False)
             project_form.save()
+            project_form.save_m2m()
             return redirect('projects:project_list')
     else:
         project_form = ProjectForm(instance=project)
@@ -305,86 +309,3 @@ def tree_structure_view(request):
     }
    
     return render(request, 'projects/tree_structure.html', context)
- 
-
-#to add the resources to the tree view structure
-"""
-def tree_structure_view(request):
-    
-    Display a project list on the left and detailed project structure on the right.
-    
-    # Get all projects with their resources prefetched for efficiency
-    projects = Project.objects.prefetch_related('resources', 'project_profile').filter(is_active=True).order_by('project_name')
-    
-    # Get all resources for reference
-    resources = Resource.objects.filter(is_active=True).order_by('resource_name')
-    
-    # Get selected project from URL parameter
-    selected_project_id = request.GET.get('project')
-    selected_project = None
-    
-    if selected_project_id:
-        try:
-            selected_project = Project.objects.prefetch_related('resources', 'project_profile').get(id=selected_project_id, is_active=True)
-        except Project.DoesNotExist:
-            selected_project = None
-    
-    # If no project is selected, select the first one
-    if not selected_project and projects.exists():
-        selected_project = projects.first()
-    
-    # Group projects by year and month for the left sidebar
-    projects_by_period = {}
-    for project in projects:
-        period_key = f"{project.year}-{project.month:02d}"
-        if period_key not in projects_by_period:
-            projects_by_period[period_key] = {
-                'year': project.year,
-                'month': project.month,
-                'month_name': project.get_month_display(),
-                'projects': []
-            }
-        projects_by_period[period_key]['projects'].append(project)
-    
-    # Group resources by year and month (new logic)
-    resources_by_period = {}
-    for resource in resources:
-        period_key = f"{resource.year}-{resource.month:02d}"
-        if period_key not in resources_by_period:
-            resources_by_period[period_key] = {
-                'year': resource.year,
-                'month': resource.month,
-                'month_name': resource.get_month_display(),
-                'resources': []
-            }
-        resources_by_period[period_key]['resources'].append(resource)
-    
-    # Sort periods chronologically
-    sorted_periods = sorted(projects_by_period.keys(), reverse=True)
-    sorted_resource_periods = sorted(resources_by_period.keys(), reverse=True)
-    
-    # Calculate summary statistics
-    total_projects = projects.count()
-    total_resources = resources.count()
-    total_billable_hours = sum(p.billable_hours for p in projects)
-    total_non_billable_hours = sum(p.non_billable_hours for p in projects)
-    total_hours = total_billable_hours + total_non_billable_hours
-    
-    context = {
-        'projects_by_period': projects_by_period,
-        'sorted_periods': sorted_periods,
-        'selected_project': selected_project,
-        'total_projects': total_projects,
-        'total_resources': total_resources,
-        'total_billable_hours': total_billable_hours,
-        'total_non_billable_hours': total_non_billable_hours,
-        'total_hours': total_hours,
-        'utilization_percentage': (total_billable_hours / total_hours * 100) if total_hours > 0 else 0,
-
-        #new resource grouping context
-        'resources_by_period': resources_by_period,
-        'sorted_resource_periods': sorted_resource_periods,
-    }
-    
-    return render(request, 'projects/tree_structure.html', context)
-"""
