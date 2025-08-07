@@ -47,6 +47,14 @@ class Project(models.Model):
         help_text="Multiple resources can be assigned to this project"
     )
 
+    # POC (Point of Contact) field - multiple selection
+    poc = models.ManyToManyField(
+        Resource,
+        related_name='poc_projects',
+        blank=True,
+        help_text="Multiple POCs can be assigned to this project"
+    )
+
     present_day = models.FloatField(
         default=0,
         validators=[MinValueValidator(0)],

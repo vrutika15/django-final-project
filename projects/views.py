@@ -204,7 +204,7 @@ def tree_structure_view(request):
     Display a project list on the left and detailed project structure on the right.
     """
     # Get all projects with their resources prefetched for efficiency
-    projects = Project.objects.prefetch_related('resources', 'project_profile').filter(is_active=True).order_by('project_name')
+    projects = Project.objects.prefetch_related('resources', 'project_profile', 'poc').filter(is_active=True).order_by('project_name')
    
     # Get all resources for reference
     resources = Resource.objects.filter(is_active=True).order_by('resource_name')
@@ -215,7 +215,7 @@ def tree_structure_view(request):
    
     if selected_project_id:
         try:
-            selected_project = Project.objects.prefetch_related('resources', 'project_profile').get(id=selected_project_id, is_active=True)
+            selected_project = Project.objects.prefetch_related('resources', 'project_profile', 'poc').get(id=selected_project_id, is_active=True)
         except Project.DoesNotExist:
             selected_project = None
    
@@ -252,7 +252,7 @@ def tree_structure_view(request):
              selected_resource = Resource.objects.prefetch_related(
     Prefetch(
         'assigned_projects',
-        queryset=Project.objects.prefetch_related('project_profile', 'resources')
+        queryset=Project.objects.prefetch_related('project_profile', 'resources', 'poc')
     )
 ).get(id=selected_resource_id, is_active=True)
  

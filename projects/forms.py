@@ -8,7 +8,7 @@ class ProjectForm(forms.ModelForm):
         model = Project
         # Exclude auto-calculated and system fields
         fields = [
-            'project_name', 'project_type', 'year', 'month', 'project_profile', 'resources',
+            'project_name', 'project_type', 'year', 'month', 'project_profile', 'resources', 'poc',
             'present_day', 'billable_days', 'non_billable_days', 'extra_hours', 'is_active'
         ]
         widgets = {
@@ -19,6 +19,7 @@ class ProjectForm(forms.ModelForm):
             'month': forms.Select(attrs={'class': 'form-select'}),
             'project_profile': forms.Select(attrs={'class': 'form-select'}),
             'resources': forms.SelectMultiple(attrs={'class': 'form-select'}),
+            'poc': forms.SelectMultiple(attrs={'class': 'form-select'}),
             'present_day': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
             'billable_days': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
             'non_billable_days': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
@@ -34,11 +35,13 @@ class ProjectForm(forms.ModelForm):
             'extra_hours': 'Extra Hours',
             'project_profile': 'Project Profile',
             'resources': 'Assigned Resources',
+            'poc': 'Point of Contact (POC)',
             'is_active': 'Active?',
         }
         help_texts = {
             'project_profile': 'Select the main project profile resource.',
             'resources': 'Hold Ctrl (Windows) or Command (Mac) to select multiple resources.',
+            'poc': 'Hold Ctrl (Windows) or Command (Mac) to select multiple POCs.',
             'month': 'Month for this project report',
         }
 
@@ -52,6 +55,7 @@ class ProjectForm(forms.ModelForm):
         #order resources by name
         self.fields['resources'].queryset = Resource.objects.filter(is_active=True).order_by('resource_name')
         self.fields['project_profile'].queryset = Resource.objects.filter(is_active=True).order_by('resource_name')
+        self.fields['poc'].queryset = Resource.objects.filter(is_active=True).order_by('resource_name')
 
     def clean(self):
         cleaned_data = super().clean()
@@ -84,3 +88,12 @@ class ProjectForm(forms.ModelForm):
             if inactive.exists():
                 raise forms.ValidationError("One or more selected resources are inactive.")
         return resources
+    
+    #func if inactive POCs are selected
+    def clean_poc(self):
+        pocs = self.cleaned_data.get('poc')
+        if pocs:
+            inactive = pocs.filter(is_active=False)
+            if inactive.exists():
+                raise forms.ValidationError("One or more selected POCs are inactive.")
+        return pocs
