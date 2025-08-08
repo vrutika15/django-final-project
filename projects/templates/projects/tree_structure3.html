@@ -314,7 +314,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-bottom: 40px;
+        margin-bottom: 60px;
         position: relative;
         width: 100%;
     }
@@ -322,11 +322,11 @@
     .tree-level::after {
         content: '';
         position: absolute;
-        top: -20px;
+        top: -40px;
         left: 50%;
         transform: translateX(-50%);
         width: 2px;
-        height: 20px;
+        height: 40px;
         background: #2c3e50;
         z-index: 1;
     }
@@ -403,7 +403,7 @@
         left: 50%;
         transform: translateX(-50%);
         width: 2px;
-        height: 20px;
+        height: 40px;
         background: #2c3e50;
         z-index: 1;
     }
@@ -444,11 +444,11 @@
     .tree-children::before {
         content: '';
         position: absolute;
-        top: -20px;
+        top: -40px;
         left: 50%;
         transform: translateX(-50%);
         width: 2px;
-        height: 20px;
+        height: 40px;
         background: #2c3e50;
     }
 
@@ -465,12 +465,13 @@
     .tree-child::before {
         content: '';
         position: absolute;
-        top: -20px;
+        top: -40px;
         left: 50%;
         transform: translateX(-50%);
         width: 2px;
-        height: 20px;
+        height: 40px;
         background: #2c3e50;
+        z-index: 1;
     }
 
     /* Ensure proper line connections */
@@ -482,22 +483,33 @@
         width: 100%; 
         height: 2px;
         background: #2c3e50;
+        z-index: 1;
     }
 
     /* Dynamic grid for multiple items */
     .tree-children-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
+        gap: 40px;
+        margin-top: 40px;
         width: 100%;
         max-width: 800px;
+        position: relative;
     }
 
     .tree-children-grid .tree-child {
         min-width: unset;
         max-width: unset;
         flex: unset;
+    }
+
+    /* Fix for third level to prevent double lines */
+    .tree-children-grid .tree-children-grid {
+        margin-top: 60px;
+    }
+
+    .tree-children-grid .tree-children-grid::before {
+        display: none;
     }
 
     /* Resource stats display */
@@ -673,8 +685,9 @@
     </ul>
 
     <div class="tab-content" id="tabContent">
-        <!-- Resources Tab -->
-        <div class="tab-pane fade show active" id="resources" role="tabpanel" aria-labelledby="resources-tab">
+        <div class="detail-content">
+                        <!-- Resources Tab -->
+            <div class="tab-pane fade show active" id="resources" role="tabpanel" aria-labelledby="resources-tab">
     <div class="card-header bg-primary text-white" style="border-radius:10px;">
         <h5 class="mb-0 p-3">Resource Tree Structure</h5>
     </div>
@@ -762,23 +775,16 @@
                                                      <div class="tree-node-name">{{ project.project_name }}</div>
                                                      <div class="tree-node-type">Project</div>
                                                  </div>
-                                                 {% if project.resources.all or project.project_profile or project.poc.all %}
+                                                 
+                                                 {% if project.resources.all or project.poc.all or project.project_profile %}
                                                      <div class="tree-connector"></div>
                                                  {% else %}
                                                      <div class="tree-connector no-children"></div>
                                                  {% endif %}
-                                             </div>
-                                         {% endfor %}
-                                     </div>
-                                 </div>
 
-                                 <!-- Third Level: Project Details -->
-                                 <div class="tree-level">
-                                     <div class="tree-children-grid">
-                                         {% for project in assigned_projects %}
-                                             {% if project.resources.all or project.project_profile or project.poc.all %}
-                                                 <div class="tree-child">
-                                                     <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
+                                                 {% if project.resources.all or project.poc.all or project.project_profile %}
+                                                     <!-- Third Level: Resources, POCs, and Project Profile within Project -->
+                                                     <div class="tree-children-grid">
                                                          {% if project.resources.all %}
                                                              <div class="tree-child">
                                                                  <div class="tree-node-content resource">
@@ -795,17 +801,6 @@
                                                                          </div>
                                                                      {% endfor %}
                                                                  </div>
-                                                             </div>
-                                                         {% endif %}
-
-                                                         {% if project.project_profile %}
-                                                             <div class="tree-child">
-                                                                 <div class="tree-node-content profile">
-                                                                     <div class="tree-node-icon"><i class="fas fa-id-badge"></i></div>
-                                                                     <div class="tree-node-name">{{ project.project_profile.resource_name }}</div>
-                                                                     <div class="tree-node-type">Project Profile</div>
-                                                                 </div>
-                                                                 <div class="tree-connector no-children"></div>
                                                              </div>
                                                          {% endif %}
 
@@ -827,9 +822,20 @@
                                                                  </div>
                                                              </div>
                                                          {% endif %}
+
+                                                         {% if project.project_profile %}
+                                                             <div class="tree-child">
+                                                                 <div class="tree-node-content profile">
+                                                                     <div class="tree-node-icon"><i class="fas fa-id-badge"></i></div>
+                                                                     <div class="tree-node-name">{{ project.project_profile.resource_name }}</div>
+                                                                     <div class="tree-node-type">Project Profile</div>
+                                                                 </div>
+                                                                 <div class="tree-connector no-children"></div>
+                                                             </div>
+                                                         {% endif %}
                                                      </div>
-                                                 </div>
-                                             {% endif %}
+                                                 {% endif %}
+                                             </div>
                                          {% endfor %}
                                      </div>
                                  </div>
@@ -849,10 +855,10 @@
             {% endif %}
         </div>
     </div>
-        </div>
+</div>
 
-        <!-- Projects Tab -->
-        <div class="tab-pane fade" id="projects" role="tabpanel" aria-labelledby="projects-tab">
+      <!-- Projects Tab -->
+<div class="tab-pane fade" id="projects" role="tabpanel" aria-labelledby="projects-tab">
     <div class="card-header bg-primary text-white" style="border-radius:10px;">
         <h5 class="mb-0 p-3">Project Tree Structure</h5>
     </div>
@@ -1000,8 +1006,7 @@
             {% endif %}
         </div>
     </div>
-        </div>
-    </div>
+</div>
 
 {% endblock %}
 

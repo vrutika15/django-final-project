@@ -296,6 +296,7 @@ def tree_structure_view(request):
     resources = Resource.objects.filter(is_active=True).order_by('-year', '-month', 'resource_name')
     selected_resource_id = request.GET.get('resource')
     selected_resource = None
+    assigned_projects = []
     
     #same as project, tries to fetch the specific resource
     if selected_resource_id:
@@ -304,11 +305,17 @@ def tree_structure_view(request):
             Prefetch('assigned_projects', queryset=Project.objects.select_related('project_profile').prefetch_related('resources'))
         ).get(id=selected_resource_id, is_active=True)"""
              selected_resource = Resource.objects.prefetch_related(
-    Prefetch(
-        'assigned_projects',
-        queryset=Project.objects.prefetch_related('project_profile', 'resources', 'poc')
-    )
-).get(id=selected_resource_id, is_active=True)
+             Prefetch(
+             'assigned_projects',
+             queryset=Project.objects.prefetch_related('project_profile', 'resources', 'poc')
+             )
+             ).get(id=selected_resource_id, is_active=True)
+              # Get projects where this resource is assigned OR is a POC (no distinct)
+             projects_as_resource = Project.objects.filter(resources=selected_resource).prefetch_related('project_profile', 'resources', 'poc')
+             projects_as_poc = Project.objects.filter(poc=selected_resource).prefetch_related('project_profile', 'resources', 'poc')
+
+             # Combine both lists (not querysets) to preserve duplicate project names
+             assigned_projects = list(projects_as_resource) + list(projects_as_poc)
  
         except Resource.DoesNotExist:
             selected_resource = None
@@ -355,6 +362,7 @@ def tree_structure_view(request):
         'resources_by_period': resources_by_period,
         'sorted_resource_periods': sorted_resource_periods,
         'selected_resource': selected_resource,
+        'assigned_projects': assigned_projects,
  
         #stats
         'total_projects': total_projects,
@@ -367,84 +375,3 @@ def tree_structure_view(request):
     return render(request, 'projects/tree_structure.html', context)
  
 
-#to add the resources to the tree view structure
-"""
-def tree_structure_view(request):
-    
-    Display a project list on the left and detailed project structure on the right.
-    
-    # Get all projects with their resources prefetched for efficiency
-    projects = Project.objects.prefetch_related('resources', 'project_profile').filter(is_active=True).order_by('project_name')
-    
-    # Get all resources for reference
-    resources = Resource.objects.filter(is_active=True).order_by('resource_name')
-    
-    # Get selected project from URL parameter
-    selected_project_id = request.GET.get('project')
-    selected_project = None
-    
-    if selected_project_id:
-        try:
-            selected_project = Project.objects.prefetch_related('resources', 'project_profile').get(id=selected_project_id, is_active=True)
-        except Project.DoesNotExist:
-            selected_project = None
-    
-    # If no project is selected, select the first one
-    if not selected_project and projects.exists():
-        selected_project = projects.first()
-    
-    # Group projects by year and month for the left sidebar
-    projects_by_period = {}
-    for project in projects:
-        period_key = f"{project.year}-{project.month:02d}"
-        if period_key not in projects_by_period:
-            projects_by_period[period_key] = {
-                'year': project.year,
-                'month': project.month,
-                'month_name': project.get_month_display(),
-                'projects': []
-            }
-        projects_by_period[period_key]['projects'].append(project)
-    
-    # Group resources by year and month (new logic)
-    resources_by_period = {}
-    for resource in resources:
-        period_key = f"{resource.year}-{resource.month:02d}"
-        if period_key not in resources_by_period:
-            resources_by_period[period_key] = {
-                'year': resource.year,
-                'month': resource.month,
-                'month_name': resource.get_month_display(),
-                'resources': []
-            }
-        resources_by_period[period_key]['resources'].append(resource)
-    
-    # Sort periods chronologically
-    sorted_periods = sorted(projects_by_period.keys(), reverse=True)
-    sorted_resource_periods = sorted(resources_by_period.keys(), reverse=True)
-    
-    # Calculate summary statistics
-    total_projects = projects.count()
-    total_resources = resources.count()
-    total_billable_hours = sum(p.billable_hours for p in projects)
-    total_non_billable_hours = sum(p.non_billable_hours for p in projects)
-    total_hours = total_billable_hours + total_non_billable_hours
-    
-    context = {
-        'projects_by_period': projects_by_period,
-        'sorted_periods': sorted_periods,
-        'selected_project': selected_project,
-        'total_projects': total_projects,
-        'total_resources': total_resources,
-        'total_billable_hours': total_billable_hours,
-        'total_non_billable_hours': total_non_billable_hours,
-        'total_hours': total_hours,
-        'utilization_percentage': (total_billable_hours / total_hours * 100) if total_hours > 0 else 0,
-
-        #new resource grouping context
-        'resources_by_period': resources_by_period,
-        'sorted_resource_periods': sorted_resource_periods,
-    }
-    
-    return render(request, 'projects/tree_structure.html', context)
-"""
