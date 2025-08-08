@@ -38,12 +38,12 @@ class ResourceForm(forms.ModelForm):
         # year and month are set in the view, so get from instance or session
         year = getattr(self.instance, 'year', None)
         month = getattr(self.instance, 'month', None)
-        if resource_name and year and month:
-            from .models import Resource as ResourceModel
-            qs = ResourceModel.objects.filter(resource_name=resource_name, year=year, month=month)
-            if self.instance.pk:
-                qs = qs.exclude(pk=self.instance.pk)
-            if qs.exists():
-                from django.core.exceptions import ValidationError
-                raise ValidationError("A resource with this name, year, and month already exists.")
+        # if resource_name and year and month:
+            # from .models import Resource as ResourceModel
+            # qs = ResourceModel.objects.filter(resource_name=resource_name, year=year, month=month)
+            # if self.instance.pk:
+                # qs = qs.exclude(pk=self.instance.pk)
+            # if qs.exists():
+                # from django.core.exceptions import ValidationError
+                # raise ValidationError("A resource with this name, year, and month already exists.")
         return cleaned_data
