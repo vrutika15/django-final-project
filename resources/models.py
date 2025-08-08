@@ -48,7 +48,7 @@ class Resource(models.Model):
         ordering = ['-year', '-month', 'resource_name']
         verbose_name = 'Resource'
         verbose_name_plural = 'Resources'
-        unique_together = ('resource_name', 'year', 'month')
+        # unique_together = ('resource_name', 'year', 'month')
 
     def __str__(self):
         return f"{self.resource_name} - {calendar.month_name[self.month]} {self.year}"
