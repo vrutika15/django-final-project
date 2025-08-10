@@ -45,6 +45,7 @@ class ResourceForm(forms.ModelForm):
         year = getattr(self.instance, 'year', None)
         month = getattr(self.instance, 'month', None)
         # if resource_name and year and month:
+<<<<<<< HEAD
         #     from .models import Resource as ResourceModel
         #     qs = ResourceModel.objects.filter(resource_name=resource_name, year=year, month=month)
         #     if self.instance.pk:
@@ -52,4 +53,13 @@ class ResourceForm(forms.ModelForm):
         #     if qs.exists():
         #         from django.core.exceptions import ValidationError
         #         raise ValidationError("A resource with this name, year, and month already exists.")
+=======
+            # from .models import Resource as ResourceModel
+            # qs = ResourceModel.objects.filter(resource_name=resource_name, year=year, month=month)
+            # if self.instance.pk:
+                # qs = qs.exclude(pk=self.instance.pk)
+            # if qs.exists():
+                # from django.core.exceptions import ValidationError
+                # raise ValidationError("A resource with this name, year, and month already exists.")
+>>>>>>> 293a2a3232a9db20a3337ba8fc252410fbcfea7c
         return cleaned_data

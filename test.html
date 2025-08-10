@@ -1,150 +1,33 @@
-view:
-resource_count = Resource.objects.filter(is_active=True,year=year, month=month).count()
-project_count = Project.objects.filter(is_active=True,year=year, month=month).count()
-
-html:
-<!--dashboard cards-->
-    <div class="d-flex justify-content-around flex-wrap gap-3 mt-4">
-  <div class="dashboard-card">
-    <h5>Total Number of Resources</h5>
-    <p class="card-value">{{ resource_count }}</p>
-  </div>
-  <div class="dashboard-card">
-    <h5>Total Number of Projects</h5>
-    <p class="card-value">{{ project_count }}</p>
-  </div>
-</div>
-
-projects-model:
-class Project(models.Model):
-    PROJECT_TYPE_CHOICES = [
-        ('REGULAR', 'Regular Project'),
-        ('FIXED_COST', 'Fixed Cost Project'),
-    ]
-
-    project_name = models.CharField(max_length=100)
-    project_type = models.CharField(
-        max_length=20,
-        choices=PROJECT_TYPE_CHOICES,
-        default='REGULAR'
-    )
-
-    year = models.PositiveIntegerField(
-        help_text="Enter the year for this project report (e.g., 2025)"
-    )
-
-    month = models.PositiveSmallIntegerField(
-        choices=[(i, calendar.month_name[i]) for i in range(1, 13)],
-        help_text="Enter the month for this project report (1–12)"
-    )
-
-    #project profile which can be selected multiple
-    project_profile = models.ForeignKey(
-        Resource,
-        on_delete=models.PROTECT,
-        related_name='profiled_projects',
-        help_text="Main profile/resource for this project"
-    )
-
-    resources = models.ManyToManyField(
-        Resource,
-        related_name='assigned_projects',
-        blank=True,
-        help_text="Multiple resources can be assigned to this project"
-    )
-
-    # POC (Point of Contact) field - multiple selection
-    poc = models.ManyToManyField(
-        Resource,
-        related_name='poc_projects',
-        blank=True,
-        help_text="Multiple POCs can be assigned to this project"
-    )
-
-    present_day = models.FloatField(
-        default=0,
-        validators=[MinValueValidator(0)],
-        help_text="Number of days the project was active"
-    )
-
-    billable_days = models.FloatField(
-        default=0,
-        validators=[MinValueValidator(0)],
-        help_text="Number of billable days"
-    )
-
-    non_billable_days = models.FloatField(
-        default=0,
-        validators=[MinValueValidator(0)],
-        help_text="Number of non-billable days"
-    )
-
-    billable_hours = models.FloatField(
-        default=0,
-        editable=False,
-        help_text="Auto-calculated from billable_days × 8"
-    )
-
-    non_billable_hours = models.FloatField(
-        default=0,
-        editable=False,
-        help_text="Auto-calculated from non_billable_days × 8"
-    )   
-
-    extra_hours = models.FloatField(
-        null=True,
-        blank=True,
-        default=0,
-        validators=[MinValueValidator(0)],
-        help_text="Any additional hours (optional)"
-    )
-
-    is_active = models.BooleanField(default=True, help_text="For soft deletion")
-    created_at = models.DateTimeField(auto_now_add=True)
-    counting = models.FloatField(default=0, help_text="Counting value")
-    updated_at = models.DateTimeField(auto_now=True)
-
-
-resources-model:
-class Resource(models.Model):
-    resource_name = models.CharField(
-        max_length=100,
-        help_text="Enter the full name of the resource"
-    )
-
-    year = models.PositiveIntegerField(
-        help_text="Enter the year manually (e.g., 2025)"
-    )
-
-    month = models.PositiveSmallIntegerField(
-        choices=[(i, calendar.month_name[i]) for i in range(1, 13)],
-        help_text="Enter the month manually (1-12)"
-    )
-
-    working_days = models.FloatField(
-        null=True,
-        blank=True,
-        help_text="Leave blank to auto-calculate (Mon-Fri + 1st Saturday)"
-    )
-
-    present_day = models.FloatField(
-        default=0,
-        help_text="Days resource was present"
-    )
-
-    present_hours = models.FloatField(
-        default=0,
-        help_text="Auto-calculated as present_day * 8 hours if not set"
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    counting = models.FloatField(default=0, help_text="Counting value")
-
-    is_active = models.BooleanField(
-        default=True,
-        help_text="Uncheck to deactivate this resource instead of deleting."
-    )
-
-+
-
-check this.. it shows 0 resources and 41 projects in every month
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        .totalcards{
+            background-color: #1E73BE;
+            height: 50px;
+            width: 50px;
+            color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section style="align-items: center;">
+            <div>
+                <div class="totalcards">
+                    Total resources
+                </div>
+                <div>
+                    Total projects
+                </div>
+                <div>
+                    Total interns
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -3,7 +3,8 @@ from .models import Resource
 from .forms import ResourceForm
 from django.contrib import messages
 from calendar import month_name
- 
+from projects.models import Project
+from interns.models import Intern
  
 def resource_list(request):
     resources = Resource.objects.all()
@@ -81,4 +82,37 @@ def resource_delete(request, pk):
 
     return render(request, 'resources/resource_confirm_delete.html', {'resource': resource})
 
- 
+def dashboard(request):
+    resource = Resource.objects.all()
+    project = Project.objects.all()
+    intern = Intern.objects.all()
+
+    resource_count = Resource.objects.values('resource_name').count()
+    project_count = Project.objects.values('project_name').count()
+    intern_count = Intern.objects.values('name').count()
+
+     #team prouctivity percentage 
+    total_present_hours = sum(r.present_hours for r in resource)
+    total_billable_hours = sum(p.billable_hours for p in project)
+    team_productivity_percentage = (100 * total_billable_hours / total_present_hours) if total_present_hours > 0 else 0
+
+    # presence percentage
+    total_present_days = sum(r.present_day for r in resource)
+    total_working_days = sum(r.working_days for r in resource)
+    presence_percentage = (100 * total_present_days)/total_working_days if total_working_days else 0
+
+    context = {
+        'resource': resource,
+        'project': project,
+        'intern': intern,
+        'resource_count': resource_count,
+        'project_count': project_count,
+        'intern_count': intern_count,
+        'total_present_hours': total_present_hours,
+        'total_billable_hours': total_billable_hours,
+        'team_productivity_percentage': team_productivity_percentage,
+        'total_present_days': total_present_days,
+        'total_working_days': total_working_days,
+        'presence_percentage': presence_percentage
+    }
+    return render(request,'admin_dashboard.html',context)
