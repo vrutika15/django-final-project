@@ -64,6 +64,7 @@ class Resource(models.Model):
 
         super().save(*args, **kwargs)
 
+    #does not need self, just works like a normal function inside the class.
     @staticmethod
     def get_working_days(year, month):
         """
@@ -74,7 +75,9 @@ class Resource(models.Model):
             
         _, num_days = calendar.monthrange(year, month)
         first_day = calendar.monthrange(year, month)[0]
+        #finds first saturday of month, loops thorough each day, adds 1 for every mon-fri, adds 1 if is saturday
         first_saturday = (5 - first_day) % 7 + 1
+        #if first_saturday is greater than number of days in month, set it to None
         if first_saturday > num_days:
             first_saturday = None
 
@@ -89,6 +92,7 @@ class Resource(models.Model):
 
         return working_days
 
+    #ex: "22 days (August 2025)"
     def get_working_days_for_display(self):
         if self.year is None or self.month is None:
             return "0 days (year/month not set)"

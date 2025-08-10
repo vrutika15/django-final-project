@@ -756,7 +756,7 @@
                                             <div class="tree-node-content profile">
                                                 <div class="tree-node-icon"><i class="fas fa-id-badge"></i></div>
                                                 <div class="tree-node-name">{{ project.project_name }}</div>
-                                                <div class="tree-node-type">Project Name</div>
+                                                <div class="tree-node-type">Project Profile</div>
                                             </div>
                                             {% if project.resources.all or project.poc.all %}
                                             <div class="tree-connector"></div>
@@ -912,7 +912,7 @@
                                         <!-- Resources -->
                                         {% if selected_project.resources.all %}
                                         <div class="tree-child">
-                                                 <div class="tree-node-content resource">
+                                                                                         <div class="tree-node-content resource">
                                                  <div class="tree-node-icon"><i class="fas fa-users"></i></div>
                                                  <div class="tree-node-name">Resources ({{ selected_project.resources.count }})</div>
                                                  <div class="tree-node-type">Assigned</div>
@@ -930,7 +930,7 @@
                                         </div>
                                         {% endif %}
                                         
-                                         <!-- Project Profile -->
+                                                                                 <!-- Project Profile -->
                                          {% if selected_project.project_profile %}
                                          <div class="tree-child">
                                              <div class="tree-node-content profile">

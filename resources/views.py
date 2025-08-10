@@ -16,7 +16,9 @@ def resource_list(request):
     if month:
         resources = resources.filter(month=month)
 
+    #distinct years for dropdown
     years = Resource.objects.values_list('year', flat=True).distinct().order_by('-year')
+    #month name in whole name format
     months = [(i, month_name[i]) for i in range(1, 13)]
 
     return render(request, "resources/resource_list.html", {
@@ -37,6 +39,7 @@ def resource_create(request):
         form = ResourceForm(request.POST)
         if form.is_valid():
             resource = form.save(commit=False)
+            #Set the year and month manually from session
             resource.year = year
             resource.month = month
             resource.save()
@@ -56,6 +59,7 @@ def resource_update(request, pk):
             messages.success(request, 'Resource updated successfully.')
             return redirect('resources:resource_list')
     else:
+        #pre-fill form with existing resource data, if get reques
         form = ResourceForm(instance=resource)
     return render(request, 'resources/resource_form.html', {'form': form, 'title': 'Edit Resource'})
 
@@ -63,7 +67,7 @@ def resource_update(request, pk):
 def resource_delete(request, pk):
     resource = get_object_or_404(Resource, pk=pk)
     if request.method == 'POST':
-        # Check if this resource is referenced by any project
+        #check if this resource is referenced by any project
         if resource.profiled_projects.exists() or resource.assigned_projects.exists():
             messages.error(
                 request,
