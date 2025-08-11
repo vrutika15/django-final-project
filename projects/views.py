@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from datetime import datetime
-from .models import Project
+from .models import Project, ProjectReport
 from .forms import ProjectForm
 from resources.models import Resource
 from django.db.models import Prefetch
@@ -120,7 +120,9 @@ def dashboard_home(request):
         join_date__month=month
     ).count()
 
-    project_count = Project.objects.filter(is_active=True, year=year, month=month).count()
+    
+    project_count = ProjectReport.objects.filter(year=year, month=month, project__is_active=True).count()
+
 
     return render(request, 'home.html', {
         'years': years,
@@ -157,8 +159,9 @@ def project_list(request):
     if selected_month:
         projects = projects.filter(month=selected_month)
 
-    years = Project.objects.values_list('year', flat=True).distinct().order_by('year')
-    months = Project.objects.values_list('month', flat=True).distinct().order_by('month')
+    years = Project.objects.values_list('start_year', flat=True).distinct().order_by('start_year')
+    months = Project.objects.values_list('start_month', flat=True).distinct().order_by('start_month')
+
 
     return render(request, 'projects/project_list.html', {
         'projects': projects,

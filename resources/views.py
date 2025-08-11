@@ -117,11 +117,15 @@ def monthly_data_update(request, pk):
 
 
 def dashboard(request):
+
+    year = int(request.GET.get('year', date.today().year))
+    month = int(request.GET.get('month', date.today().month))
+
     # Aggregate monthly data for active resources
     active_resources = Resource.objects.filter(is_active=True)
 
     # Aggregate sums for present hours and working days across all monthly data for active resources
-    monthly_data_qs = ResourceMonthlyData.objects.filter(resource__in=active_resources)
+    monthly_data_qs = ResourceMonthlyData.objects.filter(resource__in=active_resources,year=year,month=month)
 
     total_present_hours = monthly_data_qs.aggregate(total=Sum('present_hours'))['total'] or 0
     total_working_days = monthly_data_qs.aggregate(total=Sum('working_days'))['total'] or 0
@@ -148,5 +152,8 @@ def dashboard(request):
         'total_present_days': total_present_days,
         'total_working_days': total_working_days,
         'presence_percentage': presence_percentage,
+        'monthly_data': monthly_data_qs,
+        'year': year,
+        'month': month,
     }
     return render(request, 'admin_dashboard.html', context)
