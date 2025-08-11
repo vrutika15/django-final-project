@@ -18,11 +18,11 @@ def dashboard_home(request):
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
     ]
-    # Get year and month from GET params, fallback to current year/month
     now = datetime.now()
-    tab = request.GET.get('tab', 'projects') #default to projects tab
+    tab = request.GET.get('tab', 'projects')  # default to projects tab
     year_param = request.GET.get('year')
     month_param = request.GET.get('month')
+
     try:
         year = int(year_param) if year_param else now.year
     except ValueError:
@@ -31,52 +31,44 @@ def dashboard_home(request):
         month = int(month_param) if month_param else now.month
     except ValueError:
         month = now.month
+
     # Store in session for resource creation
     if year_param and month_param:
         request.session['selected_year'] = year
         request.session['selected_month'] = month
-    # Filter projects/resources by year and month (month as number)
-    from resources.models import Resource
-    from .models import Project
-    projects = Project.objects.filter(year=year, month=month)
-    resources = Resource.objects.filter(year=year, month=month)
 
-    #team productivity percentage
+    # Filter projects/resources by year and month
+    projects = Project.objects.filter(start_year=year, start_month=month)
+    resources = Resource.objects.filter(join_date__year=year, join_date__month=month)
+
+    # Initialize variables
     team_productivity_percentage = None
-    # Default values
     total_working_days = 0
     total_present_days = 0
     total_present_hours = 0
     presence_percentage = 0
-
     total_billable_days = 0
     total_non_billable_days = 0
     total_billable_hours = 0
     total_non_billable_hours = 0
-
-    #resource
     resource_status = []
 
     if tab == 'charts':
-        #team prouctivity percentage 
         total_present_hours = sum(r.present_hours for r in resources)
         total_billable_hours = sum(p.billable_hours for p in projects)
         team_productivity_percentage = (100 * total_billable_hours / total_present_hours) if total_present_hours > 0 else 0
 
-        # presence percentage
         total_present_days = sum(r.present_day for r in resources)
         total_working_days = sum(r.working_days for r in resources)
-        presence_percentage = (100 * total_present_days)/total_working_days if total_working_days else 0
-    
-    if tab == 'resources': 
-        # Totals for resource  
-       total_working_days = sum(r.working_days for r in resources)
-       total_present_days = sum(r.present_day for r in resources)
-       total_present_hours = sum(r.present_hours for r in resources)
-       presence_percentage = (100 * total_present_days)/total_working_days if total_working_days else 0
+        presence_percentage = (100 * total_present_days) / total_working_days if total_working_days else 0
 
-    if tab  == 'projects':
-         # Totals for project
+    if tab == 'resources':
+        total_working_days = sum(r.working_days for r in resources)
+        total_present_days = sum(r.present_day for r in resources)
+        total_present_hours = sum(r.present_hours for r in resources)
+        presence_percentage = (100 * total_present_days) / total_working_days if total_working_days else 0
+
+    if tab == 'projects':
         total_present_days = sum(p.present_day for p in projects)
         total_billable_days = sum(p.billable_days for p in projects)
         total_non_billable_days = sum(p.non_billable_days for p in projects)
@@ -87,7 +79,6 @@ def dashboard_home(request):
         for resource in resources:
             poc_projects = resource.poc_projects.all()
             assigned_projects = resource.assigned_projects.all()
-
             all_projects = (poc_projects | assigned_projects).distinct()
 
             total_poc_count = 0
@@ -117,16 +108,20 @@ def dashboard_home(request):
                 status = "Uncategorized"
 
             resource_status.append({
-            'name': resource.resource_name,
-            'poc_count': total_poc_count,
-            'dev_count': total_dev_count,
-            'status': status
+                'name': resource.resource_name,
+                'poc_count': total_poc_count,
+                'dev_count': total_dev_count,
+                'status': status
             })
 
-     #dashboard card
-    resource_count = Resource.objects.filter(is_active=True,year=year, month=month).values('resource_name').count()
-    project_count = Project.objects.filter(is_active=True,year=year, month=month).values('project_name').count()
-    
+    resource_count = Resource.objects.filter(
+        is_active=True,
+        join_date__year=year,
+        join_date__month=month
+    ).count()
+
+    project_count = Project.objects.filter(is_active=True, year=year, month=month).count()
+
     return render(request, 'home.html', {
         'years': years,
         'months': months,
@@ -134,7 +129,6 @@ def dashboard_home(request):
         'month': month,
         'projects': projects,
         'resources': resources,
-       # 'active_tab': active_tab,
         'current_year': now.year,
         'current_month': now.month,
         'active_tab': tab,
@@ -142,28 +136,27 @@ def dashboard_home(request):
         'total_working_days': total_working_days,
         'total_present_days': total_present_days,
         'total_present_hours': total_present_hours,
-        'presence_percentage' : presence_percentage,
+        'presence_percentage': presence_percentage,
         'total_billable_days': total_billable_days,
         'total_non_billable_days': total_non_billable_days,
         'total_billable_hours': total_billable_hours,
         'total_non_billable_hours': total_non_billable_hours,
-        'resource_status' : resource_status,
+        'resource_status': resource_status,
         'resource_count': resource_count,
         'project_count': project_count
     })
+
 
 def project_list(request):
     selected_year = request.GET.get('year')
     selected_month = request.GET.get('month')
 
     projects = Project.objects.all()
-
     if selected_year:
         projects = projects.filter(year=selected_year)
     if selected_month:
         projects = projects.filter(month=selected_month)
 
-    #get distinct years and months for filters
     years = Project.objects.values_list('year', flat=True).distinct().order_by('year')
     months = Project.objects.values_list('month', flat=True).distinct().order_by('month')
 
@@ -180,9 +173,7 @@ def project_create(request):
     if request.method == 'POST':
         project_form = ProjectForm(request.POST)
         if project_form.is_valid():
-            project = project_form.save(commit=False)
             project_form.save()
-            project_form.save_m2m()
             return redirect('projects:project_list')
     else:
         year = request.session.get('selected_year')
@@ -200,9 +191,7 @@ def project_edit(request, pk):
     if request.method == 'POST':
         project_form = ProjectForm(request.POST, instance=project)
         if project_form.is_valid():
-            project = project_form.save(commit=False)
             project_form.save()
-            project_form.save_m2m()
             return redirect('projects:project_list')
     else:
         project_form = ProjectForm(instance=project)
@@ -211,6 +200,7 @@ def project_edit(request, pk):
         'form': project_form,
         'title': 'Edit Project'
     })
+
 
 def project_delete(request, pk):
     project = get_object_or_404(Project, pk=pk)
@@ -226,13 +216,11 @@ def attendance_home(request):
     resources = Resource.objects.all()
     projects = Project.objects.prefetch_related('resources').all()
 
-    # Totals for resource
     total_working_days = sum(r.working_days for r in resources)
     total_present_days = sum(r.present_day for r in resources)
     total_present_hours = sum(r.present_hours for r in resources)
-    presence_percentage = (100 * total_present_days)/total_working_days if total_working_days else 0
+    presence_percentage = (100 * total_present_days) / total_working_days if total_working_days else 0
 
-    # Totals for project
     total_present_days = sum(p.present_day for p in projects)
     total_billable_days = sum(p.billable_days for p in projects)
     total_non_billable_days = sum(p.non_billable_days for p in projects)
@@ -245,14 +233,46 @@ def attendance_home(request):
         'total_working_days': total_working_days,
         'total_present_days': total_present_days,
         'total_present_hours': total_present_hours,
+        'presence_percentage': presence_percentage,
         'total_billable_days': total_billable_days,
         'total_non_billable_days': total_non_billable_days,
         'total_billable_hours': total_billable_hours,
         'total_non_billable_hours': total_non_billable_hours,
-        'presence_percentage' : presence_percentage
     }
-
     return render(request, 'attendance/attendance_home.html', context)
+
+
+# def attendance_home(request):
+#     resources = Resource.objects.all()
+#     projects = Project.objects.prefetch_related('resources').all()
+
+#     # Totals for resource
+#     total_working_days = sum(r.working_days for r in resources)
+#     total_present_days = sum(r.present_day for r in resources)
+#     total_present_hours = sum(r.present_hours for r in resources)
+#     presence_percentage = (100 * total_present_days)/total_working_days if total_working_days else 0
+
+#     # Totals for project
+#     total_present_days = sum(p.present_day for p in projects)
+#     total_billable_days = sum(p.billable_days for p in projects)
+#     total_non_billable_days = sum(p.non_billable_days for p in projects)
+#     total_billable_hours = sum(p.billable_hours for p in projects)
+#     total_non_billable_hours = sum(p.non_billable_hours for p in projects)
+
+#     context = {
+#         'resources': resources,
+#         'projects': projects,
+#         'total_working_days': total_working_days,
+#         'total_present_days': total_present_days,
+#         'total_present_hours': total_present_hours,
+#         'total_billable_days': total_billable_days,
+#         'total_non_billable_days': total_non_billable_days,
+#         'total_billable_hours': total_billable_hours,
+#         'total_non_billable_hours': total_non_billable_hours,
+#         'presence_percentage' : presence_percentage
+#     }
+
+#     return render(request, 'attendance/attendance_home.html', context)
 
 def tree_structure_view(request):
     # Get all projects with their resources prefetched for efficiency

@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Resources</h2>
+    <h2 class="mb-4">Resources Monthly Data</h2>
 
     <!-- Add Resource Button -->
     <a href="{% url 'resources:resource_create' %}" class="btn btn-outline-success mb-3">
@@ -17,8 +17,7 @@
             <select class="form-select" id="year" name="year">
                 <option value="">All</option>
                 {% for y in years %}
-                <option value="{{ y }}" {% if y|stringformat:"s" == request.GET.year %}selected{% endif %}>{{ y }}
-                </option> 
+                <option value="{{ y }}" {% if y|stringformat:"s" == selected_year %}selected{% endif %}>{{ y }}</option> 
                 {% endfor %}
             </select>
         </div>
@@ -27,8 +26,7 @@
             <select class="form-select" id="month" name="month">
                 <option value="">All</option>
                 {% for m in months %}
-                <option value="{{ m.0 }}" {% if m.0|stringformat:"s" == request.GET.month %}selected{% endif %}>{{ m.1 }}
-                </option>
+                <option value="{{ m.0 }}" {% if m.0|stringformat:"s" == selected_month %}selected{% endif %}>{{ m.1 }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -41,15 +39,15 @@
 
     <!-- Messages -->
     {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}">
-        <i class="far fa-info-circle"></i> {{ message }}
-    </div>
-    {% endfor %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <i class="far fa-info-circle"></i> {{ message }}
+            </div>
+        {% endfor %}
     {% endif %}
 
-    <!-- Resources Table -->
-    {% if resources %}
+    <!-- Resources Monthly Data Table -->
+    {% if monthly_data %}
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-dark">
@@ -65,27 +63,32 @@
                 </tr>
             </thead>
             <tbody>
-                {% for r in resources %}
+                {% for rmd in monthly_data %}
                 <tr>
-                    <td>{{ r.resource_name }}</td>
-                    <td>{{ r.working_days }}</td>
-                    <td>{{ r.present_day }}</td>
-                    <td>{{ r.present_hours }}</td>
-                    <td>{{ r.year }}</td>
-                    <td>{{ r.get_month_display }}</td>
+                    <td>{{ rmd.resource.resource_name }}</td>
+                    <td>{{ rmd.working_days }}</td>
+                    <td>{{ rmd.present_day }}</td>
+                    <td>{{ rmd.present_hours }}</td>
+                    <td>{{ rmd.year }}</td>
+                    <td>{{ rmd.get_month_display }}</td>
                     <td>
-                    {% if r.is_active %}
-                    <span class="badge bg-success">Active</span>
-                    {% else %}
-                    <span class="badge bg-danger">Inactive</span>
-                    {% endif %}
+                        {% if rmd.resource.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
                     </td>
                     <td class="text-center">
-                        <a href="{% url 'resources:resource_update' r.pk %}"
-                            class="btn btn-sm btn-outline-warning me-1">
+                        <a href="{% url 'resources:monthly_data_update' rmd.pk %}" class="btn btn-sm btn-outline-warning me-1" title="Edit Monthly Data">
                             <i class="far fa-edit"></i>
                         </a>
-                        <a href="{% url 'resources:resource_delete' r.pk %}" class="btn btn-sm btn-outline-danger">
+                        <a href="{% url 'resources:monthly_data_create' rmd.resource.pk %}" class="btn btn-sm btn-outline-info me-1" title="Add Monthly Data for Resource">
+                            <i class="far fa-plus-square"></i>
+                        </a>
+                        <a href="{% url 'resources:resource_update' rmd.resource.pk %}" class="btn btn-sm btn-outline-primary me-1" title="Edit Resource">
+                            <i class="far fa-user-edit"></i>
+                        </a>
+                        <a href="{% url 'resources:resource_delete' rmd.resource.pk %}" class="btn btn-sm btn-outline-danger" title="Deactivate Resource">
                             <i class="far fa-trash-alt"></i>
                         </a>
                     </td>
@@ -95,7 +98,7 @@
         </table>
     </div>
     {% else %}
-    <div class="alert alert-info"><i class="far fa-folder-open"></i> No resources found.</div>
+    <div class="alert alert-info"><i class="far fa-folder-open"></i> No resource data found.</div>
     {% endif %}
 </div>
 
