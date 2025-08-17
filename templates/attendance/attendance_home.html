@@ -1,137 +1,67 @@
-{% extends "base.html" %} {% block title %}Attendance Dashboard{% endblock %}
-{%block extra_css %}
-<!-- DataTables CSS -->
-<link
-  rel="stylesheet"
-  href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css"
-/>
-{% endblock %} {% block content %}
-<!--<!DOCTYPE html>
-<html>
-  <head>
-    <title>Company Data</title>
+{% extends "base.html" %}
+{% block title %}Attendance Dashboard{% endblock %}
 
-    cmnt Bootstrap CSS 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"/>
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css" />
+{% endblock %}
 
-    cmnt DataTables CSS 
-    <link
-      rel="stylesheet"
-      href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css"
-    />
-    comment <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css"> 
-  </head> -->
-
-<!--<body>-->
+{% block content %}
 <div class="container mt-4">
-  <div class="row ">
+  <div class="row">
     <div class="col-12">
       <h2 class="mb-2">Attendance</h2>
-     <!-- <p class="lead mb-0">Overview of Resource and Project Attendance</p> -->
     </div>
   </div>
+
   <!-- Tabs -->
   <ul class="nav nav-tabs justify-content-center" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
-      <button
-        class="nav-link active"
-        id="resource-tab"
-        data-bs-toggle="tab"
-        data-bs-target="#resource"
-        type="button"
-        role="tab"
-        aria-controls="resource"
-        aria-selected="true"
-      >
-        Resource
-      </button>
+      <button class="nav-link active" id="resource-tab" data-bs-toggle="tab" data-bs-target="#resource" type="button" role="tab" aria-controls="resource" aria-selected="true">Resource</button>
     </li>
     <li class="nav-item" role="presentation">
-      <button
-        class="nav-link"
-        id="project-tab"
-        data-bs-toggle="tab"
-        data-bs-target="#project"
-        type="button"
-        role="tab"
-        aria-controls="project"
-        aria-selected="false"
-      >
-        Project
-      </button>
+      <button class="nav-link" id="project-tab" data-bs-toggle="tab" data-bs-target="#project" type="button" role="tab" aria-controls="project" aria-selected="false">Project</button>
     </li>
   </ul>
 
   <!-- Tab Contents -->
   <div class="tab-content" id="myTabContent">
     <!-- Resource Tab -->
-    <div
-      class="tab-pane fade show active p-4"
-      id="resource"
-      role="tabpanel"
-      aria-labelledby="resource-tab"
-    >
+    <div class="tab-pane fade show active p-4" id="resource" role="tabpanel" aria-labelledby="resource-tab">
       <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white">
           <h5 class="mb-0">Resource Attendance</h5>
         </div>
         <div class="card-body">
-          <!--<div class="row mb-3">
-            <div class="col-md-6">
-              <span class="fw-bold">Total Working Days:</span> {{
-              total_working_days }}<br />
-              <span class="fw-bold">Total Present Days:</span> {{
-              total_present_days }}<br />
-              <span class="fw-bold">Total Present Hours:</span> {{
-              total_present_hours }}
-            </div>
-            <div class="col-md-6 text-md-end mt-3 mt-md-0">
-              <span class="fw-bold">Presence Percentage:</span>
-              <span class="badge bg-success fs-5"
-                >{{ presence_percentage|floatformat:2 }}%</span
-              >
-            </div>
-          </div>-->
           <div class="table-responsive">
-            <table
-              id="resourceTable"
-              class="table table-bordered table-hover align-middle"
-            >
+            <table id="resourceTable" class="table table-bordered table-hover align-middle">
               <thead class="table-dark">
                 <tr class="text-center align-middle">
                   <th>Name</th>
                   <th>Working Days</th>
                   <th>Days Present</th>
                   <th>Hours Present</th>
-                  <!--<th>Actions</th>-->
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {% if resources %} {% for resource in resources %}
-                <tr>
-                  <td>{{ resource.resource_name }}</td>
-                  <td>{{ resource.working_days }}</td>
-                  <td>{{ resource.present_day }}</td>
-                  <td>{{ resource.present_hours }}</td>
-                  <!--<td>
-                    <a
-                      href="{% url 'resources:resource_update' resource.pk %}"
-                      class="btn btn-sm btn-primary"
-                      >Edit</a
-                    >
-                    <a
-                      href="{% url 'resources:resource_delete' resource.pk %}"
-                      class="btn btn-sm btn-danger"
-                      >Delete</a
-                    >
-                  </td>-->
-                </tr>
-                {% endfor %} {% else %}
-                <tr>
-                  <td colspan="5" class="text-center">No resources found.</td>
-                </tr>
+                {% if resources %}
+                  {% for resource in resources %}
+                    <tr>
+                      <td>{{ resource.resource_name }}</td>
+                      <td>{{ resource.working_days }}</td>
+                      <td>{{ resource.present_day }}</td>
+                      <td>{{ resource.present_hours }}</td>
+                      <td class="text-center">
+                        <a href="{% url 'projects:add_resource_attendance' resource.id %}" class="btn btn-sm btn-primary">
+                          Add Monthly Attendance
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="5" class="text-center">No resources found.</td>
+                  </tr>
                 {% endif %}
               </tbody>
               <tfoot>
@@ -140,11 +70,12 @@
                   <td>{{ total_working_days }}</td>
                   <td>{{ total_present_days }}</td>
                   <td>{{ total_present_hours }}</td>
-                 <!-- <td></td>-->
+                  <td></td>
                 </tr>
                 <tr class="table-secondary fw-bold">
                   <td colspan="3">Presence Percentage</td>
                   <td>{{ presence_percentage|floatformat:2 }}%</td>
+                  <td></td>
                 </tr>
               </tfoot>
             </table>
@@ -152,37 +83,16 @@
         </div>
       </div>
     </div>
+
     <!-- Project Tab -->
-    <div
-      class="tab-pane fade p-4"
-      id="project"
-      role="tabpanel"
-      aria-labelledby="project-tab"
-    >
+    <div class="tab-pane fade p-4" id="project" role="tabpanel" aria-labelledby="project-tab">
       <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white">
           <h5 class="mb-0">Project Attendance</h5>
         </div>
         <div class="card-body">
-          <!--<div class="row mb-3">
-            <div class="col-md-6">
-              <span class="fw-bold">Total Billable Days:</span> {{
-              total_billable_days }}<br />
-              <span class="fw-bold">Total Non-Billable Days:</span> {{
-              total_non_billable_days }}
-            </div>
-            <div class="col-md-6 text-md-end mt-3 mt-md-0">
-              <span class="fw-bold">Total Billable Hours:</span> {{
-              total_billable_hours }}<br />
-              <span class="fw-bold">Total Non-Billable Hours:</span> {{
-              total_non_billable_hours }}
-            </div>
-          </div>-->
           <div class="table-responsive">
-            <table
-              id="projectTable"
-              class="table table-striped table-bordered align-middle"
-            >
+            <table id="projectTable" class="table table-striped table-bordered align-middle">
               <thead class="table-dark">
                 <tr class="text-center align-middle">
                   <th>Project Name</th>
@@ -194,6 +104,7 @@
                   <th>Non-Billable Days</th>
                   <th>Billable Hours</th>
                   <th>Non-Billable Hours</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -203,8 +114,7 @@
                   <td>{{ proj.project_type }}</td>
                   <td>
                     {% for resource in proj.resources.all %}
-                    <span>{{ resource.resource_name }}</span>
-                    {% if not forloop.last %}, {% endif %} 
+                      {{ resource.resource_name }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                   </td>
                   <td>{{ proj.extra_hours|default_if_none:0 }}</td>
@@ -213,6 +123,11 @@
                   <td>{{ proj.non_billable_days }}</td>
                   <td>{{ proj.billable_hours }}</td>
                   <td>{{ proj.non_billable_hours }}</td>
+                  <td class="text-center">
+                    <a href="{% url 'projects:add_project_attendance' proj.id %}" class="btn btn-sm btn-primary">
+                      Add Monthly Attendance
+                    </a>
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -224,11 +139,8 @@
                   <td>{{ total_non_billable_days }}</td>
                   <td>{{ total_billable_hours }}</td>
                   <td>{{ total_non_billable_hours }}</td>
+                  <td></td>
                 </tr>
-               <!-- <tr class="table-secondary fw-bold">
-                  <td colspan="6">Team Productivity Percentage</td>
-                  <td>{{ team_productivity_percentage|floatformat:2 }}</td>
-                </tr> -->
               </tfoot>
             </table>
           </div>
@@ -236,21 +148,19 @@
       </div>
     </div>
   </div>
-  {% endblock %} {% block extra_js %}
-  <!-- JS -->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
-  <!-- DataTables Init Script -->
-  <script>
-    $(document).ready(function () {
-      $("#resourceTable").DataTable();
-      $("#projectTable").DataTable();
-    });
-  </script>
-  {% endblock %}
-  <!--</body>
-</html>-->
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+<script>
+  $(document).ready(function () {
+    $("#resourceTable").DataTable();
+    $("#projectTable").DataTable();
+  });
+</script>
+{% endblock %}

@@ -50,7 +50,6 @@ class ResourceMonthlyData(models.Model):
     )
     present_day = models.FloatField(default=0)
     present_hours = models.FloatField(default=0)
-    counting = models.FloatField(default=0, help_text="Custom counting value")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

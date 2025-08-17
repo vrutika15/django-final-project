@@ -49,8 +49,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('form');
     const yearInput = document.querySelector('select[name="year"]');
     const monthInput = document.querySelector('select[name="month"]');
-    const presentDayInput = document.querySelector('input[name="present_day"]');
-    const presentHoursInput = document.querySelector('input[name="present_hours"]');
+    const presentDayInput = document.getElementById('id_present_day');
+    const presentHoursInput = document.getElementById('id_present_hours');
 
     // Restore year/month from localStorage
     const storedYear = localStorage.getItem('selectedYear');
@@ -67,12 +67,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Dynamic calculation: present_hours = present_day * 8
     if (presentDayInput && presentHoursInput) {
         presentDayInput.addEventListener('input', function () {
-            const presentDay = parseFloat(presentDayInput.value);
-            if (!isNaN(presentDay)) {
-                presentHoursInput.value = (presentDay * 8).toFixed(2);
-            } else {
-                presentHoursInput.value = '';
-            }
+            const presentDay = parseFloat(this.value) || 0;
+            presentHoursInput.value = (presentDay * 8).toFixed(2);
         });
     }
 });

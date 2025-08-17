@@ -20,7 +20,7 @@ class ResourceMonthlyForm(forms.ModelForm):
     # For month-specific details
     class Meta:
         model = ResourceMonthlyData
-        fields = ['year', 'month', 'working_days', 'present_day', 'present_hours', 'counting']
+        fields = ['year', 'month', 'working_days', 'present_day', 'present_hours']
         widgets = {
             'year': forms.NumberInput(attrs={'class': 'form-control'}),
             'month': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -30,13 +30,11 @@ class ResourceMonthlyForm(forms.ModelForm):
                 'placeholder': 'Leave blank for auto-calculation'
             }),
             'present_day': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
-            'present_hours': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
-            'counting': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'present_hours': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5', 'readonly': 'readonly'}),
         }
         labels = {
             'present_day': 'Days Present',
-            'present_hours': 'Hours Present',
-            'counting': 'Include in Calculation'
+            'present_hours': 'Hours Present'
         }
 
     def __init__(self, *args, **kwargs):
@@ -59,4 +57,9 @@ class ResourceMonthlyForm(forms.ModelForm):
         #     if qs.exists():
         #         from django.core.exceptions import ValidationError
         #         raise ValidationError("A record for this resource already exists for this month and year.")
+
+        present_day = cleaned_data.get('present_day')
+        if present_day is not None:
+            cleaned_data['present_hours'] = round(present_day * 8, 2)
+
         return cleaned_data

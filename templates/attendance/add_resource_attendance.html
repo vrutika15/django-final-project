@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Add Monthly Attendance for {{ resource.resource_name }}</h2>
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        <div class="row">
+            {% for field in form %}
+                <div class="mb-3 col-md-6">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}:</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="text-danger">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-success">Submit</button>
+        <a href="{% url 'projects:attendance_home' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+<script>
+  document.getElementById('id_present_day').addEventListener('input', function() {
+    const presentDay = parseFloat(this.value) || 0;
+    document.getElementById('id_present_hours').value = (presentDay * 8).toFixed(2);
+  });
+</script>
+{% endblock %}

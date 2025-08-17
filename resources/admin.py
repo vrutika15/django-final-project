@@ -22,7 +22,6 @@ class ResourceMonthlyDataAdmin(admin.ModelAdmin):
         'working_days',
         'present_day',
         'present_hours',
-        'counting',
         'created_at',
     )
     search_fields = ('resource__resource_name',)

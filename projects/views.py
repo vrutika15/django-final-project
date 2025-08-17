@@ -3,14 +3,17 @@ from django.urls import reverse
 from datetime import datetime
 from .models import Project, ProjectReport
 from .forms import ProjectForm
-from resources.models import Resource
-from django.db.models import Prefetch
+from resources.models import Resource, ResourceMonthlyData
+from django.db.models import Prefetch, Max, Q
 from django.contrib import messages
-
+from django.db.models import Sum
+from datetime import date
+import calendar
+from resources.forms import ResourceMonthlyForm
+from projects.forms import ProjectReportForm
 
 def team_dashboard_redirect(request):
     return redirect('dashboard_home')
-
 
 def dashboard_home(request):
     years = list(range(2020, 2031))
@@ -19,7 +22,7 @@ def dashboard_home(request):
         'July', 'August', 'September', 'October', 'November', 'December'
     ]
     now = datetime.now()
-    tab = request.GET.get('tab', 'projects')  # default to projects tab
+    tab = request.GET.get('tab', 'projects')
     year_param = request.GET.get('year')
     month_param = request.GET.get('month')
 
@@ -32,16 +35,14 @@ def dashboard_home(request):
     except ValueError:
         month = now.month
 
-    # Store in session for resource creation
     if year_param and month_param:
         request.session['selected_year'] = year
         request.session['selected_month'] = month
 
-    # Filter projects/resources by year and month
-    projects = Project.objects.filter(start_year=year, start_month=month)
+    # Filter ProjectReports instead of Project
+    reports = ProjectReport.objects.filter(year=year, month=month)
     resources = Resource.objects.filter(join_date__year=year, join_date__month=month)
 
-    # Initialize variables
     team_productivity_percentage = None
     total_working_days = 0
     total_present_days = 0
@@ -54,26 +55,36 @@ def dashboard_home(request):
     resource_status = []
 
     if tab == 'charts':
-        total_present_hours = sum(r.present_hours for r in resources)
-        total_billable_hours = sum(p.billable_hours for p in projects)
+        monthly_data_qs = ResourceMonthlyData.objects.filter(
+            resource__in=resources,
+            year=year,
+            month=month
+        )
+        total_present_hours = monthly_data_qs.aggregate(total=Sum('present_hours'))['total'] or 0
+        total_billable_hours = reports.aggregate(total=Sum('billable_hours'))['total'] or 0
         team_productivity_percentage = (100 * total_billable_hours / total_present_hours) if total_present_hours > 0 else 0
 
-        total_present_days = sum(r.present_day for r in resources)
-        total_working_days = sum(r.working_days for r in resources)
+        total_present_days = monthly_data_qs.aggregate(total=Sum('present_day'))['total'] or 0
+        total_working_days = monthly_data_qs.aggregate(total=Sum('working_days'))['total'] or 0
         presence_percentage = (100 * total_present_days) / total_working_days if total_working_days else 0
 
     if tab == 'resources':
-        total_working_days = sum(r.working_days for r in resources)
-        total_present_days = sum(r.present_day for r in resources)
-        total_present_hours = sum(r.present_hours for r in resources)
+        monthly_data_qs = ResourceMonthlyData.objects.filter(
+            resource__in=resources,
+            year=year,
+            month=month
+        )
+        total_working_days = monthly_data_qs.aggregate(total=Sum('working_days'))['total'] or 0
+        total_present_days = monthly_data_qs.aggregate(total=Sum('present_day'))['total'] or 0
+        total_present_hours = monthly_data_qs.aggregate(total=Sum('present_hours'))['total'] or 0
         presence_percentage = (100 * total_present_days) / total_working_days if total_working_days else 0
 
     if tab == 'projects':
-        total_present_days = sum(p.present_day for p in projects)
-        total_billable_days = sum(p.billable_days for p in projects)
-        total_non_billable_days = sum(p.non_billable_days for p in projects)
-        total_billable_hours = sum(p.billable_hours for p in projects)
-        total_non_billable_hours = sum(p.non_billable_hours for p in projects)
+        total_present_days = reports.aggregate(total=Sum('present_day'))['total'] or 0
+        total_billable_days = reports.aggregate(total=Sum('billable_days'))['total'] or 0
+        total_non_billable_days = reports.aggregate(total=Sum('non_billable_days'))['total'] or 0
+        total_billable_hours = reports.aggregate(total=Sum('billable_hours'))['total'] or 0
+        total_non_billable_hours = reports.aggregate(total=Sum('non_billable_hours'))['total'] or 0
 
     if tab == 'resourcesmanagement':
         for resource in resources:
@@ -114,22 +125,15 @@ def dashboard_home(request):
                 'status': status
             })
 
-    resource_count = Resource.objects.filter(
-        is_active=True,
-        join_date__year=year,
-        join_date__month=month
-    ).count()
-
-    
-    project_count = ProjectReport.objects.filter(year=year, month=month, project__is_active=True).count()
-
+    resource_count = resources.filter(is_active=True).count()
+    project_count = reports.count()  # ProjectReport count for selected year/month
 
     return render(request, 'home.html', {
         'years': years,
         'months': months,
         'year': year,
         'month': month,
-        'projects': projects,
+        'projects': reports,  # renamed to reports
         'resources': resources,
         'current_year': now.year,
         'current_month': now.month,
@@ -154,14 +158,14 @@ def project_list(request):
     selected_month = request.GET.get('month')
 
     projects = Project.objects.all()
+
     if selected_year:
-        projects = projects.filter(year=selected_year)
+        projects = projects.filter(start_year=selected_year)
     if selected_month:
-        projects = projects.filter(month=selected_month)
+        projects = projects.filter(start_month=selected_month)
 
     years = Project.objects.values_list('start_year', flat=True).distinct().order_by('start_year')
     months = Project.objects.values_list('start_month', flat=True).distinct().order_by('start_month')
-
 
     return render(request, 'projects/project_list.html', {
         'projects': projects,
@@ -170,6 +174,7 @@ def project_list(request):
         'selected_year': selected_year,
         'selected_month': selected_month,
     })
+
 
 
 def project_create(request):
@@ -214,35 +219,95 @@ def project_delete(request, pk):
         return redirect('projects:project_list')
     return render(request, 'projects/project_confirm_delete.html', {'project': project})
 
+def add_resource_attendance(request, resource_id):
+    resource = get_object_or_404(Resource, pk=resource_id)
+    if request.method == "POST":
+        form = ResourceMonthlyForm(request.POST)
+        if form.is_valid():
+            attendance = form.save(commit=False)
+            attendance.resource = resource
+            attendance.save()
+            return redirect("projects:attendance_home")
+    else:
+        form = ResourceMonthlyForm()
+    return render(request, "attendance/add_resource_attendance.html", {"form": form, "resource": resource})
+
+
+def add_project_attendance(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    if request.method == "POST":
+        form = ProjectReportForm(request.POST)
+        if form.is_valid():
+            attendance = form.save(commit=False)
+            attendance.project = project
+            attendance.save()
+            return redirect("projects:attendance_home")
+    else:
+        form = ProjectReportForm(initial={"project": project})
+    return render(request, "attendance/add_project_attendance.html", {"form": form, "project": project})
 
 def attendance_home(request):
     resources = Resource.objects.all()
-    projects = Project.objects.prefetch_related('resources').all()
 
-    total_working_days = sum(r.working_days for r in resources)
-    total_present_days = sum(r.present_day for r in resources)
-    total_present_hours = sum(r.present_hours for r in resources)
-    presence_percentage = (100 * total_present_days) / total_working_days if total_working_days else 0
+    # Initialize totals
+    total_working_days = 0
+    total_present_days = 0
+    total_present_hours = 0
 
-    total_present_days = sum(p.present_day for p in projects)
-    total_billable_days = sum(p.billable_days for p in projects)
-    total_non_billable_days = sum(p.non_billable_days for p in projects)
-    total_billable_hours = sum(p.billable_hours for p in projects)
-    total_non_billable_hours = sum(p.non_billable_hours for p in projects)
+    for res in resources:
+        # Calculate working days from join_date to leave_date or today
+        leave = res.leave_date or date.today()
+        if res.join_date:
+            working_days = (leave - res.join_date).days
+            total_working_days += working_days
+
+        # Safely access monthly_data as a dictionary
+        monthly_data = res.monthly_data if isinstance(res.monthly_data, dict) else {}
+        total_present_days += monthly_data.get('present_days', 0)
+        total_present_hours += monthly_data.get('present_hours', 0)
+
+    # Presence percentage
+    presence_percentage = (100 * total_present_days / total_working_days) if total_working_days else 0
+
+    # Aggregate project totals
+    project_totals = ProjectReport.objects.aggregate(
+        total_billable_days=Sum('billable_days'),
+        total_non_billable_days=Sum('non_billable_days'),
+        total_billable_hours=Sum('billable_hours'),
+        total_non_billable_hours=Sum('non_billable_hours'),
+        total_extra_hours=Sum('extra_hours'),
+    )
+
+    total_billable_days = project_totals.get('total_billable_days') or 0
+    total_non_billable_days = project_totals.get('total_non_billable_days') or 0
+    total_billable_hours = project_totals.get('total_billable_hours') or 0
+    total_non_billable_hours = project_totals.get('total_non_billable_hours') or 0
+    total_extra_hours = project_totals.get('total_extra_hours') or 0
+
+    total_hours = total_billable_hours + total_non_billable_hours + total_extra_hours
+    standard_hours_per_month = 8 * 22
+    utilization_percentage = (
+        (total_hours / (standard_hours_per_month * ProjectReport.objects.count()) * 100)
+        if ProjectReport.objects.exists() else 0
+    )
 
     context = {
         'resources': resources,
-        'projects': projects,
+        'projects': Project.objects.all(),
         'total_working_days': total_working_days,
         'total_present_days': total_present_days,
         'total_present_hours': total_present_hours,
-        'presence_percentage': presence_percentage,
+        'presence_percentage': round(presence_percentage, 2),
         'total_billable_days': total_billable_days,
         'total_non_billable_days': total_non_billable_days,
         'total_billable_hours': total_billable_hours,
         'total_non_billable_hours': total_non_billable_hours,
+        'total_extra_hours': total_extra_hours,
+        'utilization_percentage': round(utilization_percentage, 2),
     }
+
     return render(request, 'attendance/attendance_home.html', context)
+
 
 
 # def attendance_home(request):
@@ -277,124 +342,101 @@ def attendance_home(request):
 
 #     return render(request, 'attendance/attendance_home.html', context)
 
+
 def tree_structure_view(request):
-    # Get all projects with their resources prefetched for efficiency
-    projects = Project.objects.prefetch_related('resources', 'project_profile', 'poc').filter(is_active=True).order_by('project_name')
-   
-    #get all active resources for reference
-    resources = Resource.objects.filter(is_active=True).order_by('resource_name')
-   
-    #get selected project from url parameter
+    projects = Project.objects.filter(is_active=True).prefetch_related(
+        'reports__project_profile',  
+        'reports__resources',        
+        'reports__poc'               
+    )
+
+    # --- Fetch all active resources and annotate latest year/month from reports ---
+    resources = Resource.objects.filter(is_active=True).annotate(
+        latest_year=Max('monthly_data__year'),
+        latest_month=Max('monthly_data__month')
+    ).order_by('-latest_year', '-latest_month', 'resource_name')
+
+    # --- Handle selected project ---
     selected_project_id = request.GET.get('project')
     selected_project = None
-   
     if selected_project_id:
         try:
-            selected_project = Project.objects.prefetch_related('resources', 'project_profile', 'poc').get(id=selected_project_id, is_active=True)
+            selected_project = projects.get(id=selected_project_id)
         except Project.DoesNotExist:
-            #if project not found or not is active then set selected project to none
             selected_project = None
-   
-    #if no project is selected, select the first one
     if not selected_project and projects.exists():
         selected_project = projects.first()
-   
-    #group projects by year and month for the left sidebar, print most recent first
+
+    # --- Group projects by year-month using reports ---
     projects_by_period = {}
     for project in projects:
-        period_key = f"{project.year}-{project.month:02d}"
-        if period_key not in projects_by_period:
-            projects_by_period[period_key] = {
-                'year': project.year,
-                'month': project.month,
-                'month_name': project.get_month_display(),
+        for report in project.reports.all():
+            period_key = f"{report.year}-{report.month:02d}"
+            projects_by_period.setdefault(period_key, {
+                'year': report.year,
+                'month': report.month,
+                'month_name': calendar.month_name[report.month],
                 'projects': []
-            }
-        projects_by_period[period_key]['projects'].append(project)
-   
-    # Sort periods chronologically
+            })['projects'].append(report)
+    
     sorted_periods = sorted(projects_by_period.keys(), reverse=True)
- 
-    # refetch resources ordered by month and year descending, then my name
-    resources = Resource.objects.filter(is_active=True).order_by('-year', '-month', 'resource_name')
+
+    # --- Handle selected resource ---
     selected_resource_id = request.GET.get('resource')
     selected_resource = None
     assigned_projects = []
-    
-    #same as project, tries to fetch the specific resource
+
     if selected_resource_id:
         try:
-             """selected_resource = Resource.objects.prefetch_related(
-            Prefetch('assigned_projects', queryset=Project.objects.select_related('project_profile').prefetch_related('resources'))
-        ).get(id=selected_resource_id, is_active=True)"""
-             selected_resource = Resource.objects.prefetch_related(
-             Prefetch(
-             'assigned_projects',
-             queryset=Project.objects.prefetch_related('project_profile', 'resources', 'poc')
-             )
-             ).get(id=selected_resource_id, is_active=True)
-              # Get projects where this resource is assigned OR is a POC (no distinct)
-             projects_as_resource = Project.objects.filter(resources=selected_resource).prefetch_related('project_profile', 'resources', 'poc')
-             projects_as_poc = Project.objects.filter(poc=selected_resource).prefetch_related('project_profile', 'resources', 'poc')
-
-             # Combine both lists (not querysets) to preserve duplicate project names
-             assigned_projects = list(projects_as_resource) + list(projects_as_poc)
- 
+            selected_resource = resources.get(id=selected_resource_id)
+            # Fetch assigned projects for a selected resource
+            assigned_projects_qs = ProjectReport.objects.filter(
+                Q(resources=selected_resource) | Q(poc=selected_resource)
+            ).select_related('project', 'project_profile').prefetch_related('resources', 'poc').distinct()
+            assigned_projects = list(assigned_projects_qs)
         except Resource.DoesNotExist:
             selected_resource = None
- 
     if not selected_resource and resources.exists():
         selected_resource = resources.first()
- 
-    # Group resources by year and month
+
+    # --- Group resources by latest year-month ---
     resources_by_period = {}
     for resource in resources:
-        period_key = f"{resource.year}-{resource.month:02d}"
-        if period_key not in resources_by_period:
-            resources_by_period[period_key] = {
-                'year': resource.year,
-                'month': resource.month,
-                'month_name': resource.get_month_display(),
-                'resources': []
-            }
-        resources_by_period[period_key]['resources'].append(resource)
- 
+        year = resource.latest_year or 0
+        month = resource.latest_month or 0
+        period_key = f"{year}-{month:02d}"
+        resources_by_period.setdefault(period_key, {
+            'year': year,
+            'month': month,
+            'month_name': calendar.month_name[month] if month else 'N/A',
+            'resources': []
+        })['resources'].append(resource)
+
     sorted_resource_periods = sorted(resources_by_period.keys(), reverse=True)
- 
-   
-    # Calculate summary statistics
-    #total no of projects
+
+    # --- Summary statistics over reports ---
+    all_reports = ProjectReport.objects.filter(project__in=projects)
     total_projects = projects.count()
-    #total no of resorces
     total_resources = resources.count()
-    #sum of total billable hours
-    total_billable_hours = sum(p.billable_hours for p in projects)
-    #sum of total non billable hours
-    total_non_billable_hours = sum(p.non_billable_hours for p in projects)
-    #sum of total hours that is billable + non-billable
+    total_billable_hours = sum(r.billable_hours for r in all_reports)
+    total_non_billable_hours = sum(r.non_billable_hours for r in all_reports)
     total_hours = total_billable_hours + total_non_billable_hours
-    
-    #pass data for display
+
+    # --- Render template ---
     context = {
-        #projects
         'projects_by_period': projects_by_period,
         'sorted_periods': sorted_periods,
         'selected_project': selected_project,
- 
-        #resorces
         'resources_by_period': resources_by_period,
         'sorted_resource_periods': sorted_resource_periods,
         'selected_resource': selected_resource,
         'assigned_projects': assigned_projects,
- 
-        #stats
         'total_projects': total_projects,
         'total_resources': total_resources,
         'total_billable_hours': total_billable_hours,
         'total_non_billable_hours': total_non_billable_hours,
         'total_hours': total_hours,
     }
-   
+
     return render(request, 'projects/tree_structure.html', context)
- 
 

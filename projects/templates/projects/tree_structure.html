@@ -749,7 +749,6 @@
                                         <div class="tree-connector no-children"></div>
                                     {% endif %}
                                 </div>
-<<<<<<< HEAD
                                 
                                 <!-- Second Level: Project Profile -->
                                 {% if selected_resource.assigned_projects.all %}
@@ -817,93 +816,6 @@
                                     </div>
                                 </div>
                                 {% else %}
-=======
-                            </div>
-
-                                                         <!-- Second Level: Projects -->
-                             {% if assigned_projects %}
-                                 <div class="tree-level">
-                                     <div class="tree-children-grid">
-                                         {% for project in assigned_projects %}
-                                             <div class="tree-child">
-                                                 <div class="tree-node-content project">
-                                                     <div class="tree-node-icon"><i class="fas fa-project-diagram"></i></div>
-                                                     <div class="tree-node-name">{{ project.project_name }}</div>
-                                                     <div class="tree-node-type">Project</div>
-                                                 </div>
-                                                 {% if project.resources.all or project.project_profile or project.poc.all %}
-                                                     <div class="tree-connector"></div>
-                                                 {% else %}
-                                                     <div class="tree-connector no-children"></div>
-                                                 {% endif %}
-                                             </div>
-                                         {% endfor %}
-                                     </div>
-                                 </div>
-
-                                 <!-- Third Level: Project Details -->
-                                 <div class="tree-level">
-                                     <div class="tree-children-grid">
-                                         {% for project in assigned_projects %}
-                                             {% if project.resources.all or project.project_profile or project.poc.all %}
-                                                 <div class="tree-child">
-                                                     <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
-                                                         {% if project.resources.all %}
-                                                             <div class="tree-child">
-                                                                 <div class="tree-node-content resource">
-                                                                     <div class="tree-node-icon"><i class="fas fa-users"></i></div>
-                                                                     <div class="tree-node-name">Resources ({{ project.resources.count }})</div>
-                                                                     <div class="tree-node-type">Assigned</div>
-                                                                 </div>
-                                                                 <div class="tree-connector no-children"></div>
-                                                                 <div class="resource-stats">
-                                                                     {% for res in project.resources.all %}
-                                                                         <div class="resource-stat-item">
-                                                                             <div class="resource-stat-value">{{ res.resource_name }}</div>
-                                                                             <div class="resource-stat-label">Resource</div>
-                                                                         </div>
-                                                                     {% endfor %}
-                                                                 </div>
-                                                             </div>
-                                                         {% endif %}
-
-                                                         {% if project.project_profile %}
-                                                             <div class="tree-child">
-                                                                 <div class="tree-node-content profile">
-                                                                     <div class="tree-node-icon"><i class="fas fa-id-badge"></i></div>
-                                                                     <div class="tree-node-name">{{ project.project_profile.resource_name }}</div>
-                                                                     <div class="tree-node-type">Project Profile</div>
-                                                                 </div>
-                                                                 <div class="tree-connector no-children"></div>
-                                                             </div>
-                                                         {% endif %}
-
-                                                         {% if project.poc.all %}
-                                                             <div class="tree-child">
-                                                                 <div class="tree-node-content poc">
-                                                                     <div class="tree-node-icon"><i class="fas fa-user-tie"></i></div>
-                                                                     <div class="tree-node-name">POCs ({{ project.poc.count }})</div>
-                                                                     <div class="tree-node-type">Point of Contact</div>
-                                                                 </div>
-                                                                 <div class="tree-connector no-children"></div>
-                                                                 <div class="resource-stats">
-                                                                     {% for poc in project.poc.all %}
-                                                                         <div class="resource-stat-item">
-                                                                             <div class="resource-stat-value">{{ poc.resource_name }}</div>
-                                                                             <div class="resource-stat-label">POC</div>
-                                                                         </div>
-                                                                     {% endfor %}
-                                                                 </div>
-                                                             </div>
-                                                         {% endif %}
-                                                     </div>
-                                                 </div>
-                                             {% endif %}
-                                         {% endfor %}
-                                     </div>
-                                 </div>
-                            {% else %}
->>>>>>> 293a2a3232a9db20a3337ba8fc252410fbcfea7c
                                 <div class="empty-state" style="padding: 20px;">
                                     <p>No projects assigned to this resource.</p>
                                 </div>
@@ -960,7 +872,6 @@
                                 </div>
                             </div>
                         {% endwith %}
-<<<<<<< HEAD
                         {% endfor %}
                         {% else %}
                         <div class="empty-state">
@@ -1067,10 +978,6 @@
                         </div>
                     </div>
                     {% else %}
-=======
-                    {% endfor %}
-                {% else %}
->>>>>>> 293a2a3232a9db20a3337ba8fc252410fbcfea7c
                     <div class="empty-state">
                         <h5>No Projects Found</h5>
                         <p>Create your first project to get started.</p>
