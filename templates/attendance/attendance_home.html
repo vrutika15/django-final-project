@@ -48,9 +48,9 @@
                   {% for resource in resources %}
                     <tr>
                       <td>{{ resource.resource_name }}</td>
-                      <td>{{ resource.working_days }}</td>
-                      <td>{{ resource.present_day }}</td>
-                      <td>{{ resource.present_hours }}</td>
+                      <td>{{ resource.working_days | default:0}}</td>
+                      <td>{{ resource.present_day | default:0}}</td>
+                      <td>{{ resource.present_hours | default:0}}</td>
                       <td class="text-center">
                         <a href="{% url 'projects:add_resource_attendance' resource.id %}" class="btn btn-sm btn-primary">
                           Add Monthly Attendance
@@ -117,12 +117,12 @@
                       {{ resource.resource_name }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                   </td>
-                  <td>{{ proj.extra_hours|default_if_none:0 }}</td>
-                  <td>{{ proj.present_day }}</td>
-                  <td>{{ proj.billable_days }}</td>
-                  <td>{{ proj.non_billable_days }}</td>
-                  <td>{{ proj.billable_hours }}</td>
-                  <td>{{ proj.non_billable_hours }}</td>
+                  <td>{{ proj.extra_hours | default:0 }}</td>
+                  <td>{{ proj.present_day | default:0 }}</td>
+                  <td>{{ proj.billable_days | default:0}}</td>
+                  <td>{{ proj.non_billable_days | default:0}}</td>
+                  <td>{{ proj.billable_hours | default:0}}</td>
+                  <td>{{ proj.non_billable_hours | default:0}}</td>
                   <td class="text-center">
                     <a href="{% url 'projects:add_project_attendance' proj.id %}" class="btn btn-sm btn-primary">
                       Add Monthly Attendance
