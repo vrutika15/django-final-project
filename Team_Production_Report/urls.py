@@ -18,9 +18,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from projects.views import dashboard_home
+# from resources.views import dashboard
 
 urlpatterns = [
     path("", dashboard_home, name="home"),
+    # path("",dashboard,name="dashboard"),
     path("admin/", admin.site.urls),
     path("resources/", include("resources.urls")),
     path("projects/", include("projects.urls")),

@@ -422,7 +422,6 @@ def tree_structure_view(request):
     total_non_billable_hours = sum(r.non_billable_hours for r in all_reports)
     total_hours = total_billable_hours + total_non_billable_hours
 
-    # --- Render template ---
     context = {
         'projects_by_period': projects_by_period,
         'sorted_periods': sorted_periods,
