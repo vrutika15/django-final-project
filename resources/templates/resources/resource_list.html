@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4">Resources Monthly Data</h2>
+<div class="container">
+    <h2 class="mb-4">Resources</h2>
 
     <!-- Add Resource Button -->
     <a href="{% url 'resources:resource_create' %}" class="btn btn-outline-success mb-3">
@@ -41,7 +41,7 @@
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }}">
-                <i class="far fa-info-circle"></i> {{ message }}
+                <i class="fa fa-info-circle"></i> {{ message }}
             </div>
         {% endfor %}
     {% endif %}
@@ -79,14 +79,14 @@
                         {% endif %}
                     </td>
                     <td class="text-center">
-                        <a href="{% url 'resources:monthly_data_update' rmd.pk %}" class="btn btn-sm btn-outline-warning me-1" title="Edit Monthly Data">
+                        {% comment %} <a href="{% url 'resources:monthly_data_update' rmd.pk %}" class="btn btn-sm btn-outline-warning me-1" title="Edit Monthly Data">
                             <i class="far fa-edit"></i>
                         </a>
                         <a href="{% url 'resources:monthly_data_create' rmd.resource.pk %}" class="btn btn-sm btn-outline-info me-1" title="Add Monthly Data for Resource">
                             <i class="far fa-plus-square"></i>
-                        </a>
+                        </a> {% endcomment %}
                         <a href="{% url 'resources:resource_update' rmd.resource.pk %}" class="btn btn-sm btn-outline-primary me-1" title="Edit Resource">
-                            <i class="far fa-user-edit"></i>
+                            <i class="far fa-edit"></i>
                         </a>
                         <a href="{% url 'resources:resource_delete' rmd.resource.pk %}" class="btn btn-sm btn-outline-danger" title="Deactivate Resource">
                             <i class="far fa-trash-alt"></i>

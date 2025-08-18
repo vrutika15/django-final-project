@@ -1,3 +1,4 @@
+from datetime import date
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Resource, ResourceMonthlyData
 from .forms import ResourceGlobalForm, ResourceMonthlyForm
@@ -6,6 +7,8 @@ from calendar import month_name
 from projects.models import Project
 from interns.models import Intern
 from django.db.models import Sum, Q
+from projects.models import Project,ProjectReport
+from interns.models import Intern
 
 def resource_list(request):
     year = request.GET.get("year")
@@ -116,44 +119,61 @@ def monthly_data_update(request, pk):
     })
 
 
+# def dashboard(request):
+
+#     year = int(request.GET.get('year', date.today().year))
+#     month = int(request.GET.get('month', date.today().month))
+
+#     # Aggregate monthly data for active resources
+#     active_resources = Resource.objects.filter(is_active=True)
+
+#     # Aggregate sums for present hours and working days across all monthly data for active resources
+#     monthly_data_qs = ResourceMonthlyData.objects.filter(resource__in=active_resources,year=year,month=month)
+
+#     total_present_hours = monthly_data_qs.aggregate(total=Sum('present_hours'))['total'] or 0
+#     total_working_days = monthly_data_qs.aggregate(total=Sum('working_days'))['total'] or 0
+#     total_present_days = monthly_data_qs.aggregate(total=Sum('present_day'))['total'] or 0
+
+#     # Assuming Project model has billable_hours field
+#     projects = Project.objects.all()
+#     total_billable_hours = projects.aggregate(total=Sum('billable_hours'))['total'] or 0
+
+#     resource_count = active_resources.count()
+#     project_count = projects.count()
+#     intern_count = Intern.objects.count()
+
+#     team_productivity_percentage = (100 * total_billable_hours / total_present_hours) if total_present_hours > 0 else 0
+#     presence_percentage = (100 * total_present_days / total_working_days) if total_working_days > 0 else 0
+
+#     context = {
+#         'resource_count': resource_count,
+#         'project_count': project_count,
+#         'intern_count': intern_count,
+#         'total_present_hours': total_present_hours,
+#         'total_billable_hours': total_billable_hours,
+#         'team_productivity_percentage': team_productivity_percentage,
+#         'total_present_days': total_present_days,
+#         'total_working_days': total_working_days,
+#         'presence_percentage': presence_percentage,
+#         'monthly_data': monthly_data_qs,
+#         'year': year,
+#         'month': month,
+#     }
+#     return render(request, 'admin_dashboard.html', context)
+
 def dashboard(request):
 
-    year = int(request.GET.get('year', date.today().year))
-    month = int(request.GET.get('month', date.today().month))
+    #total-counts
+    resources = Resource.objects.count()
+    projects = Project.objects.count()
+    interns = Intern.objects.count()
 
-    # Aggregate monthly data for active resources
-    active_resources = Resource.objects.filter(is_active=True)
-
-    # Aggregate sums for present hours and working days across all monthly data for active resources
-    monthly_data_qs = ResourceMonthlyData.objects.filter(resource__in=active_resources,year=year,month=month)
-
-    total_present_hours = monthly_data_qs.aggregate(total=Sum('present_hours'))['total'] or 0
-    total_working_days = monthly_data_qs.aggregate(total=Sum('working_days'))['total'] or 0
-    total_present_days = monthly_data_qs.aggregate(total=Sum('present_day'))['total'] or 0
-
-    # Assuming Project model has billable_hours field
-    projects = Project.objects.all()
-    total_billable_hours = projects.aggregate(total=Sum('billable_hours'))['total'] or 0
-
-    resource_count = active_resources.count()
-    project_count = projects.count()
-    intern_count = Intern.objects.count()
-
-    team_productivity_percentage = (100 * total_billable_hours / total_present_hours) if total_present_hours > 0 else 0
-    presence_percentage = (100 * total_present_days / total_working_days) if total_working_days > 0 else 0
+    #charts
 
     context = {
-        'resource_count': resource_count,
-        'project_count': project_count,
-        'intern_count': intern_count,
-        'total_present_hours': total_present_hours,
-        'total_billable_hours': total_billable_hours,
-        'team_productivity_percentage': team_productivity_percentage,
-        'total_present_days': total_present_days,
-        'total_working_days': total_working_days,
-        'presence_percentage': presence_percentage,
-        'monthly_data': monthly_data_qs,
-        'year': year,
-        'month': month,
+        'resources': resources,
+        'projects': projects,
+        'interns': interns
     }
-    return render(request, 'admin_dashboard.html', context)
+
+    return render(request,'admin_dashboard.html',context)

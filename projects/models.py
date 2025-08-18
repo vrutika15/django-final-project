@@ -4,8 +4,6 @@ from django.core.validators import MinValueValidator
 from django.urls import reverse
 import calendar
 
-
-# Global Project model (only name + active date range)
 class Project(models.Model):
     project_name = models.CharField(max_length=100)
 
@@ -47,7 +45,6 @@ class Project(models.Model):
         verbose_name_plural = 'Projects'
 
 
-# Project details by month/year + type
 class ProjectReport(models.Model):
     PROJECT_TYPE_CHOICES = [
         ('REGULAR', 'Regular Project'),

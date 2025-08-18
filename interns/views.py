@@ -30,7 +30,7 @@ def technology_edit(request, pk):
         form = TechnologyForm(instance=tech)
     return render(request, 'technologies/technology_form.html', {'form': form, 'title': 'Edit Technology'})
 
-#dlete tech
+#delete tech
 def technology_delete(request, pk):
     tech = get_object_or_404(Technology, pk=pk)
     if request.method == 'POST':
@@ -38,9 +38,7 @@ def technology_delete(request, pk):
         return redirect('interns:technology_list')
     return render(request, 'technologies/technology_confirm_delete.html', {'technology': tech})
 
-
 #interns
-
 
 #list intern
 def intern_list(request):

@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB:  team_report_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user1234
+    ports:
+      - "5432:5432"
+
+  django:
+    build: .
+    container_name: team_report_app
+    command: sh -c "python manage.py makemigrations --check --dry-run || python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app 
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://user:user1234@db:5432/team_report_db
+
+volumes:
+  postgres_data:
