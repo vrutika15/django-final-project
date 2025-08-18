@@ -7,6 +7,8 @@ from calendar import month_name
 from projects.models import Project
 from interns.models import Intern
 from django.db.models import Sum, Q
+from projects.models import Project,ProjectReport
+from interns.models import Intern
 
 def resource_list(request):
     year = request.GET.get("year")
@@ -159,4 +161,19 @@ def monthly_data_update(request, pk):
 #     }
 #     return render(request, 'admin_dashboard.html', context)
 
-# def dashboard(request)
+def dashboard(request):
+
+    #total-counts
+    resources = Resource.objects.count()
+    projects = Project.objects.count()
+    interns = Intern.objects.count()
+
+    #charts
+
+    context = {
+        'resources': resources,
+        'projects': projects,
+        'interns': interns
+    }
+
+    return render(request,'admin_dashboard.html',context)
