@@ -105,10 +105,10 @@ class ProjectReport(models.Model):
     def total_days(self):
         return self.billable_days + self.non_billable_days
 
-    # @property
-    # def utilization_percentage(self):
-    #     standard_hours = 8 * 22  # 22 working days/month
-    #     return min((self.total_hours / standard_hours) * 100, 100) if standard_hours else 0
+    @property
+    def utilization_percentage(self):
+        standard_hours = 8 * 22  # 22 working days/month
+        return min((self.total_hours / standard_hours) * 100, 100) if standard_hours else 0
 
     @property
     def resource_count(self):

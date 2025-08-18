@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
+{% extends 'base.html' %}
+{% block title %} Dashboard {% endblock %}
+{%block css %}
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
-      integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ=="
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
@@ -16,238 +13,596 @@
       rel="stylesheet"
       crossorigin="anonymous"
     />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+      :root {
+        --primary-color: #3b82f6;
+        --primary-dark: #2563eb;
+        --secondary-color: #f8fafc;
+        --success-color: #3b82f6;
+        --warning-color: #3b82f6;
+        --danger-color: #ef4444;
+        --info-color: #3b82f6;
+        --text-primary: #000000;
+        --text-secondary: #374151;
+        --border-color: #e5e7eb;
+        --light-blue: #dbeafe;
+        --light-blue-hover: #bfdbfe;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        background-color: #f3fcfa;
-      }
-      .totalcard {
-        background-color: #1e73be;
-        padding: 5px;
-        width: 200px;
-        height: 100px;
-        border-radius: 5px;
-        color: white;
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        min-height: 100vh;
+        color: var(--text-primary);
       }
 
-      .cards {
-        display: flex;
-        gap: 5px;
-        justify-content: space-around;
-        align-items: center;
+      .dashboard-container {
+        min-height: 100vh;
+        padding: 2rem 1rem;
+      }
+
+      .dashboard-header {
         text-align: center;
-      }
-
-      .link-card {
-        background-color: white;
-        color: black;
-        padding: 5px;
-        width: 200px;
-        height: 100px;
-        border-radius: 5px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      }
-
-      .link-card:hover {
-        background-color: #1e73be; 
+        margin-bottom: 3rem;
         color: white;
-        cursor: pointer;
       }
 
-      a {
-        text-decoration: none;
-        color: black;
+      .dashboard-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
       }
 
-      a:hover{
-        color:white;
+      .dashboard-subtitle {
+        font-size: 1.1rem;
+        font-weight: 400;
+        opacity: 0.9;
       }
 
-      .chart-container {
-        max-width: 260px;
-        max-height: 260px;
-        margin: 0 auto;
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+      }
+
+      .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--shadow-lg);
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+      }
+
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      }
+
+      .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        margin-bottom: 1rem;
+      }
+
+      .stat-icon.users { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); }
+      .stat-icon.projects { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); }
+      .stat-icon.interns { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); }
+
+      .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-label {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+
+      .charts-section {
+        margin-bottom: 3rem;
+      }
+
+      .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
       }
 
       .chart-card {
-        height: 420px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        border-radius: 12px;
-        background-color: white;
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+      }
+
+      .chart-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
       }
 
       .chart-title {
-        font-size: 1.1rem;
+        font-size: 1.25rem;
         font-weight: 600;
-        margin-bottom: 30px;
-        margin-top: 30px;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        color: var(--text-primary);
       }
+
+      .chart-container {
+        max-width: 300px;
+        max-height: 300px;
+        margin: 0 auto;
+      }
+
+      .chart-message {
+        text-align: center;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+      }
+
+      .chart-message.danger {
+        background-color: #fef2f2;
+        color: var(--danger-color);
+        border: 1px solid #fecaca;
+      }
+
+      .navigation-section {
+        margin-bottom: 2rem;
+      }
+
+      .nav-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .nav-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--shadow-lg);
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+        text-decoration: none;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .nav-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--light-blue-hover);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .nav-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        color: var(--text-primary);
+        text-decoration: none;
+        background: var(--light-blue);
+      }
+
+      .nav-card:hover::before {
+        opacity: 1;
+      }
+
+      .nav-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+      }
+
+      .nav-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        display: block;
+      }
+
+      .nav-text {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      .welcome-banner {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 3rem;
+        text-align: center;
+        color: var(--text-primary);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .welcome-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .welcome-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+
+      @media (max-width: 768px) {
+        .dashboard-container {
+          padding: 1rem 0.5rem;
+        }
+
+        .dashboard-title {
+          font-size: 2rem;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+
+        .charts-grid {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+
+        .nav-grid {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+
+        .stat-card,
+        .chart-card,
+        .nav-card {
+          padding: 1.5rem;
+        }
+
+        .chart-container {
+          max-width: 250px;
+          max-height: 250px;
+        }
+      }
+
+             @media (max-width: 480px) {
+         .dashboard-title {
+           font-size: 1.75rem;
+         }
+
+         .stat-number {
+           font-size: 2rem;
+         }
+
+         .chart-container {
+           max-width: 200px;
+           max-height: 200px;
+         }
+       }
+
+       /* Month Tabs Styles */
+       .month-tabs-container {
+         position: fixed;
+         bottom: 0;
+         left: 0;
+         right: 0;
+         background: white;
+         border-top: 1px solid var(--border-color);
+         box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
+         z-index: 1000;
+         padding: 1rem 0;
+       }
+
+       .month-tabs {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         gap: 0.5rem;
+         max-width: 600px;
+         margin: 0 auto;
+         padding: 0 1rem;
+       }
+
+       .month-tab {
+         padding: 0.75rem 1rem;
+         border: 1px solid var(--border-color);
+         border-radius: 8px;
+         background: white;
+         color: var(--text-secondary);
+         font-weight: 500;
+         font-size: 0.875rem;
+         cursor: pointer;
+         transition: all 0.2s ease;
+         min-width: 60px;
+         text-align: center;
+       }
+
+       .month-tab:hover {
+         background: var(--light-blue);
+         color: var(--primary-color);
+         border-color: var(--primary-color);
+       }
+
+       .month-tab.active {
+         background: var(--primary-color);
+         color: white;
+         border-color: var(--primary-color);
+       }
+
+       .month-tab.active:hover {
+         background: var(--primary-dark);
+       }
+
+       /* Adjust main container to account for fixed tabs */
+       .dashboard-container {
+         padding-bottom: 120px;
+       }
+
+       @media (max-width: 768px) {
+         .month-tabs {
+           gap: 0.25rem;
+           padding: 0 0.5rem;
+         }
+
+         .month-tab {
+           padding: 0.5rem 0.75rem;
+           font-size: 0.75rem;
+           min-width: 50px;
+         }
+       }
+
+       @media (max-width: 480px) {
+         .month-tabs {
+           gap: 0.125rem;
+         }
+
+         .month-tab {
+           padding: 0.375rem 0.5rem;
+           font-size: 0.7rem;
+           min-width: 40px;
+         }
+       }
     </style>
-  </head>
-  <body>
-    <main style="padding-top:30px;padding-bottom:30px;">
-      <!--Total Cards-->
-      <section>
-        <div class="cards">
-          <div class="totalcard">
-            <i class="fa-solid fa-users"></i>
-            <p>Total resources</p>
-            <p>{{ resource_count }}</p>
-          </div>
-          <div class="totalcard">
-            <i class="fa-solid fa-diagram-project"></i>
-            <p>Total projects</p>
-            <p>{{ project_count }}</p>
-          </div>
-          <div class="totalcard">
-            <i class="fa-solid fa-user"></i>
-            <p>Total interns</p>
-            <p>{{ intern_count }}</p>
-          </div>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <!-- Statistics Cards -->
+  <section class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon users">
+          <i class="fas fa-users"></i>
         </div>
-      </section>
+        <div class="stat-label">Total Resources</div>
+         <div class="stat-number">{{ resources }}</div>
+      </div>
 
-      <!--Charts-->
-      <section style="margin-top: 50px">
-        <div class="container py-4">
-          <div class="row justify-content-center g-4">
-            <!-- Team Productivity -->
-            <div class="col-md-6">
-              <div class="cardd shadow-sm chart-card">
-                <div class="card-body text-center">
-                  <div class="chart-title text-success">Team Productivity</div>
-                  {% if team_productivity_percentage == 0 %}
-                  <p class="text-danger fw-bold mb-2">
-                    0% productivity — All hours unproductive.
-                  </p>
-                  {% endif %}
-                  <div class="chart-container">
-                    <canvas id="productivityChart"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Presence Percentage -->
-            <div class="col-md-6">
-              <div class="cardd shadow-sm chart-card">
-                <div class="card-body text-center">
-                  <div class="chart-title text-primary">
-                    Presence Percentage
-                  </div>
-                  {% if presence_percentage == 0 %}
-                  <p class="text-danger fw-bold mb-2">
-                    0% presence — No working days present.
-                  </p>
-                  {% endif %}
-                  <div class="chart-container">
-                    <canvas id="presenceChart"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+       <div class="stat-card">
+        <div class="stat-icon projects">
+          <i class="fas fa-diagram-project"></i>
         </div>
-      </section>
+        <div class="stat-label">Active Projects</div>
+         <div class="stat-number">{{ projects }}</div>
+      </div>
 
-      <!--Link Cards-->
-      <section style="margin-top: 50px">
-        <div class="cards">
-          <div class="link-card">
-            <a href="{% url 'resources:resource_list' %}"
-              ><p style="padding-top: 25px">Resources</p></a
-            >
-          </div>
-          <div class="link-card">
-            <a href="{% url 'projects:project_list' %}"
-              ><p style="padding-top: 25px">Projects</p></a
-            >
-          </div>
-          <div class="link-card">
-            <a href="{% url 'interns:intern_list' %}"
-              ><p style="padding-top: 25px">Interns</p></a
-            >
-          </div>
+      <div class="stat-card">
+        <div class="stat-icon interns">
+          <i class="fas fa-user-graduate"></i>
         </div>
-      </section>
-    </main>
+        <div class="stat-label">Total Interns</div>
+         <div class="stat-number">{{ interns }}</div>
+      </div>
+    </div>
+  </section>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-      crossorigin="anonymous"
-    ></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Charts Section -->
+  <section class="charts-section">
+    <div class="charts-grid">
+      <!-- Team Productivity Chart -->
+      <div class="chart-card">
+        <div class="chart-title">
+          <i class="fas fa-chart-pie text-success me-2"></i>
+          Team Productivity
+        </div>
+        {% comment %} {% if team_productivity_percentage == 0 %}
+        <div class="chart-message danger">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          0% productivity — All hours unproductive
+        </div>
+        {% endif %}
+        <div class="chart-container">
+          <canvas id="productivityChart"></canvas>
+        </div> {% endcomment %}
+      </div>
+
+      <!-- Presence Percentage Chart -->
+      <div class="chart-card">
+        <div class="chart-title">
+          <i class="fas fa-calendar-check text-primary me-2"></i>
+          Attendance Rate
+        </div>
+        {% comment %} {% if presence_percentage == 0 %}
+        <div class="chart-message danger">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          0% presence — No working days present
+        </div>
+        {% endif %}
+        <div class="chart-container">
+          <canvas id="presenceChart"></canvas>
+        </div>
+      </div> {% endcomment %}
+    </div>
+  </section>
+
+  <!-- Navigation Cards -->
+  <section class="navigation-section">
+    <div class="nav-grid">
+      <a href="#" class="nav-card">
+        <div class="nav-content">
+          <i class="fas fa-users nav-icon"></i>
+          <div class="nav-text">View Resources</div>
+        </div>
+      </a>
+      
+      <a href="#" class="nav-card">
+        <div class="nav-content">
+          <i class="fas fa-project-diagram nav-icon"></i>
+          <div class="nav-text">View Projects</div>
+        </div>
+      </a>
+      
+      <a href="#" class="nav-card">
+        <div class="nav-content">
+          <i class="fas fa-user-graduate nav-icon"></i>
+          <div class="nav-text">View Charts</div>
+        </div>
+      </a>
+
+      <a href="#" class="nav-card">
+        <div class="nav-content">
+          <i class="fas fa-user-graduate nav-icon"></i>
+          <div class="nav-text">Manage Resources</div>
+        </div>
+      </a>
+    </div>
+     </section>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-      const productivity = parseFloat(
-        "{{ team_productivity_percentage|floatformat:2 }}"
-      );
+      // Enhanced chart configuration with better styling
+      const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true,
+              font: {
+                size: 12,
+                weight: '500'
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: 'white',
+            bodyColor: 'white',
+            borderColor: 'rgba(255, 255, 255, 0.2)',
+            borderWidth: 1,
+            cornerRadius: 8,
+            displayColors: true
+          }
+        }
+      };
+
+      // Productivity Chart
+      const productivity = parseFloat("{{ team_productivity_percentage|floatformat:2 }}");
       const unproductive = 100 - productivity;
 
       const ctx = document.getElementById("productivityChart").getContext("2d");
       const productivityChart = new Chart(ctx, {
-        type: "pie",
+        type: "doughnut",
         data: {
           labels: ["Productive", "Unproductive"],
-          datasets: [
-            {
-              data: [productivity, unproductive],
-              backgroundColor: ["#28a745", "#dc3545"],
-              borderColor: ["#ffffff", "#ffffff"],
-              borderWidth: 1,
-            },
-          ],
+          datasets: [{
+            data: [productivity, unproductive],
+                         backgroundColor: [
+               "rgba(59, 130, 246, 0.9)",
+               "rgba(239, 68, 68, 0.9)"
+             ],
+             borderColor: [
+               "rgba(59, 130, 246, 1)",
+               "rgba(239, 68, 68, 1)"
+             ],
+            borderWidth: 2,
+            hoverOffset: 4
+          }]
         },
         options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: {
-                font: {
-                  size: 10,
-                },
-              },
-            },
-          },
-        },
+          ...chartOptions,
+          cutout: '60%'
+        }
       });
 
+      // Presence Chart
       const presence = parseFloat("{{ presence_percentage|floatformat:2 }}");
       const absence = 100 - presence;
 
-      const ctxPresence = document
-        .getElementById("presenceChart")
-        .getContext("2d");
+      const ctxPresence = document.getElementById("presenceChart").getContext("2d");
       const presenceChart = new Chart(ctxPresence, {
-        type: "pie",
+        type: "doughnut",
         data: {
           labels: ["Present", "Absent"],
-          datasets: [
-            {
-              data: [presence, absence],
-              backgroundColor: ["#007bff", "#ffc107"],
-              borderColor: ["#ffffff", "#ffffff"],
-              borderWidth: 1,
-            },
-          ],
+          datasets: [{
+            data: [presence, absence],
+                         backgroundColor: [
+               "rgba(59, 130, 246, 0.9)",
+               "rgba(156, 163, 175, 0.9)"
+             ],
+             borderColor: [
+               "rgba(59, 130, 246, 1)",
+               "rgba(156, 163, 175, 1)"
+             ],
+            borderWidth: 2,
+            hoverOffset: 4
+          }]
         },
         options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: {
-                font: {
-                  size: 10,
-                },
-              },
-            },
-          },
-        },
+          ...chartOptions,
+          cutout: '60%'
+        }
       });
     </script>
-  </body>
-</html>
+{% endblock %}
