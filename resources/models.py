@@ -55,7 +55,7 @@ class ResourceMonthlyData(models.Model):
     class Meta:
         db_table = 'resource_monthly_data'
         ordering = ['-year', '-month', 'resource']
-        unique_together = ('resource', 'year', 'month')
+        #unique_together = ('resource', 'year', 'month')
 
     def __str__(self):
         return f"{self.resource.resource_name} - {calendar.month_name[self.month]} {self.year}"
