@@ -162,6 +162,8 @@ def monthly_data_update(request, pk):
 #     return render(request, 'admin_dashboard.html', context)
 
 def dashboard(request):
+    resourceAttendance = ResourceMonthlyData.objects.all()
+    projectAttendance = ProjectReport.objects.all()
 
     #total-counts
     resources = Resource.objects.count()
@@ -169,11 +171,28 @@ def dashboard(request):
     interns = Intern.objects.count()
 
     #charts
+    #presence percentage
+    total_present_day = sum(r.present_day for r in resourceAttendance)
+    total_working_days = sum(r.working_days for r in resourceAttendance)
+    presence_percentage = (100*total_present_day)/total_working_days
+
+    #team productivity percentage
+    total_present_hours = sum(r.present_hours for r in resourceAttendance)
+    total_billable_hours = sum(p.billable_hours for p in projectAttendance)
+    team_productivity_percentage = (100*total_billable_hours)/total_present_hours
 
     context = {
         'resources': resources,
         'projects': projects,
-        'interns': interns
+        'interns': interns,
+        'total_present_day': total_present_day,
+        "total_working_days": total_working_days,
+        "presence_percentage": presence_percentage,
+        "total_present_hours": total_present_hours,
+        "total_billable_hours": total_billable_hours,
+        "team_productivity_percentage": team_productivity_percentage,
+        "resourceAttendance": resourceAttendance,
+        "projectAttendance": projectAttendance
     }
 
     return render(request,'admin_dashboard.html',context)

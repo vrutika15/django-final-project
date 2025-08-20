@@ -449,7 +449,7 @@
           <i class="fas fa-chart-pie text-success me-2"></i>
           Team Productivity
         </div>
-        {% comment %} {% if team_productivity_percentage == 0 %}
+        {% if team_productivity_percentage == 0 %}
         <div class="chart-message danger">
           <i class="fas fa-exclamation-triangle me-2"></i>
           0% productivity — All hours unproductive
@@ -457,7 +457,7 @@
         {% endif %}
         <div class="chart-container">
           <canvas id="productivityChart"></canvas>
-        </div> {% endcomment %}
+        </div>
       </div>
 
       <!-- Presence Percentage Chart -->
@@ -466,7 +466,7 @@
           <i class="fas fa-calendar-check text-primary me-2"></i>
           Attendance Rate
         </div>
-        {% comment %} {% if presence_percentage == 0 %}
+       {% if presence_percentage == 0 %}
         <div class="chart-message danger">
           <i class="fas fa-exclamation-triangle me-2"></i>
           0% presence — No working days present
@@ -475,21 +475,21 @@
         <div class="chart-container">
           <canvas id="presenceChart"></canvas>
         </div>
-      </div> {% endcomment %}
+      </div> 
     </div>
   </section>
 
   <!-- Navigation Cards -->
   <section class="navigation-section">
     <div class="nav-grid">
-      <a href="#" class="nav-card">
+      <a href="{% url 'resources:resource_list' %}" class="nav-card">
         <div class="nav-content">
           <i class="fas fa-users nav-icon"></i>
           <div class="nav-text">View Resources</div>
         </div>
       </a>
       
-      <a href="#" class="nav-card">
+      <a href="{% url 'projects:project_list' %}" class="nav-card">
         <div class="nav-content">
           <i class="fas fa-project-diagram nav-icon"></i>
           <div class="nav-text">View Projects</div>
@@ -517,9 +517,7 @@
 
 {% block js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script>
-      // Enhanced chart configuration with better styling
       const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
