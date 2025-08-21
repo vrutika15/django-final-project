@@ -12,25 +12,32 @@ from interns.models import Intern
 import calendar
 
 def resource_list(request):
-    year = request.GET.get("year")
-    month = request.GET.get("month")
+    # year = request.GET.get("year")
+    # month = request.GET.get("month")
 
-    monthly_qs = ResourceMonthlyData.objects.select_related('resource')
-    if year:
-        monthly_qs = monthly_qs.filter(year=year)
-    if month:
-        monthly_qs = monthly_qs.filter(month=month)
+    # monthly_qs = ResourceMonthlyData.objects.select_related('resource')
+    # if year:
+    #     monthly_qs = monthly_qs.filter(year=year)
+    # if month:
+    #     monthly_qs = monthly_qs.filter(month=month)
 
-    years = ResourceMonthlyData.objects.values_list('year', flat=True).distinct().order_by('-year')
-    months = [(i, month_name[i]) for i in range(1, 13)]
+    # years = ResourceMonthlyData.objects.values_list('year', flat=True).distinct().order_by('-year')
+    # months = [(i, month_name[i]) for i in range(1, 13)]
 
-    context = {
-        "monthly_data": monthly_qs,
-        "years": years,
-        "months": months,
-        "selected_year": year,
-        "selected_month": month,
+    # context = {
+    #     "monthly_data": monthly_qs,
+    #     "years": years,
+    #     "months": months,
+    #     "selected_year": year,
+    #     "selected_month": month,
+    # }
+
+    resources = Resource.objects.all()
+
+    context={
+        "resources": resources
     }
+    
     return render(request, "resources/resource_list.html", context)
 
 

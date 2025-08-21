@@ -55,8 +55,6 @@ class Project(models.Model):
 
 
 class ProjectReport(models.Model):
-    
-
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="reports")
     year = models.PositiveIntegerField(
         help_text="Year for this report (e.g., 2025)"

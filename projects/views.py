@@ -298,7 +298,7 @@ def attendance_home(request):
         "projects": projects,
         "projectAttendance": projectAttendance,
         "total_working_days": total_working_days,
-        "total_present_days": total_present_days_resources,
+        "total_present_days_resources": total_present_days_resources,
         "total_present_hours": total_present_hours,
         "total_present_days_projects":total_present_days_projects,
         "total_billable_days": total_billable_days,

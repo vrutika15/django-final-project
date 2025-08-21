@@ -47,7 +47,7 @@
     {% endif %}
 
     <!-- Resources Monthly Data Table -->
-    {% if monthly_data %}
+    {% if resources %}
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-dark">
@@ -63,16 +63,16 @@
                 </tr>
             </thead>
             <tbody>
-                {% for rmd in monthly_data %}
+                {% for r in resources %}
                 <tr>
-                    <td>{{ rmd.resource.resource_name }}</td>
+                    <td>{{ r.resource_name }}</td>
                     {% comment %} <td>{{ rmd.working_days }}</td>
                     <td>{{ rmd.present_day }}</td>
                     <td>{{ rmd.present_hours }}</td>
                     <td>{{ rmd.year }}</td>
                     <td>{{ rmd.get_month_display }}</td> {% endcomment %}
                     <td>
-                        {% if rmd.resource.is_active %}
+                        {% if r.is_active %}
                             <span class="badge bg-success">Active</span>
                         {% else %}
                             <span class="badge bg-danger">Inactive</span>
@@ -85,10 +85,10 @@
                         <a href="{% url 'resources:monthly_data_create' rmd.resource.pk %}" class="btn btn-sm btn-outline-info me-1" title="Add Monthly Data for Resource">
                             <i class="far fa-plus-square"></i>
                         </a> {% endcomment %}
-                        <a href="{% url 'resources:resource_update' rmd.resource.pk %}" class="btn btn-sm btn-outline-warning me-1" title="Edit Resource">
+                        <a href="{% url 'resources:resource_update' r.pk %}" class="btn btn-sm btn-outline-warning me-1" title="Edit Resource">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a href="{% url 'resources:resource_delete' rmd.resource.pk %}" class="btn btn-sm btn-outline-danger" title="Deactivate Resource">
+                        <a href="{% url 'resources:resource_delete' r.pk %}" class="btn btn-sm btn-outline-danger" title="Deactivate Resource">
                             <i class="fas fa-trash-alt"></i>
                         </a>
                     </td>
