@@ -46,6 +46,7 @@ class ResourceMonthlyData(models.Model):
     working_days = models.FloatField(
         null=True,
         blank=True,
+        default=0,
         help_text="Leave blank to auto-calculate (Mon-Fri + 1st Saturday)"
     )
     present_day = models.FloatField(default=0)

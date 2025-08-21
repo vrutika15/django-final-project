@@ -36,16 +36,22 @@
         {% endfor %}
       </select>
     </div>
+     <div class="col-12 mt-5">
+            <a href="{% url 'projects:project_list' %}" class="btn btn-outline-secondary mt-auto">
+                <i class="far fa-times-circle"></i> Clear Filter
+            </a>
+        </div>
   </form>
 
   <!-- Projects Table -->
+   {% if projects %}
   <div class="table-responsive">
     <table class="table table-bordered table-hover align-middle">
       <thead class="table-dark">
         <tr>
           <th>Name</th>
           <th>Type</th>
-          <th>Project Profile</th>
+          {% comment %} <th>Project Profile</th>
           <th>Resources</th>
           <th>POC</th>
           <th>Present Days</th>
@@ -55,7 +61,7 @@
           <th>Non-Billable Hours</th>
           <th>Year</th>
           <th>Month</th>
-          <th>Extra Hours</th>
+          <th>Extra Hours</th> {% endcomment %}
           <th>Active</th>
           <th>Actions</th>
         </tr>
@@ -65,7 +71,7 @@
         <tr>
           <td>{{ project.project_name }}</td>
           <td>{{ project.get_project_type_display }}</td>
-          <td>{{ project.project_profile.resource_name }}</td>
+          {% comment %} <td>{{ project.project_profile.resource_name }}</td>
           <td>
             {% for resource in project.resources.all %}
               <span>{{ resource.resource_name }}</span>{% if not forloop.last %}, {% endif %}
@@ -87,7 +93,7 @@
           <td>{{ project.non_billable_hours}}</td>
           <td>{{ project.year }}</td>
           <td>{{ project.month }}</td>
-          <td>{{ project.extra_hours|default_if_none:0 }}</td>
+          <td>{{ project.extra_hours|default_if_none:0 }}</td> {% endcomment %}
           <td>
             {% if project.is_active %}
               <span class="badge bg-success">Active</span>
@@ -114,5 +120,8 @@
       </tbody>
     </table>
   </div>
+  {% else %}
+    <div class="alert alert-info"><i class="far fa-folder-open"></i> No project found.</div>
+    {% endif %}
 </div>
 {% endblock %}

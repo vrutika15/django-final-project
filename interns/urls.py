@@ -14,4 +14,7 @@ urlpatterns = [
     path('<int:pk>/edit/', views.intern_edit, name='intern_edit'),
     path('<int:pk>/delete/', views.intern_delete, name='intern_delete'),
 
+    path('resources/',views.resources,name="resources"),
+    path("projects/",views.projects,name="projects"),
+    # path("manageresources")
 ]

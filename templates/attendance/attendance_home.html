@@ -3,6 +3,61 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css" />
+<style>
+    .month-tabs-container {
+         position: fixed;
+         bottom: 0;
+         left: 0;
+         right: 0;
+         background: white;
+         border-top: 1px solid var(--border-color);
+         box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
+         z-index: 1000;
+         padding: 1rem 0;
+    }
+
+       .month-tabs {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         gap: 0.5rem;
+         max-width: 600px;
+         margin: 0 auto;
+         padding: 0 1rem;
+       }
+
+       .month-tab {
+         padding: 0.75rem 1rem;
+         border: 1px solid var(--border-color);
+         border-radius: 8px;
+         background: white;
+         color: var(--text-secondary);
+         font-weight: 500;
+         font-size: 0.875rem;
+         cursor: pointer;
+         transition: all 0.2s ease;
+         min-width: 60px;
+         text-align: center;
+        text-decoration: none;   
+        display: inline-block; 
+       }
+
+       .month-tab:hover {
+         background: var(--light-blue);
+         color: var(--primary-color);
+         border-color: var(--primary-color);
+       }
+
+       .month-tab.active {
+         background: var(--primary-color);
+         color: white;
+         border-color: var(--primary-color);
+       }
+
+       .month-tab.active:hover {
+         background: var(--primary-dark);
+       }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -44,31 +99,21 @@
                 </tr>
               </thead>
               <tbody>
-                {% if resources %}
-                  {% for resource in resources %}
-                    <tr>
-                      <td>{{ resource.resource_name }}</td>
-<<<<<<< HEAD
-                      <td>{{ resource.working_days | default:0}}</td>
-                      <td>{{ resource.present_day | default:0}}</td>
-                      <td>{{ resource.present_hours | default:0}}</td>
-=======
-                      <td>{{ resource.working_days }}0</td>
-                      <td>{{ resource.present_day }}0</td>
-                      <td>{{ resource.present_hours }}0</td>
->>>>>>> 019e7001e78832fc814ebd6b05ad8573b5ef3afc
+                {% if resources_with_attendance %}
+    {% for item in resources_with_attendance %}
+      <tr>
+        <td>{{ item.resource.resource_name }}</td>
+        <td>{{ item.attendance.working_days|default:"-" }}</td>
+        <td>{{ item.attendance.present_day|default:"-" }}</td>
+        <td>{{ item.attendance.present_hours|default:"-" }}</td>
                       <td class="text-center">
-                        <a href="{% url 'projects:add_resource_attendance' resource.id %}" class="btn btn-sm btn-primary">
+                        <a href="{% url 'projects:add_resource_attendance' item.resource.id %}" class="btn btn-sm btn-primary">
                           Add Monthly Attendance
                         </a>
                       </td>
                     </tr>
                   {% endfor %}
-                {% else %}
-                  <tr>
-                    <td colspan="5" class="text-center">No resources found.</td>
-                  </tr>
-                {% endif %}
+                
               </tbody>
               <tfoot>
                 <tr class="table-secondary fw-bold">
@@ -84,6 +129,11 @@
                   <td></td>
                 </tr>
               </tfoot>
+              {% else %}
+                  <tr>
+                    <td colspan="5" class="text-center">No resources found.</td>
+                  </tr>
+                {% endif %}
             </table>
           </div>
         </div>
@@ -113,7 +163,8 @@
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody> 
+                {% if projects %}
                 {% for proj in projects %}
                 <tr>
                   <td>{{ proj.project_name }}</td>
@@ -148,11 +199,26 @@
                   <td></td>
                 </tr>
               </tfoot>
+              {% else %}
+                  <tr>
+                    <td colspan="10" class="text-center">No projects found.</td>
+                  </tr>
+                {% endif %}
             </table>
           </div>
         </div>
       </div>
     </div>
+  </div>
+   <!-- Month Tabs -->
+<div class="month-tabs-container">
+  <div class="month-tabs">
+    {% for m, name in months %}
+      <a href="?year={{ year }}&month={{ m }}" 
+         class="month-tab {% if m == month %}active{% endif %}">
+        {{ name }}
+      </a>
+    {% endfor %}
   </div>
 </div>
 {% endblock %}

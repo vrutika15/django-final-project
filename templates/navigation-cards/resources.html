@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{%block content %}
+<div class="container">
+    <h2 class="mb-4">Resources</h2>
+
+    {% if resources %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Resource Name</th>
+                    <th>Working Days</th>
+                    <th>Days Present</th>
+                    <th>Hours Present</th>
+                    <th>Active</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if resources_with_attendance %}
+    {% for item in resources_with_attendance %}
+      <tr>
+        <td>{{ item.resource.resource_name }}</td>
+        <td>{{ item.attendance.working_days|default:"-" }}</td>
+        <td>{{ item.attendance.present_day|default:"-" }}</td>
+        <td>{{ item.attendance.present_hours|default:"-" }}</td> 
+        <td>
+            {% if item.resource.is_active %}
+                <span class="badge bg-success">Active</span>
+            {% else %}
+                <span class="badge bg-danger">Inactive</span>
+            {% endif %}
+        </td> 
+      </tr>
+    {% endfor %}
+    {% else %}
+      <tr>
+        <td colspan="5" class="text-center">No resources found.</td>
+      </tr>
+    {% endif %}
+    </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info"><i class="far fa-folder-open"></i> No resource data found.</div>
+    {% endif %}
+</div>
+{% endblock %}

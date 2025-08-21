@@ -513,6 +513,14 @@
                         {% endfor %}
                     </select>
                 </form> {% endcomment %}
+                <form class="d-flex ms-auto" role="search" method="get" action="">
+    <select id="yearSelectNavbar" name="year" class="form-select" aria-label="Select Year" onchange="this.form.submit()">
+        {% for y in years %}
+            <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+    </select>
+</form>
+
 
             </div>
         </div> 

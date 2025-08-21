@@ -5,6 +5,7 @@ from .models import Project, ProjectReport
 class ProjectAdmin(admin.ModelAdmin):
     list_display = (
         'project_name',
+        'project_type',
         'start_year',
         'start_month',
         'end_year',
@@ -14,14 +15,14 @@ class ProjectAdmin(admin.ModelAdmin):
         'updated_at',
     )
     search_fields = ('project_name',)
-    list_filter = ('is_active', 'start_year', 'start_month', 'end_year', 'end_month')
+    list_filter = ('project_type','is_active', 'start_year', 'start_month', 'end_year', 'end_month')
     ordering = ['project_name']
 
 @admin.register(ProjectReport)
 class ProjectReportAdmin(admin.ModelAdmin):
     list_display = (
         'project',
-        'project_type',
+        
         'year',
         'month',
         'project_profile',
@@ -37,7 +38,7 @@ class ProjectReportAdmin(admin.ModelAdmin):
         'created_at',
         'updated_at',
     )
-    list_filter = ('project_type', 'year', 'month')
+    list_filter = ( 'year', 'month')
     search_fields = ('project__project_name', 'project_profile__resource_name')
     filter_horizontal = ('resources', 'poc')
     readonly_fields = ('billable_hours', 'non_billable_hours', 'created_at', 'updated_at')

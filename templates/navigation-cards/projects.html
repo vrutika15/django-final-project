@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{%block content %}
+<div class="container">
+    <h2 class="mb-4">Projects</h2>
+
+    {% if projects %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-dark">
+               <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Project Profile</th>
+          <th>Resources</th>
+          <th>POC</th>
+          <th>Present Days</th>
+          <th>Billable Days</th>
+          <th>Non-Billable Days</th>
+          <th>Billable Hours</th>
+          <th>Non-Billable Hours</th>
+          <th>Extra Hours</th> 
+          <th>Active</th>
+        </tr>
+            </thead>
+            <tbody>
+                {% if projects_with_attendance %}
+    {% for item in projects_with_attendance %}
+      <tr>
+        <td>{{ item.project.project_name }}</td>
+        <td>{{ item.project.project_type }}</td>
+        <td>{{ item.attendance.project_profile|default:"-" }}</td>
+        <td>{{ item.attendance.resources|default:"-" }}</td>
+        <td>{{ item.attendance.poc|default:"-" }}</td> 
+        <td>{{ item.attendance.present_day|default:"-" }}</td> 
+        <td>{{ item.attendance.billable_days|default:"-" }}</td> 
+        <td>{{ item.attendance.non_billable_days|default:"-" }}</td> 
+        <td>{{ item.attendance.billable_hours|default:"-" }}</td> 
+        <td>{{ item.attendance.non_billable_hours|default:"-" }}</td> 
+        <td>{{ item.attendance.extra_hours|default:"-" }}</td> 
+        <td>
+            {% if item.project.is_active %}
+                <span class="badge bg-success">Active</span>
+            {% else %}
+                <span class="badge bg-danger">Inactive</span>
+            {% endif %}
+        </td> 
+      </tr>
+    {% endfor %}
+    {% else %}
+      <tr>
+        <td colspan="5" class="text-center">No projects found.</td>
+      </tr>
+    {% endif %}
+    </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info"><i class="far fa-folder-open"></i> No projects data found.</div>
+    {% endif %}
+</div>
+{% endblock %}

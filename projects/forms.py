@@ -8,13 +8,14 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = [
-            'project_name',
+            'project_name','project_type',
             'start_year', 'start_month',
             'end_year', 'end_month',
             'is_active'
         ]
         widgets = {
             'project_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'project_type': forms.Select(attrs={'class': 'form-select'}),
             'start_year': forms.NumberInput(attrs={'class': 'form-control', 'min': 2000, 'max': 2100}),
             'start_month': forms.Select(attrs={'class': 'form-select'}),
             'end_year': forms.NumberInput(attrs={'class': 'form-control', 'min': 2000, 'max': 2100}),
@@ -23,21 +24,23 @@ class ProjectForm(forms.ModelForm):
         }
         labels = {
             'project_name': 'Project Name',
-            'is_active': 'Active?',
+            'project_type': 'Type',
+            'is_active': 'Is Active?',
         }
-
+        # help_texts = {
+        #     'is_active': "Uncheck if project got removed or completed"
+        # }
 
 class ProjectReportForm(forms.ModelForm):
     class Meta:
         model = ProjectReport
         fields = [
-            'project', 'project_type', 'year', 'month', 'project_profile',
+            'project',  'year', 'month', 'project_profile',
             'resources', 'poc',
             'present_day', 'billable_days', 'non_billable_days', 'extra_hours'
         ]
         widgets = {
             'project': forms.Select(attrs={'class': 'form-select'}),
-            'project_type': forms.Select(attrs={'class': 'form-select'}),
             'year': forms.NumberInput(attrs={
                 'class': 'form-control', 'min': 2000, 'max': 2100, 'placeholder': 'Year (e.g. 2025)'}),
             'month': forms.Select(attrs={'class': 'form-select'}),
@@ -51,7 +54,6 @@ class ProjectReportForm(forms.ModelForm):
         }
         labels = {
             'project': 'Project',
-            'project_type': 'Type',
             'present_day': 'Days Present',
             'billable_days': 'Billable Days',
             'non_billable_days': 'Non-Billable Days',

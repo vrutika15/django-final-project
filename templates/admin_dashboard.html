@@ -359,6 +359,8 @@
          transition: all 0.2s ease;
          min-width: 60px;
          text-align: center;
+        text-decoration: none;   
+        display: inline-block; 
        }
 
        .month-tab:hover {
@@ -482,26 +484,26 @@
   <!-- Navigation Cards -->
   <section class="navigation-section">
     <div class="nav-grid">
-      <a href="{% url 'resources:resource_list' %}" class="nav-card">
+      <a href="{% url 'interns:resources' %}" class="nav-card">
         <div class="nav-content">
           <i class="fas fa-users nav-icon"></i>
           <div class="nav-text">View Resources</div>
         </div>
       </a>
       
-      <a href="{% url 'projects:project_list' %}" class="nav-card">
+      <a href="{% url 'interns:projects' %}" class="nav-card">
         <div class="nav-content">
           <i class="fas fa-project-diagram nav-icon"></i>
           <div class="nav-text">View Projects</div>
         </div>
       </a>
       
-      <a href="#" class="nav-card">
+      {% comment %} <a href="#" class="nav-card">
         <div class="nav-content">
           <i class="fas fa-user-graduate nav-icon"></i>
-          <div class="nav-text">View Charts</div>
+          <div class="nav-text">View Interns</div>
         </div>
-      </a>
+      </a> {% endcomment %}
 
       <a href="#" class="nav-card">
         <div class="nav-content">
@@ -509,8 +511,20 @@
           <div class="nav-text">Manage Resources</div>
         </div>
       </a>
-    </div>
-     </section>
+
+      <!-- Month Tabs -->
+    <div class="month-tabs-container">
+    <div class="month-tabs">
+    {% for m, name in months %}
+      <a href="?year={{ year }}&month={{ m }}" 
+         class="month-tab {% if m == month %}active{% endif %}">
+        {{ name }}
+      </a>
+    {% endfor %}
+  </div>
+  </div>
+  </div>
+  </section>
 
 </div>
 {% endblock %}

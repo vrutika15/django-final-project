@@ -1,14 +1,15 @@
-from datetime import date
+from datetime import date, timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Resource, ResourceMonthlyData
 from .forms import ResourceGlobalForm, ResourceMonthlyForm
 from django.contrib import messages
-from calendar import month_name
+from calendar import calendar, month_name
 from projects.models import Project
 from interns.models import Intern
 from django.db.models import Sum, Q
 from projects.models import Project,ProjectReport
 from interns.models import Intern
+import calendar
 
 def resource_list(request):
     year = request.GET.get("year")
@@ -160,39 +161,55 @@ def monthly_data_update(request, pk):
 #         'month': month,
 #     }
 #     return render(request, 'admin_dashboard.html', context)
-
+from django.utils import timezone
 def dashboard(request):
-    resourceAttendance = ResourceMonthlyData.objects.all()
-    projectAttendance = ProjectReport.objects.all()
+    # get selected year/month from query params (default = current)
+    current_year = timezone.now().year
+    current_month = timezone.now().month
+    selected_year = int(request.GET.get("year", current_year))
+    selected_month = int(request.GET.get("month", current_month))
 
-    #total-counts
-    resources = Resource.objects.count()
-    projects = Project.objects.count()
+    # filter attendance by selected year and month
+    resourceAttendance = ResourceMonthlyData.objects.filter(
+        year=selected_year, month=selected_month
+    )
+    projectAttendance = ProjectReport.objects.filter(
+        year=selected_year, month=selected_month
+    )
+
+    # total counts
+    resources = Resource.objects.filter(is_active=True).count()
+    projects = Project.objects.filter(is_active=True).count()
     interns = Intern.objects.count()
 
-    #charts
-    #presence percentage
+    # charts
     total_present_day = sum(r.present_day for r in resourceAttendance)
     total_working_days = sum(r.working_days for r in resourceAttendance)
-    presence_percentage = (100*total_present_day)/total_working_days
+    presence_percentage = (100*total_present_day)/total_working_days if total_working_days else 0
 
-    #team productivity percentage
     total_present_hours = sum(r.present_hours for r in resourceAttendance)
     total_billable_hours = sum(p.billable_hours for p in projectAttendance)
-    team_productivity_percentage = (100*total_billable_hours)/total_present_hours
+    team_productivity_percentage = (100*total_billable_hours)/total_present_hours if total_present_hours else 0
+
+    # year and month lists
+    years = range(current_year - 5, current_year + 1)
+    months = [(i, calendar.month_abbr[i]) for i in range(1, 13)]
 
     context = {
-        'resources': resources,
-        'projects': projects,
-        'interns': interns,
-        'total_present_day': total_present_day,
+        "resources": resources,
+        "projects": projects,
+        "interns": interns,
+        "total_present_day": total_present_day,
         "total_working_days": total_working_days,
         "presence_percentage": presence_percentage,
         "total_present_hours": total_present_hours,
         "total_billable_hours": total_billable_hours,
         "team_productivity_percentage": team_productivity_percentage,
         "resourceAttendance": resourceAttendance,
-        "projectAttendance": projectAttendance
+        "projectAttendance": projectAttendance,
+        "years": years,
+        "year": selected_year,
+        "months": months,
+        "month": selected_month,
     }
-
     return render(request,'admin_dashboard.html',context)

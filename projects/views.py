@@ -8,6 +8,8 @@ from django.db.models import Prefetch, Max, Q
 from django.contrib import messages
 from django.db.models import Sum
 from datetime import date
+from django.utils import timezone
+from datetime import datetime
 import calendar
 from resources.forms import ResourceMonthlyForm
 from projects.forms import ProjectReportForm
@@ -247,67 +249,70 @@ def add_project_attendance(request, project_id):
     return render(request, "attendance/add_project_attendance.html", {"form": form, "project": project})
 
 def attendance_home(request):
-    resources = Resource.objects.all()
+    current_year = timezone.now().year
+    current_month = timezone.now().month
+    selected_year = int(request.GET.get("year", current_year))
+    selected_month = int(request.GET.get("month", current_month))
+    year = request.GET.get("year")
+    month = request.GET.get("month")
+    resources = Resource.objects.filter(is_active=True)
+    projects = Project.objects.filter(is_active=True)
+    resourceAttendance = ResourceMonthlyData.objects.filter(
+     year=selected_year, month=selected_month
+    )
+    projectAttendance = ProjectReport.objects.all()
+    
+    resources_with_attendance = []
+    for resource in resources:
+        current_attendance = resource.monthly_data.filter(
+            year=year,
+            month=month
+        ).first()  
+        resources_with_attendance.append({
+            "resource": resource,
+            "attendance": current_attendance
+        })
 
-    # Initialize totals
-    total_working_days = 0
-    total_present_days = 0
-    total_present_hours = 0
+    # Totals (resource attendance)
+    total_working_days = sum(r.working_days or 0 for r in resourceAttendance)
+    total_present_days_resources = sum(r.present_day or 0 for r in resourceAttendance)
+    total_present_hours = sum(r.present_hours or 0 for r in resourceAttendance)
 
-    for res in resources:
-        # Calculate working days from join_date to leave_date or today
-        leave = res.leave_date or date.today()
-        if res.join_date:
-            working_days = (leave - res.join_date).days
-            total_working_days += working_days
+    # Totals (project attendance)
+    total_present_days_projects = sum(p.present_days or 0 for p in projectAttendance)
+    total_billable_days = sum(p.billable_days or 0 for p in projectAttendance)
+    total_non_billable_days = sum(p.non_billable_days or 0 for p in projectAttendance)
+    total_billable_hours = sum(p.billable_hours or 0 for p in projectAttendance)
+    total_non_billable_hours = sum(p.non_billable_hours or 0 for p in projectAttendance)
 
-        # Safely access monthly_data as a dictionary
-        monthly_data = res.monthly_data if isinstance(res.monthly_data, dict) else {}
-        total_present_days += monthly_data.get('present_days', 0)
-        total_present_hours += monthly_data.get('present_hours', 0)
-
-    # Presence percentage
-    presence_percentage = (100 * total_present_days / total_working_days) if total_working_days else 0
-
-    # Aggregate project totals
-    project_totals = ProjectReport.objects.aggregate(
-        total_billable_days=Sum('billable_days'),
-        total_non_billable_days=Sum('non_billable_days'),
-        total_billable_hours=Sum('billable_hours'),
-        total_non_billable_hours=Sum('non_billable_hours'),
-        total_extra_hours=Sum('extra_hours'),
+    presence_percentage = (
+        (total_present_days_resources / total_working_days * 100)
+        if total_working_days else 0
     )
 
-    total_billable_days = project_totals.get('total_billable_days') or 0
-    total_non_billable_days = project_totals.get('total_non_billable_days') or 0
-    total_billable_hours = project_totals.get('total_billable_hours') or 0
-    total_non_billable_hours = project_totals.get('total_non_billable_hours') or 0
-    total_extra_hours = project_totals.get('total_extra_hours') or 0
-
-    total_hours = total_billable_hours + total_non_billable_hours + total_extra_hours
-    standard_hours_per_month = 8 * 22
-    utilization_percentage = (
-        (total_hours / (standard_hours_per_month * ProjectReport.objects.count()) * 100)
-        if ProjectReport.objects.exists() else 0
-    )
+    years = range(current_year - 5, current_year + 1)
+    months = [(i, calendar.month_abbr[i]) for i in range(1, 13)]
 
     context = {
-        'resources': resources,
-        'projects': Project.objects.all(),
-        'total_working_days': total_working_days,
-        'total_present_days': total_present_days,
-        'total_present_hours': total_present_hours,
-        'presence_percentage': round(presence_percentage, 2),
-        'total_billable_days': total_billable_days,
-        'total_non_billable_days': total_non_billable_days,
-        'total_billable_hours': total_billable_hours,
-        'total_non_billable_hours': total_non_billable_hours,
-        'total_extra_hours': total_extra_hours,
-        'utilization_percentage': round(utilization_percentage, 2),
+        "resources_with_attendance": resources_with_attendance,
+        "projects": projects,
+        "projectAttendance": projectAttendance,
+        "total_working_days": total_working_days,
+        "total_present_days": total_present_days_resources,
+        "total_present_hours": total_present_hours,
+        "total_present_days_projects":total_present_days_projects,
+        "total_billable_days": total_billable_days,
+        "total_non_billable_days": total_non_billable_days,
+        "total_billable_hours": total_billable_hours,
+        "total_non_billable_hours": total_non_billable_hours,
+        "presence_percentage": presence_percentage,
+         "years": years,
+        "year": selected_year,
+        "months": months,
+        "month": selected_month,
     }
 
     return render(request, 'attendance/attendance_home.html', context)
-
 
 
 # def attendance_home(request):

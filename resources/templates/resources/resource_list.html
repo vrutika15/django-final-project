@@ -53,11 +53,11 @@
             <thead class="table-dark">
                 <tr>
                     <th>Resource Name</th>
-                    <th>Working Days</th>
+                    {% comment %} <th>Working Days</th>
                     <th>Days Present</th>
                     <th>Hours Present</th>
                     <th>Year</th>
-                    <th>Month</th>
+                    <th>Month</th> {% endcomment %}
                     <th>Active</th>
                     <th class="text-center">Actions</th>
                 </tr>
@@ -66,11 +66,11 @@
                 {% for rmd in monthly_data %}
                 <tr>
                     <td>{{ rmd.resource.resource_name }}</td>
-                    <td>{{ rmd.working_days }}</td>
+                    {% comment %} <td>{{ rmd.working_days }}</td>
                     <td>{{ rmd.present_day }}</td>
                     <td>{{ rmd.present_hours }}</td>
                     <td>{{ rmd.year }}</td>
-                    <td>{{ rmd.get_month_display }}</td>
+                    <td>{{ rmd.get_month_display }}</td> {% endcomment %}
                     <td>
                         {% if rmd.resource.is_active %}
                             <span class="badge bg-success">Active</span>
@@ -85,11 +85,11 @@
                         <a href="{% url 'resources:monthly_data_create' rmd.resource.pk %}" class="btn btn-sm btn-outline-info me-1" title="Add Monthly Data for Resource">
                             <i class="far fa-plus-square"></i>
                         </a> {% endcomment %}
-                        <a href="{% url 'resources:resource_update' rmd.resource.pk %}" class="btn btn-sm btn-outline-primary me-1" title="Edit Resource">
-                            <i class="far fa-edit"></i>
+                        <a href="{% url 'resources:resource_update' rmd.resource.pk %}" class="btn btn-sm btn-outline-warning me-1" title="Edit Resource">
+                            <i class="fas fa-edit"></i>
                         </a>
                         <a href="{% url 'resources:resource_delete' rmd.resource.pk %}" class="btn btn-sm btn-outline-danger" title="Deactivate Resource">
-                            <i class="far fa-trash-alt"></i>
+                            <i class="fas fa-trash-alt"></i>
                         </a>
                     </td>
                 </tr>

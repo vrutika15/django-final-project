@@ -5,7 +5,16 @@ from django.urls import reverse
 import calendar
 
 class Project(models.Model):
+    PROJECT_TYPE_CHOICES = [
+        ('REGULAR', 'Regular Project'),
+        ('FIXED_COST', 'Fixed Cost Project'),
+    ]
     project_name = models.CharField(max_length=100)
+    project_type = models.CharField(
+        max_length=20,
+        choices=PROJECT_TYPE_CHOICES,
+        default='REGULAR'
+    )
 
     start_year = models.PositiveIntegerField(
         help_text="Year when the project starts (e.g., 2025)"
@@ -46,17 +55,9 @@ class Project(models.Model):
 
 
 class ProjectReport(models.Model):
-    PROJECT_TYPE_CHOICES = [
-        ('REGULAR', 'Regular Project'),
-        ('FIXED_COST', 'Fixed Cost Project'),
-    ]
+    
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="reports")
-    project_type = models.CharField(
-        max_length=20,
-        choices=PROJECT_TYPE_CHOICES,
-        default='REGULAR'
-    )
     year = models.PositiveIntegerField(
         help_text="Year for this report (e.g., 2025)"
     )
