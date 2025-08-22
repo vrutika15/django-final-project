@@ -274,20 +274,20 @@ def attendance_home(request):
         })
 
     # Totals (resource attendance)
-    total_working_days = sum(r.working_days or 0 for r in resourceAttendance)
-    total_present_days_resources = sum(r.present_day or 0 for r in resourceAttendance)
-    total_present_hours = sum(r.present_hours or 0 for r in resourceAttendance)
+    total_working_days = sum(r.working_days  for r in resourceAttendance)
+    total_present_days_resources = sum(r.present_day  for r in resourceAttendance)
+    total_present_hours = sum(r.present_hours  for r in resourceAttendance)
 
     # Totals (project attendance)
-    total_present_days_projects = sum(p.present_days or 0 for p in projectAttendance)
-    total_billable_days = sum(p.billable_days or 0 for p in projectAttendance)
-    total_non_billable_days = sum(p.non_billable_days or 0 for p in projectAttendance)
-    total_billable_hours = sum(p.billable_hours or 0 for p in projectAttendance)
-    total_non_billable_hours = sum(p.non_billable_hours or 0 for p in projectAttendance)
+    total_present_days_projects = sum(p.present_days  for p in projectAttendance)
+    total_billable_days = sum(p.billable_days  for p in projectAttendance)
+    total_non_billable_days = sum(p.non_billable_days for p in projectAttendance)
+    total_billable_hours = sum(p.billable_hours for p in projectAttendance)
+    total_non_billable_hours = sum(p.non_billable_hours for p in projectAttendance)
 
     presence_percentage = (
-        (total_present_days_resources / total_working_days * 100)
-        if total_working_days else 0
+        (100 * total_present_days_resources) / total_working_days
+        
     )
 
     years = range(current_year - 5, current_year + 1)

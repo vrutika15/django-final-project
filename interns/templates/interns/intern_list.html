@@ -1,4 +1,62 @@
 {% extends 'base.html' %}
+{% block css%}
+<style>
+    .month-tabs-container {
+         position: fixed;
+         bottom: 0;
+         left: 0;
+         right: 0;
+         background: white;
+         border-top: 1px solid var(--border-color);
+         box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
+         z-index: 1000;
+         padding: 1rem 0;
+       }
+
+       .month-tabs {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         gap: 0.5rem;
+         max-width: 600px;
+         margin: 0 auto;
+         padding: 0 1rem;
+       }
+
+       .month-tab {
+         padding: 0.75rem 1rem;
+         border: 1px solid var(--border-color);
+         border-radius: 8px;
+         background: white;
+         color: var(--text-secondary);
+         font-weight: 500;
+         font-size: 0.875rem;
+         cursor: pointer;
+         transition: all 0.2s ease;
+         min-width: 60px;
+         text-align: center;
+        text-decoration: none;   
+        display: inline-block; 
+       }
+
+       .month-tab:hover {
+         background: var(--light-blue);
+         color: var(--primary-color);
+         border-color: var(--primary-color);
+       }
+
+       .month-tab.active {
+         background: var(--primary-color);
+         color: white;
+         border-color: var(--primary-color);
+       }
+
+       .month-tab.active:hover {
+         background: var(--primary-dark);
+       }
+
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -77,5 +135,15 @@
             </div>
         </div>
     </div>
+     <!-- Month Tabs -->
+    <div class="month-tabs-container">
+    <div class="month-tabs">
+    {% for m, name in months %}
+      <a href="?year={{ year }}&month={{ m }}" 
+         class="month-tab {% if m == month %}active{% endif %}">
+        {{ name }}
+      </a>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}
