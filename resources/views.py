@@ -32,10 +32,24 @@ def resource_list(request):
     #     "selected_month": month,
     # }
 
+    current_year = timezone.now().year
+    current_month = timezone.now().month
+    selected_year = int(request.GET.get("year", current_year))
+    selected_month = int(request.GET.get("month", current_month))
+    year = request.GET.get("year")
+    month = request.GET.get("month")
+
     resources = Resource.objects.all()
 
+    years = range(current_year - 5, current_year + 1)
+    months = [(i, calendar.month_abbr[i]) for i in range(1, 13)]
+
     context={
-        "resources": resources
+        "resources": resources,
+        "years": years,
+        "year": selected_year,
+        "months": months,
+        "month": selected_month,
     }
     
     return render(request, "resources/resource_list.html", context)

@@ -35,7 +35,8 @@ class ProjectReportForm(forms.ModelForm):
     class Meta:
         model = ProjectReport
         fields = [
-            'project',  'year', 'month', 'project_profile',
+            'project', 
+              'year', 'month', 'project_profile',
             'resources', 'poc',
             'present_day', 'billable_days', 'non_billable_days', 'extra_hours'
         ]
