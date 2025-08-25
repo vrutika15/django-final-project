@@ -184,13 +184,11 @@ def monthly_data_update(request, pk):
 #     return render(request, 'admin_dashboard.html', context)
 from django.utils import timezone
 def dashboard(request):
-    # get selected year/month from query params (default = current)
     current_year = timezone.now().year
     current_month = timezone.now().month
     selected_year = int(request.GET.get("year", current_year))
     selected_month = int(request.GET.get("month", current_month))
 
-    # filter attendance by selected year and month
     resourceAttendance = ResourceMonthlyData.objects.filter(
         year=selected_year, month=selected_month
     )
@@ -212,7 +210,6 @@ def dashboard(request):
     total_billable_hours = sum(p.billable_hours for p in projectAttendance)
     team_productivity_percentage = (100*total_billable_hours)/total_present_hours if total_present_hours else 0
 
-    # year and month lists
     years = range(current_year - 5, current_year + 1)
     months = [(i, calendar.month_abbr[i]) for i in range(1, 13)]
 

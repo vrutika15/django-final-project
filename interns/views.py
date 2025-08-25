@@ -183,6 +183,7 @@ def projects(request):
 def manage_resources(request):
     resource_status = []
     resources = Resource.objects.filter(is_active=True)
+    
 
     for resource in resources:
             poc_projects = resource.poc_projects.all()
