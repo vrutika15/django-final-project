@@ -147,7 +147,7 @@ def projects(request):
 
     projects_with_attendance = []
     for project in projects:
-        current_attendance = project.filter(
+        current_attendance = project.reports.filter(
             year=year,
             month=month
         ).first() 

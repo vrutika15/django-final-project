@@ -236,65 +236,102 @@ def add_resource_attendance(request, resource_id):
 
 
 def add_project_attendance(request, project_id):
+
     project = get_object_or_404(Project, pk=project_id)
+ 
     if request.method == "POST":
+
         form = ProjectReportForm(request.POST)
+
+        form.fields['project'].queryset = Project.objects.filter(pk=project.pk)
+
         if form.is_valid():
+
             attendance = form.save(commit=False)
-            attendance.project = project
+
+            attendance.project = project  # force it anyway
+
             attendance.save()
+
+            form.save_m2m()
+
             return redirect("projects:attendance_home")
+
     else:
+
         form = ProjectReportForm(initial={"project": project})
-    return render(request, "attendance/add_project_attendance.html", {"form": form, "project": project})
+        form = ProjectReportForm()
+
+        form.fields['project'].queryset = Project.objects.filter(pk=project.pk)
+ 
+    return render(
+
+        request,
+
+        "attendance/add_project_attendance.html",
+
+        {"form": form, "project": project}
+
+    )
+ 
 
 def attendance_home(request):
     current_year = timezone.now().year
     current_month = timezone.now().month
     selected_year = int(request.GET.get("year", current_year))
     selected_month = int(request.GET.get("month", current_month))
-    year = request.GET.get("year")
-    month = request.GET.get("month")
     resources = Resource.objects.filter(is_active=True)
     projects = Project.objects.filter(is_active=True)
     resourceAttendance = ResourceMonthlyData.objects.filter(
      year=selected_year, month=selected_month
     )
-    projectAttendance = ProjectReport.objects.all()
+    projectAttendance = ProjectReport.objects.filter(
+     year=selected_year, month=selected_month
+    )
     
     resources_with_attendance = []
     for resource in resources:
         current_attendance = resource.monthly_data.filter(
-            year=year,
-            month=month
-        ).first()  
+            year=selected_year,
+            month=selected_month
+        ).first()
+
         resources_with_attendance.append({
             "resource": resource,
             "attendance": current_attendance
+        })
+
+    projects_with_attendance = []
+    for project in projects:
+        current_proj_attendance = project.reports.filter(
+            year = selected_year,
+            month = selected_month
+        ).first()
+
+        projects_with_attendance.append({
+            "project": project,
+            "attendance": current_proj_attendance
         })
 
     # Totals (resource attendance)
     total_working_days = sum(r.working_days  for r in resourceAttendance)
     total_present_days_resources = sum(r.present_day  for r in resourceAttendance)
     total_present_hours = sum(r.present_hours  for r in resourceAttendance)
+    presence_percentage = (100 * total_present_days_resources) / total_working_days if total_working_days else 0
 
     # Totals (project attendance)
-    total_present_days_projects = sum(p.present_days  for p in projectAttendance)
+    total_present_days_projects = sum(p.present_day  for p in projectAttendance)
     total_billable_days = sum(p.billable_days  for p in projectAttendance)
     total_non_billable_days = sum(p.non_billable_days for p in projectAttendance)
     total_billable_hours = sum(p.billable_hours for p in projectAttendance)
     total_non_billable_hours = sum(p.non_billable_hours for p in projectAttendance)
-
-    presence_percentage = (
-        (100 * total_present_days_resources) / total_working_days
-        
-    )
 
     years = range(current_year - 5, current_year + 1)
     months = [(i, calendar.month_abbr[i]) for i in range(1, 13)]
 
     context = {
         "resources_with_attendance": resources_with_attendance,
+        "projects_with_attendance": projects_with_attendance,
         "projects": projects,
         "projectAttendance": projectAttendance,
         "total_working_days": total_working_days,
@@ -306,7 +343,7 @@ def attendance_home(request):
         "total_billable_hours": total_billable_hours,
         "total_non_billable_hours": total_non_billable_hours,
         "presence_percentage": presence_percentage,
-         "years": years,
+        "years": years,
         "year": selected_year,
         "months": months,
         "month": selected_month,

@@ -11,7 +11,7 @@
     </a>
 
     <!-- Filter Section (Year + Month + Clear) -->
-    <form method="get" id="filterForm" class="row g-3 align-items-end mb-4">
+    {% comment %} <form method="get" id="filterForm" class="row g-3 align-items-end mb-4">
         <div class="col-md-3">
             <label for="year" class="form-label">Year</label>
             <select class="form-select" id="year" name="year">
@@ -35,7 +35,40 @@
                 <i class="far fa-times-circle"></i> Clear Filter
             </a>
         </div>
-    </form>
+    </form> {% endcomment %}
+
+    <form method="get" class="row row-cols-lg-auto g-3 align-items-center mb-4" id="filter-form">
+    <div class="col-12">
+      <label for="year-select" class="form-label">Year</label>
+      <select id="year-select" name="year" class="form-select"
+              onchange="document.getElementById('filter-form').submit();">
+        <option value="">All Years</option>
+        {% for y in years %}
+        <option value="{{ y }}" {% if selected_year|stringformat:'s' == y|stringformat:'s' %}selected{% endif %}>
+          {{ y }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-12">
+      <label for="month-select" class="form-label">Month</label>
+      <select id="month-select" name="month" class="form-select"
+              onchange="document.getElementById('filter-form').submit();">
+        <option value="">All Months</option>
+        {% for m in months %}
+        <option value="{{ m }}" {% if selected_month|stringformat:'s' == m|stringformat:'s' %}selected{% endif %}>
+          {{ m }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+     <div class="col-12 mt-5">
+            <a href="{% url 'resources:resource_list' %}" class="btn btn-outline-secondary mt-auto">
+                <i class="far fa-times-circle"></i> Clear Filter
+            </a>
+        </div>
+  </form>
+
 
     <!-- Messages -->
     {% if messages %}

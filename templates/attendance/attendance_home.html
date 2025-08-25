@@ -82,7 +82,7 @@
   <!-- Tab Contents -->
   <div class="tab-content" id="myTabContent">
     <!-- Resource Tab -->
-    <div class="tab-pane fade show active p-4" id="resource" role="tabpanel" aria-labelledby="resource-tab">
+    <div class="tab-pane fade show active p-4 mb-4" id="resource" role="tabpanel" aria-labelledby="resource-tab">
       <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white">
           <h5 class="mb-0">Resource Attendance</h5>
@@ -141,7 +141,7 @@
     </div>
 
     <!-- Project Tab -->
-    <div class="tab-pane fade p-4" id="project" role="tabpanel" aria-labelledby="project-tab">
+    <div class="tab-pane fade p-4 mb-4" id="project" role="tabpanel" aria-labelledby="project-tab">
       <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white">
           <h5 class="mb-0">Project Attendance</h5>
@@ -164,24 +164,24 @@
                 </tr>
               </thead>
               <tbody> 
-                {% if projects %}
-                {% for proj in projects %}
+                {% if projects_with_attendance %}
+                {% for item in projects_with_attendance %}
                 <tr>
-                  <td>{{ proj.project_name }}</td>
-                  <td>{{ proj.project_type }}</td>
+                  <td>{{ item.project.project_name }}</td>
+                  <td>{{ item.project.project_type }}</td>
                   <td>
-                    {% for resource in proj.resources.all %}
+                    {% for resource in item.project.resources.all %}
                       {{ resource.resource_name }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                   </td>
-                  <td>{{ proj.extra_hours | default:0 }}</td>
-                  <td>{{ proj.present_day | default:0 }}</td>
-                  <td>{{ proj.billable_days | default:0}}</td>
-                  <td>{{ proj.non_billable_days | default:0}}</td>
-                  <td>{{ proj.billable_hours | default:0}}</td>
-                  <td>{{ proj.non_billable_hours | default:0}}</td>
+                  <td>{{ item.attendance.extra_hours | default:0 }}</td>
+                  <td>{{ item.attendance.present_day | default:0 }}</td>
+                  <td>{{ item.attendance.billable_days | default:0}}</td>
+                  <td>{{ item.attendance.non_billable_days | default:0}}</td>
+                  <td>{{ item.attendance.billable_hours | default:0}}</td>
+                  <td>{{ item.attendance.non_billable_hours | default:0}}</td>
                   <td class="text-center">
-                    <a href="{% url 'projects:add_project_attendance' proj.id %}" class="btn btn-sm btn-primary">
+                    <a href="{% url 'projects:add_project_attendance' item.project.id %}" class="btn btn-sm btn-primary">
                       Add Monthly Attendance
                     </a>
                   </td>
@@ -221,6 +221,7 @@
       </a>
     {% endfor %}
   </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
