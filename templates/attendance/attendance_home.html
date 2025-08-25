@@ -108,9 +108,15 @@
                   <td>{{ item.attendance.present_day|default:"-" }}</td>
                   <td>{{ item.attendance.present_hours|default:"-" }}</td>
                   <td class="text-center">
-                    <a href="{% url 'projects:add_resource_attendance' item.resource.id %}" class="btn btn-sm btn-primary">
-                      Add Monthly Attendance
+                    {% if item.attendance %}
+                    <a href="#" class="btn btn-sm btn-warning" title="Edit Monthly Attendance">
+                      <i class="fas fa-edit"></i>
                     </a>
+                    {% else %}
+                    <a href="{% url 'projects:add_resource_attendance' item.resource.id %}" class="btn btn-sm btn-primary" title="Add Monthly Attendance">
+                      <i class="fas fa-plus"></i>
+                    </a>
+                    {% endif %}
                   </td>
                 </tr>
                 {% endfor %}
@@ -124,9 +130,9 @@
                   <td></td>
                 </tr>
                 <tr class="table-secondary fw-bold">
-                  <td colspan="3">Presence Percentage</td>
+                  <td colspan="4">Presence Percentage</td>
                   <td>{{ presence_percentage|floatformat:2 }}%</td>
-                  <td></td>
+                 
                 </tr>
               </tfoot>
               {% else %}
@@ -181,9 +187,15 @@
                   <td>{{ item.attendance.billable_hours | default:0}}</td>
                   <td>{{ item.attendance.non_billable_hours | default:0}}</td>
                   <td class="text-center">
-                    <a href="{% url 'projects:add_project_attendance' item.project.id %}" class="btn btn-sm btn-primary">
-                      Add Monthly Attendance
+                    {% if item.attendance %}
+                    <a href="#" class="btn btn-sm btn-warning" title="Edit Monthly Attendance">
+                      <i class="fas fa-edit"></i>
                     </a>
+                    {% else %}
+                    <a href="{% url 'projects:add_project_attendance' item.project.id %}" class="btn btn-sm btn-primary" title="Add Monthly Attendance">
+                      <i class="fas fa-plus"></i>
+                    </a>
+                    {% endif %}
                   </td>
                 </tr>
                 {% endfor %}
@@ -191,7 +203,7 @@
               <tfoot>
                 <tr class="table-secondary fw-bold">
                   <td colspan="4">Total</td>
-                  <td>{{ total_present_days }}</td>
+                  <td>{{ total_present_days_projects }}</td>
                   <td>{{ total_billable_days }}</td>
                   <td>{{ total_non_billable_days }}</td>
                   <td>{{ total_billable_hours }}</td>

@@ -107,31 +107,36 @@ def intern_delete(request, pk):
 #navigation-card
 #resources
 def resources(request):
-    year = request.GET.get("year")
-    month = request.GET.get("month")
+    current_year = timezone.now().year
+    current_month = timezone.now().month
+    selected_year = int(request.GET.get("year", current_year))
+    selected_month = int(request.GET.get("month", current_month))
 
     resources = Resource.objects.filter(is_active=True)
     resourceAttendance = ResourceMonthlyData.objects.filter(
-    year=year,
-    month=month
+    year=selected_year, month=selected_month
     )
 
     resources_with_attendance = []
     for resource in resources:
         current_attendance = resource.monthly_data.filter(
-            year=year,
-            month=month
+            year=selected_year, month=selected_month
         ).first()  
         resources_with_attendance.append({
             "resource": resource,
             "attendance": current_attendance
         })
 
+    years = range(current_year - 5, current_year + 1)
+    months = [(i, calendar.month_abbr[i]) for i in range(1, 13)]
+
     context = {
         "resources": resources,
         "resourceAttendance": resourceAttendance,
-        "year": year,
-        "month": month,
+        "years": years,
+        "year": selected_year,
+        "months": months,
+        "month": selected_month,
         "resources_with_attendance": resources_with_attendance,
     }
 
@@ -139,29 +144,36 @@ def resources(request):
 
 #projects
 def projects(request):
-    year = request.GET.get("year")
-    month = request.GET.get("month")
+    current_year = timezone.now().year
+    current_month = timezone.now().month
+    selected_year = int(request.GET.get("year", current_year))
+    selected_month = int(request.GET.get("month", current_month))
 
     projects = Project.objects.filter(is_active=True)
-    projectAttendance = ProjectReport.objects.filter(year=year,month=month)
+    projectAttendance = ProjectReport.objects.filter(year=selected_year, month=selected_month)
 
     projects_with_attendance = []
     for project in projects:
         current_attendance = project.reports.filter(
-            year=year,
-            month=month
+            year = selected_year,
+            month = selected_month
         ).first() 
         projects_with_attendance.append({
             "project": project,
             "attendance": current_attendance
         })
 
+    years = range(current_year - 5, current_year + 1)
+    months = [(i, calendar.month_abbr[i]) for i in range(1, 13)]
+
     context = {
         "projects": projects,
         "projectAttendance": projectAttendance,
         "projects_with_attendance": projects_with_attendance,
-        "year": year,
-        "month": month,
+       "years": years,
+        "year": selected_year,
+        "months": months,
+        "month": selected_month,
         "projects_with_attendance": projects_with_attendance,
     }
 
