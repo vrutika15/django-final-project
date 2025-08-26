@@ -205,47 +205,57 @@ def projects(request):
     return render(request,"navigation-cards/projects.html",context)
 
 #manage resources
+def determine_resource_status(poc_count, dev_count):
+    if poc_count >= 5 and dev_count == 0:
+        return "Highly packed"
+    elif poc_count >= 2 and dev_count == 1:
+        return "Occupied"
+    elif poc_count >= 2 and dev_count == 0:
+        return "Partially packed"
+    elif poc_count == 0 and dev_count == 1:
+        return "Partially occupied"
+    elif poc_count >= 0 and dev_count >= 2:
+        return "Occupied"
+    elif poc_count == 1 and dev_count == 0:
+        return "Bench"
+    elif poc_count == 0 and dev_count == 0:
+        return "Bench"
+    else:
+        return "Uncategorized"
+
+
 def manage_resources(request):
-    resource_status = []
+    current_year = timezone.now().year
+    current_month = timezone.now().month
+
+    selected_year = int(request.GET.get("year", current_year))
+    selected_month = int(request.GET.get("month", current_month))
+
+    reports = ProjectReport.objects.filter(year=selected_year, month=selected_month)
+
     resources = Resource.objects.filter(is_active=True)
-    
+    resource_status = []
 
     for resource in resources:
-            poc_projects = resource.poc_projects.all()
-            assigned_projects = resource.assigned_projects.all()
-            all_projects = (poc_projects | assigned_projects).distinct()
+        poc_count = reports.filter(poc=resource).count()
+        dev_count = reports.filter(resources=resource).count()
 
-            total_poc_count = 0
-            total_dev_count = 0
+        status = determine_resource_status(poc_count, dev_count)
 
-            for project in all_projects:
-                if resource in project.poc.all():
-                    total_poc_count += 1
-                if resource in project.resources.all():
-                    total_dev_count += 1
+        resource_status.append({
+            'name': resource.resource_name,
+            'poc_count': poc_count,
+            'dev_count': dev_count,
+            'status': status
+        })
 
-            if total_poc_count >= 5 and total_dev_count == 0:
-                status = "Highly packed"
-            elif total_poc_count >= 2 and total_dev_count == 1:
-                status = "Occupied"
-            elif total_poc_count >= 2 and total_dev_count == 0:
-                status = "Partially packed"
-            elif total_poc_count == 0 and total_dev_count == 1:
-                status = "Partially occupied"
-            elif total_poc_count >= 0 and total_dev_count >= 2:
-                status = "Occupied"
-            elif total_poc_count == 1 and total_dev_count == 0:
-                status = "Bench"
-            elif total_poc_count == 0 and total_dev_count == 0:
-                status = "Bench"
-            else:
-                status = "Uncategorized"
+    years = range(current_year - 5, current_year + 1)
+    months = [(i, calendar.month_abbr[i]) for i in range(1, 13)]
 
-            resource_status.append({
-                'name': resource.resource_name,
-                'poc_count': total_poc_count,
-                'dev_count': total_dev_count,
-                'status': status
-            })
-
-    return render(request,"navigation-cards/manage_resources.html",{"resource_status":resource_status})
+    return render(request, "navigation-cards/manage_resources.html", {
+        "resource_status": resource_status,
+        "years": years,
+        "year": selected_year,
+        "months": months,
+        "month": selected_month,
+    })

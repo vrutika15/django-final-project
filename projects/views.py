@@ -211,23 +211,6 @@ def project_edit(request, pk):
         'title': 'Edit Project'
     })
 
-def edit_project_attendance(request, pk):
-    project=get_object_or_404(ProjectReport,pk=pk)
-    if request.method=="POST":
-        project_form=ProjectReportForm(request.POST,instance=project)
-        project_form.fields['project'].queryset = Project.objects.filter(pk=project.pk)
-        if project_form.is_valid():
-            project_form.save()
-            return redirect("projects:attendance_home")
-    else:
-        project_form=ProjectReportForm(instance=project)
-    
-    return render(request, 'attendance/edit_project_attendance.html', {
-        'form': project_form,
-        'title': 'Edit Project Attendance'
-    })
-
-
 def project_delete(request, pk):
     project = get_object_or_404(Project, pk=pk)
     if request.method == 'POST':
@@ -273,13 +256,49 @@ def add_project_attendance(request, project_id):
         {"form": form, "project": project}
     )
  
+def edit_project_attendance(request, pk):
+    project=get_object_or_404(ProjectReport,pk=pk)
+    if request.method=="POST":
+        project_form=ProjectReportForm(request.POST,instance=project)
+        project_form.fields['project'].queryset = Project.objects.filter(pk=project.pk)
+        if project_form.is_valid():
+            project_form.save()
+            return redirect("projects:attendance_home")
+    else:
+        project_form=ProjectReportForm(instance=project)
+        project_form.fields['project'].queryset = Project.objects.filter(pk=project.project.pk)
+    
+    return render(request, 'attendance/edit_project_attendance.html', {
+        'form': project_form,
+        'title': 'Edit Project Attendance',
+        'attendance': project
+    })
+
+def edit_resource_attendance(request,pk):
+    resources=get_object_or_404(ResourceMonthlyData,pk=pk)
+    if request.method=="POST":
+        form=ResourceMonthlyForm(request.POST,instance=resources)
+        # form.fields['monthly_data'].queryset = Resource.objects.filter(pk=resources.pk)
+        if form.is_valid():
+            form.save()
+            return redirect("projects:attendance_home")
+    else:
+        form=ResourceMonthlyForm(instance=resources)
+        # form.fields['monthly_data'].queryset = Resource.objects.filter(pk=resources.monthly_data.pk)
+    
+    return render(request, 'attendance/edit_resource_attendance.html', {
+        'form': form,
+        'title': 'Edit Resource Attendance',
+        'attendance': resources
+    })
+
 def attendance_home(request):
     current_year = timezone.now().year
     current_month = timezone.now().month
     selected_year = int(request.GET.get("year", current_year))
     selected_month = int(request.GET.get("month", current_month))
-    resources = Resource.objects.filter(is_active=True)
-    projects = Project.objects.filter(is_active=True)
+    resources = Resource.objects.all()
+    projects = Project.objects.all()
     resourceAttendance = ResourceMonthlyData.objects.filter(
      year=selected_year, month=selected_month
     )

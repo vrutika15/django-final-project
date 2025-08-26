@@ -17,5 +17,5 @@ urlpatterns = [
     #navigation cards
     path('resources/',views.resources,name="resources"),
     path("projects/",views.projects,name="projects"),
-    # path("manageresources")
+    path("manageresources",views.manage_resources,name="manage_resources")
 ]

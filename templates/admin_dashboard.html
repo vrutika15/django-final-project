@@ -505,7 +505,7 @@
         </div>
       </a> {% endcomment %}
 
-      <a href="#" class="nav-card">
+      <a href="{% url 'interns:manage_resources' %}?year={{ year }}&month={{ month }}" class="nav-card">
         <div class="nav-content">
           <i class="fas fa-user nav-icon"></i>
           <div class="nav-text">Manage Resources</div>

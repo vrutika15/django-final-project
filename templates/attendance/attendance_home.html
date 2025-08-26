@@ -97,6 +97,7 @@
                   <th>Days Present</th>
                   <th>Hours Present</th>
                   <th>Actions</th>
+                  <th>Active</th>
                 </tr>
               </thead>
               <tbody>
@@ -109,13 +110,20 @@
                   <td>{{ item.attendance.present_hours|default:"-" }}</td>
                   <td class="text-center">
                     {% if item.attendance %}
-                    <a href="#" class="btn btn-sm btn-warning" title="Edit Monthly Attendance">
+                    <a href="{% url 'projects:edit_resource_attendance' item.resource.id %}" class="btn btn-sm btn-warning" title="Edit Monthly Attendance">
                       <i class="fas fa-edit"></i>
                     </a>
                     {% else %}
                     <a href="{% url 'projects:add_resource_attendance' item.resource.id %}" class="btn btn-sm btn-primary" title="Add Monthly Attendance">
                       <i class="fas fa-plus"></i>
                     </a>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if item.resource.is_active %}
+                    <span class="badge bg-success">Active</span>
+                    {% else %}
+                    <span class="badge bg-danger">Inactive</span>
                     {% endif %}
                   </td>
                 </tr>
@@ -127,6 +135,7 @@
                   <td>{{ total_working_days }}</td>
                   <td>{{ total_present_days_resources }}</td>
                   <td>{{ total_present_hours }}</td>
+                  <td></td>
                   <td></td>
                 </tr>
                 {% comment %} <tr class="table-secondary fw-bold">
@@ -169,6 +178,7 @@
                   <th>Billable Hours</th>
                   <th>Non-Billable Hours</th>
                   <th>Actions</th>
+                  <th>Active</th>
                 </tr>
               </thead>
               <tbody> 
@@ -213,6 +223,13 @@
                     </a>
                     {% endif %}
                   </td>
+                  <td>
+                    {% if item.project.is_active %}
+                    <span class="badge bg-success">Active</span>
+                    {% else %}
+                    <span class="badge bg-danger">Inactive</span>
+                    {% endif %}
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -224,6 +241,7 @@
                   <td>{{ total_non_billable_days }}</td>
                   <td>{{ total_billable_hours }}</td>
                   <td>{{ total_non_billable_hours }}</td>
+                  <td></td>
                   <td></td>
                 </tr>
               </tfoot>
