@@ -129,11 +129,11 @@
                   <td>{{ total_present_hours }}</td>
                   <td></td>
                 </tr>
-                <tr class="table-secondary fw-bold">
+                {% comment %} <tr class="table-secondary fw-bold">
                   <td colspan="4">Presence Percentage</td>
                   <td>{{ presence_percentage|floatformat:2 }}%</td>
                  
-                </tr>
+                </tr> {% endcomment %}
               </tfoot>
               {% else %}
                   <tr>
@@ -159,7 +159,9 @@
                 <tr class="text-center align-middle">
                   <th>Project Name</th>
                   <th>Project Type</th>
+                  <th>Project Profile</th>
                   <th>Resource</th>
+                  <th>POC</th>
                   <th>Extra Hours</th>
                   <th>Present Days</th>
                   <th>Billable Days</th>
@@ -175,10 +177,24 @@
                 <tr>
                   <td>{{ item.project.project_name }}</td>
                   <td>{{ item.project.project_type }}</td>
+                  <td>{{ item.attendance.project_profile|default:"No project profile" }}</td>
                   <td>
-                    {% for resource in item.project.resources.all %}
-                      {{ resource.resource_name }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
+                  {% if item.attendance and item.attendance.resources.exists %}
+                  {% for resource in item.attendance.resources.all %}
+                    {{ resource.resource_name }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                  {% else %}
+                    <span class="text-muted">No resources</span>
+                  {% endif %}
+                  </td>
+                  <td>
+                  {% if item.attendance and item.attendance.poc.exists %}
+                  {% for poc in item.attendance.poc.all %}
+                    {{ poc.resource_name }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                  {% else %}
+                    <span class="text-muted">No poc</span>
+                  {% endif %}
                   </td>
                   <td>{{ item.attendance.extra_hours | default:0 }}</td>
                   <td>{{ item.attendance.present_day | default:0 }}</td>
@@ -188,7 +204,7 @@
                   <td>{{ item.attendance.non_billable_hours | default:0}}</td>
                   <td class="text-center">
                     {% if item.attendance %}
-                    <a href="#" class="btn btn-sm btn-warning" title="Edit Monthly Attendance">
+                    <a href="{%url 'projects:edit_project_attendance' item.project.id %}" class="btn btn-sm btn-warning" title="Edit Monthly Attendance">
                       <i class="fas fa-edit"></i>
                     </a>
                     {% else %}
@@ -202,7 +218,7 @@
               </tbody>
               <tfoot>
                 <tr class="table-secondary fw-bold">
-                  <td colspan="4">Total</td>
+                  <td colspan="6">Total</td>
                   <td>{{ total_present_days_projects }}</td>
                   <td>{{ total_billable_days }}</td>
                   <td>{{ total_non_billable_days }}</td>

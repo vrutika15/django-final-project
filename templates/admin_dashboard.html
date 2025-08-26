@@ -484,14 +484,14 @@
   <!-- Navigation Cards -->
   <section class="navigation-section">
     <div class="nav-grid">
-      <a href="{% url 'interns:resources' %}" class="nav-card">
+      <a href="{% url 'interns:resources' %}?year={{ year }}&month={{ month }}" class="nav-card">
         <div class="nav-content">
           <i class="fas fa-users nav-icon"></i>
           <div class="nav-text">View Resources</div>
         </div>
       </a>
       
-      <a href="{% url 'interns:projects' %}" class="nav-card">
+      <a href="{% url 'interns:projects' %}?year={{ year }}&month={{ month }}" class="nav-card">
         <div class="nav-content">
           <i class="fas fa-project-diagram nav-icon"></i>
           <div class="nav-text">View Projects</div>

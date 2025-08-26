@@ -29,16 +29,26 @@
         <td>{{ item.project.project_name }}</td>
         <td>{{ item.project.project_type }}</td>
         <td>{{ item.attendance.project_profile|default:"-" }}</td>
-        {% if "resources.Resource.None" %}
-        <td>-</td>
-        {% else %}
-        <td>{{ item.attendance.resources|default:"-" }}</td>
-        {% endif %}
-        {% if "resources.Resource.None" %}
-        <td>-</td>
-         {% else %}
-        <td>{{ item.attendance.poc|default:"-" }}</td> 
-        {% endif %}
+        <td>
+  {% if item.attendance and item.attendance.resources.exists %}
+    {% for resource in item.attendance.resources.all %}
+      {{ resource.resource_name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+  {% else %}
+    -
+  {% endif %}
+</td>
+
+        <td>
+  {% if item.attendance and item.attendance.poc.exists %}
+    {% for poc in item.attendance.poc.all %}
+      {{ poc.resource_name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+  {% else %}
+    -
+  {% endif %}
+</td>
+
         <td>{{ item.attendance.present_day|default:"-" }}</td> 
         <td>{{ item.attendance.billable_days|default:"-" }}</td> 
         <td>{{ item.attendance.non_billable_days|default:"-" }}</td> 

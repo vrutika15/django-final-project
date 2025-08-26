@@ -1,4 +1,5 @@
 import calendar
+from django.urls import reverse
 from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Technology, Intern
@@ -62,7 +63,7 @@ def intern_list(request):
     selected_year = int(request.GET.get("year", current_year))
     selected_month = int(request.GET.get("month", current_month))
 
-    interns = Intern.objects.all()
+    interns = Intern.objects.filter(year=selected_year, month=selected_month)
 
     years = range(current_year - 5, current_year + 1)
     months = [(i, calendar.month_abbr[i]) for i in range(1, 13)]
@@ -73,15 +74,39 @@ def intern_list(request):
         "month": selected_month,})
 
 #create intern
+# def intern_create(request):
+#     if request.method == 'POST':
+#         form = InternForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('interns:intern_list')
+#     else:
+#         form = InternForm()
+#     return render(request, 'interns/intern_form.html', {'form': form, 'title': 'Add Intern'})
+
 def intern_create(request):
+    selected_year = int(request.GET.get("year", timezone.now().year))
+    selected_month = int(request.GET.get("month", timezone.now().month))
+
     if request.method == 'POST':
         form = InternForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('interns:intern_list')
+            intern = form.save(commit=False)
+            intern.year = selected_year
+            intern.month = selected_month
+            intern.save()
+            form.save_m2m()
+            return redirect(f"{reverse('interns:intern_list')}?year={selected_year}&month={selected_month}")
     else:
         form = InternForm()
-    return render(request, 'interns/intern_form.html', {'form': form, 'title': 'Add Intern'})
+    
+    return render(request, 'interns/intern_form.html', {
+        'form': form,
+        'title': 'Add Intern',
+        'year': selected_year,
+        'month': selected_month,
+    })
+
 
 #edit intern
 def intern_edit(request, pk):

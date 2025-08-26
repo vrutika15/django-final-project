@@ -15,4 +15,5 @@ urlpatterns = [
     path("tree-structure/", views.tree_structure_view, name="tree_structure"),
     path("attendance/resource/<int:resource_id>/add/", views.add_resource_attendance, name="add_resource_attendance"),
     path("attendance/project/<int:project_id>/add/", views.add_project_attendance, name="add_project_attendance"),
+    path("attendance/project/<int:pk>/edit/",views.edit_project_attendance,name="edit_project_attendance")
 ]

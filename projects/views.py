@@ -211,6 +211,22 @@ def project_edit(request, pk):
         'title': 'Edit Project'
     })
 
+def edit_project_attendance(request, pk):
+    project=get_object_or_404(ProjectReport,pk=pk)
+    if request.method=="POST":
+        project_form=ProjectReportForm(request.POST,instance=project)
+        project_form.fields['project'].queryset = Project.objects.filter(pk=project.pk)
+        if project_form.is_valid():
+            project_form.save()
+            return redirect("projects:attendance_home")
+    else:
+        project_form=ProjectReportForm(instance=project)
+    
+    return render(request, 'attendance/edit_project_attendance.html', {
+        'form': project_form,
+        'title': 'Edit Project Attendance'
+    })
+
 
 def project_delete(request, pk):
     project = get_object_or_404(Project, pk=pk)
@@ -236,45 +252,27 @@ def add_resource_attendance(request, resource_id):
 
 
 def add_project_attendance(request, project_id):
-
     project = get_object_or_404(Project, pk=project_id)
- 
     if request.method == "POST":
-
         form = ProjectReportForm(request.POST)
-
         form.fields['project'].queryset = Project.objects.filter(pk=project.pk)
-
         if form.is_valid():
-
             attendance = form.save(commit=False)
-
             attendance.project = project  # force it anyway
-
             attendance.save()
-
             form.save_m2m()
-
             return redirect("projects:attendance_home")
-
     else:
-
         form = ProjectReportForm(initial={"project": project})
         form = ProjectReportForm()
-
         form.fields['project'].queryset = Project.objects.filter(pk=project.pk)
  
     return render(
-
         request,
-
         "attendance/add_project_attendance.html",
-
         {"form": form, "project": project}
-
     )
  
-
 def attendance_home(request):
     current_year = timezone.now().year
     current_month = timezone.now().month

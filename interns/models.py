@@ -49,6 +49,10 @@ class Intern(models.Model):
         null=True,
         help_text="Description of the task assigned to the intern"
     )
+    
+    year = models.IntegerField(null=True, blank=True)
+
+    month = models.IntegerField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
