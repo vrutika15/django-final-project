@@ -90,16 +90,6 @@ def intern_list(request):
         "month": selected_month,})
 
 #create intern
-# def intern_create(request):
-#     if request.method == 'POST':
-#         form = InternForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('interns:intern_list')
-#     else:
-#         form = InternForm()
-#     return render(request, 'interns/intern_form.html', {'form': form, 'title': 'Add Intern'})
-
 def intern_create(request):
     role = request.session.get('role')
     if role != 'admin':

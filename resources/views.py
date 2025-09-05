@@ -10,6 +10,7 @@ from django.db.models import Sum, Q
 from projects.models import Project,ProjectReport
 from interns.models import Intern
 import calendar
+from django.utils import timezone
 from django.http import HttpResponseForbidden
 
 def resource_list(request):
@@ -58,10 +59,6 @@ def resource_list(request):
 
 
 def resource_create(request):
-    role = request.session.get('role')
-    # Admin only
-    if role != 'admin':
-        return HttpResponseForbidden("Not allowed")
     """
     Create new Resource and optionally a ResourceMonthlyData record.
     For simplicity, start with only Resource creation.
@@ -101,7 +98,6 @@ def resource_delete(request, pk):
         return HttpResponseForbidden("Not allowed")
     resource = get_object_or_404(Resource, pk=pk)
     if request.method == 'POST':
-        # Assuming you have proper related names on Project model
         if resource.profiled_projects.exists() or resource.assigned_projects.exists():
             messages.error(request, "Cannot deactivate this resource because it's used in one or more projects.")
         else:
@@ -113,10 +109,6 @@ def resource_delete(request, pk):
 
 
 def monthly_data_create(request, resource_id):
-    role = request.session.get('role')
-    # User and Admin can add monthly data; Superadmin read-only
-    if role not in ['user', 'admin']:
-        return HttpResponseForbidden("Not allowed")
     """
     Create monthly data for a given resource.
     """
@@ -163,48 +155,6 @@ def monthly_data_update(request, pk):
     })
 
 
-# def dashboard(request):
-
-#     year = int(request.GET.get('year', date.today().year))
-#     month = int(request.GET.get('month', date.today().month))
-
-#     # Aggregate monthly data for active resources
-#     active_resources = Resource.objects.filter(is_active=True)
-
-#     # Aggregate sums for present hours and working days across all monthly data for active resources
-#     monthly_data_qs = ResourceMonthlyData.objects.filter(resource__in=active_resources,year=year,month=month)
-
-#     total_present_hours = monthly_data_qs.aggregate(total=Sum('present_hours'))['total'] or 0
-#     total_working_days = monthly_data_qs.aggregate(total=Sum('working_days'))['total'] or 0
-#     total_present_days = monthly_data_qs.aggregate(total=Sum('present_day'))['total'] or 0
-
-#     # Assuming Project model has billable_hours field
-#     projects = Project.objects.all()
-#     total_billable_hours = projects.aggregate(total=Sum('billable_hours'))['total'] or 0
-
-#     resource_count = active_resources.count()
-#     project_count = projects.count()
-#     intern_count = Intern.objects.count()
-
-#     team_productivity_percentage = (100 * total_billable_hours / total_present_hours) if total_present_hours > 0 else 0
-#     presence_percentage = (100 * total_present_days / total_working_days) if total_working_days > 0 else 0
-
-#     context = {
-#         'resource_count': resource_count,
-#         'project_count': project_count,
-#         'intern_count': intern_count,
-#         'total_present_hours': total_present_hours,
-#         'total_billable_hours': total_billable_hours,
-#         'team_productivity_percentage': team_productivity_percentage,
-#         'total_present_days': total_present_days,
-#         'total_working_days': total_working_days,
-#         'presence_percentage': presence_percentage,
-#         'monthly_data': monthly_data_qs,
-#         'year': year,
-#         'month': month,
-#     }
-#     return render(request, 'admin_dashboard.html', context)
-from django.utils import timezone
 def dashboard(request):
     current_year = timezone.now().year
     current_month = timezone.now().month
