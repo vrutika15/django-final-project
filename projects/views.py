@@ -12,6 +12,7 @@ from django.utils import timezone
 from datetime import datetime
 import calendar
 from resources.forms import ResourceMonthlyForm
+from django.http import HttpResponseForbidden
 from projects.forms import ProjectReportForm
 
 def team_dashboard_redirect(request):
@@ -175,11 +176,15 @@ def project_list(request):
         'months': months,
         'selected_year': selected_year,
         'selected_month': selected_month,
+        'role': request.session.get('role'),
     })
 
 
 
 def project_create(request):
+    role = request.session.get('role')
+    if role not in ['user', 'admin']:
+        return HttpResponseForbidden("Not allowed")
     if request.method == 'POST':
         project_form = ProjectForm(request.POST)
         if project_form.is_valid():
@@ -198,6 +203,9 @@ def project_create(request):
 
 def project_edit(request, pk):
     project = get_object_or_404(Project, pk=pk)
+    role = request.session.get('role')
+    if role not in ['user', 'admin']:
+        return HttpResponseForbidden("Not allowed")
     if request.method == 'POST':
         project_form = ProjectForm(request.POST, instance=project)
         if project_form.is_valid():
@@ -213,6 +221,10 @@ def project_edit(request, pk):
 
 def project_delete(request, pk):
     project = get_object_or_404(Project, pk=pk)
+    role = request.session.get('role')
+    # Only admin can delete
+    if role != 'admin':
+        return HttpResponseForbidden("Not allowed")
     if request.method == 'POST':
         project.is_active = False
         project.save()
@@ -222,6 +234,9 @@ def project_delete(request, pk):
 
 def add_resource_attendance(request, resource_id):
     resource = get_object_or_404(Resource, pk=resource_id)
+    role = request.session.get('role')
+    if role not in ['user', 'admin']:
+        return HttpResponseForbidden("Not allowed")
     if request.method == "POST":
         form = ResourceMonthlyForm(request.POST)
         if form.is_valid():
@@ -236,6 +251,9 @@ def add_resource_attendance(request, resource_id):
 
 def add_project_attendance(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
+    role = request.session.get('role')
+    if role not in ['user', 'admin']:
+        return HttpResponseForbidden("Not allowed")
     if request.method == "POST":
         form = ProjectReportForm(request.POST)
         form.fields['project'].queryset = Project.objects.filter(pk=project.pk)
@@ -258,6 +276,9 @@ def add_project_attendance(request, project_id):
  
 def edit_project_attendance(request, pk):
     project=get_object_or_404(ProjectReport,pk=pk)
+    role = request.session.get('role')
+    if role not in ['user', 'admin']:
+        return HttpResponseForbidden("Not allowed")
     if request.method=="POST":
         project_form=ProjectReportForm(request.POST,instance=project)
         project_form.fields['project'].queryset = Project.objects.filter(pk=project.pk)
@@ -276,6 +297,9 @@ def edit_project_attendance(request, pk):
 
 def edit_resource_attendance(request,pk):
     resources=get_object_or_404(ResourceMonthlyData,pk=pk)
+    role = request.session.get('role')
+    if role not in ['user', 'admin']:
+        return HttpResponseForbidden("Not allowed")
     if request.method=="POST":
         form=ResourceMonthlyForm(request.POST,instance=resources)
         # form.fields['monthly_data'].queryset = Resource.objects.filter(pk=resources.pk)
@@ -403,6 +427,10 @@ def attendance_home(request):
 
 
 def tree_structure_view(request):
+    role = request.session.get('role')
+    if role not in ['user', 'admin', 'superadmin']:
+        return HttpResponseForbidden("Not allowed")
+    
     projects = Project.objects.filter(is_active=True).prefetch_related(
         'reports__project_profile',  
         'reports__resources',        

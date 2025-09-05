@@ -455,9 +455,9 @@
     {% block css%}{% endblock %}
   </head>
   <body>
-     <nav class="navbar navbar-expand-lg">
+     <nav class="navbar navbar-expand-lg {% if request.resolver_match.url_name == 'landing' or request.resolver_match.url_name == 'login' %}d-none{% endif %}">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'dashboard' %}">
+            <a class="navbar-brand" href="{% url 'landing' %}">
                 <i class="fas fa-chart-line me-2"></i>
                 {% comment %} Team Production Report {% endcomment %}
             </a>
@@ -467,42 +467,51 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-5 mb-2 mb-lg-0">
+                    {% if request.session.role == 'user' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'projects:project_list' %}">Projects</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'resources:resource_list' %}">Resources</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'projects:attendance_home' %}">Attendance</a>
+                        </li>
+                    {% elif request.session.role == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'projects:project_list' %}">Projects</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'resources:resource_list' %}">Resources</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'projects:attendance_home' %}">Attendance</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'interns:technology_list' %}">Tech Stack</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'interns:intern_list' %}">Interns</a>
+                        </li>
+                    {% elif request.session.role == 'superadmin' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'projects:project_list' %}">Projects</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'resources:resource_list' %}">Resources</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'projects:attendance_home' %}">Attendance</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'interns:technology_list' %}">Tech Stack</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'interns:intern_list' %}">Interns</a>
+                        </li>
+                    {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'projects:project_list' %}">
-                            {% comment %} <i class="fas fa-project-diagram me-1"></i> {% endcomment %}
-                            Projects
-                        </a>
-                    </li>
-                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'resources:resource_list' %}">
-                            {% comment %} <i class="fas fa-users me-1"></i> {% endcomment %}
-                            Resources
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'projects:attendance_home' %}">
-                            {% comment %} <i class="fas fa-calendar-check me-1"></i> {% endcomment %}
-                            Attendance
-                        </a>
-                    </li>
-                   
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'interns:technology_list' %}">
-                            {% comment %} <i class="fas fa-code me-1"></i> {% endcomment %}
-                            Tech Stack
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'interns:intern_list' %}">
-                            {% comment %} <i class="fas fa-user-graduate me-1"></i> {% endcomment %}
-                            Interns
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'projects:tree_structure' %}">
-                            {% comment %} <i class="fas fa-tree me-1"></i> {% endcomment %}
-                            Tree Structure
-                        </a>
+                        <a class="nav-link" href="{% url 'tree_structure' %}">Tree Structure</a>
                     </li>
                 </ul>
 

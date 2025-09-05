@@ -17,13 +17,30 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-# from projects.views import dashboard_home
-from resources.views import dashboard
+from . import views as core_views
+from resources.views import dashboard as dashboard_view
+from projects.views import tree_structure_view
 
 urlpatterns = [
-    # path("", dashboard_home, name="home"),
-    path("",dashboard,name="dashboard"),
+    # Landing + auth
+    path("", core_views.landing, name="landing"),
+    path("login/", core_views.login_view, name="login"),
+    path("logout/", core_views.logout_view, name="logout"),
+
+    # Role homes
+    path("user/", core_views.user_home, name="user_home"),
+    path("admin-site/", core_views.admin_home, name="admin_home"),
+    path("superadmin/", core_views.superadmin_home, name="superadmin_home"),
+
+    # Dashboard and Tree
+    path("dashboard/", dashboard_view, name="dashboard"),
+    path("admin-dashboard/", dashboard_view, name="admin_dashboard"),
+    path("tree/", tree_structure_view, name="tree_structure"),
+
+    # Django admin
     path("admin/", admin.site.urls),
+
+    # Apps
     path("resources/", include("resources.urls")),
     path("projects/", include("projects.urls")),
     path('interns/', include('interns.urls')),

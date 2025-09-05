@@ -5,9 +5,11 @@
   <h2 class="mb-4">Projects</h2>
 
   <div class="d-flex justify-content-between align-items-center mb-3">
+    {% if request.session.role == 'user' or request.session.role == 'admin' %}
     <a href="{% url 'projects:project_create' %}" class="btn btn-outline-success ">
       <i class="far fa-plus-square"></i> New Project
     </a>
+    {% endif %}
   </div>
 
   <!-- Filter Form -->
@@ -102,14 +104,16 @@
             {% endif %}
           </td>
           <td>
-            <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-sm btn-outline-warning me-1"
-              title="Edit Project">
-              <i class="fas fa-edit"></i>
-            </a>
-            <a href="{% url 'projects:project_delete' project.pk %}" class="btn btn-sm btn-outline-danger"
-              title="Delete Project">
-              <i class="fas fa-trash-alt"></i>
-            </a>
+            {% if request.session.role != 'superadmin' %}
+              <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-sm btn-outline-warning me-1" title="Edit Project">
+                <i class="fas fa-edit"></i>
+              </a>
+            {% endif %}
+            {% if request.session.role == 'admin' %}
+              <a href="{% url 'projects:project_delete' project.pk %}" class="btn btn-sm btn-outline-danger" title="Delete Project">
+                <i class="fas fa-trash-alt"></i>
+              </a>
+            {% endif %}
           </td>
         </tr>
         {% empty %}

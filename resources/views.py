@@ -10,8 +10,10 @@ from django.db.models import Sum, Q
 from projects.models import Project,ProjectReport
 from interns.models import Intern
 import calendar
+from django.http import HttpResponseForbidden
 
 def resource_list(request):
+    # All roles can view (User/Admin/Superadmin)
     # year = request.GET.get("year")
     # month = request.GET.get("month")
 
@@ -56,6 +58,10 @@ def resource_list(request):
 
 
 def resource_create(request):
+    role = request.session.get('role')
+    # Admin only
+    if role != 'admin':
+        return HttpResponseForbidden("Not allowed")
     """
     Create new Resource and optionally a ResourceMonthlyData record.
     For simplicity, start with only Resource creation.
@@ -72,6 +78,10 @@ def resource_create(request):
 
 
 def resource_update(request, pk):
+    role = request.session.get('role')
+    # Admin only
+    if role != 'admin':
+        return HttpResponseForbidden("Not allowed")
     resource = get_object_or_404(Resource, pk=pk)
     if request.method == 'POST':
         form = ResourceGlobalForm(request.POST, instance=resource)
@@ -85,6 +95,10 @@ def resource_update(request, pk):
 
 
 def resource_delete(request, pk):
+    role = request.session.get('role')
+    # Admin only
+    if role != 'admin':
+        return HttpResponseForbidden("Not allowed")
     resource = get_object_or_404(Resource, pk=pk)
     if request.method == 'POST':
         # Assuming you have proper related names on Project model
@@ -99,6 +113,10 @@ def resource_delete(request, pk):
 
 
 def monthly_data_create(request, resource_id):
+    role = request.session.get('role')
+    # User and Admin can add monthly data; Superadmin read-only
+    if role not in ['user', 'admin']:
+        return HttpResponseForbidden("Not allowed")
     """
     Create monthly data for a given resource.
     """
@@ -123,6 +141,10 @@ def monthly_data_create(request, resource_id):
 
 
 def monthly_data_update(request, pk):
+    role = request.session.get('role')
+    # User and Admin can edit monthly data; Superadmin read-only
+    if role not in ['user', 'admin']:
+        return HttpResponseForbidden("Not allowed")
     monthly_data = get_object_or_404(ResourceMonthlyData, pk=pk)
 
     if request.method == 'POST':

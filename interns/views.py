@@ -6,9 +6,13 @@ from .models import Technology, Intern
 from .forms import TechnologyForm, InternForm
 from resources.models import Resource,ResourceMonthlyData
 from projects.models import Project,ProjectReport
+from django.http import HttpResponseForbidden
 
 #list all tech
 def technology_list(request):
+    role = request.session.get('role')
+    if role not in ['admin', 'superadmin']:
+        return HttpResponseForbidden("Not allowed")
     current_year = timezone.now().year
     current_month = timezone.now().month
     selected_year = int(request.GET.get("year", current_year))
@@ -25,6 +29,9 @@ def technology_list(request):
 
 #create new tech
 def technology_create(request):
+    role = request.session.get('role')
+    if role != 'admin':
+        return HttpResponseForbidden("Not allowed")
     if request.method == 'POST':
         form = TechnologyForm(request.POST)
         if form.is_valid():
@@ -36,6 +43,9 @@ def technology_create(request):
 
 #edit tech
 def technology_edit(request, pk):
+    role = request.session.get('role')
+    if role != 'admin':
+        return HttpResponseForbidden("Not allowed")
     tech = get_object_or_404(Technology, pk=pk)
     if request.method == 'POST':
         form = TechnologyForm(request.POST, instance=tech)
@@ -48,6 +58,9 @@ def technology_edit(request, pk):
 
 #delete tech
 def technology_delete(request, pk):
+    role = request.session.get('role')
+    if role != 'admin':
+        return HttpResponseForbidden("Not allowed")
     tech = get_object_or_404(Technology, pk=pk)
     if request.method == 'POST':
         tech.delete()
@@ -58,6 +71,9 @@ def technology_delete(request, pk):
 
 #list intern
 def intern_list(request):
+    role = request.session.get('role')
+    if role not in ['admin', 'superadmin']:
+        return HttpResponseForbidden("Not allowed")
     current_year = timezone.now().year
     current_month = timezone.now().month
     selected_year = int(request.GET.get("year", current_year))
@@ -85,6 +101,9 @@ def intern_list(request):
 #     return render(request, 'interns/intern_form.html', {'form': form, 'title': 'Add Intern'})
 
 def intern_create(request):
+    role = request.session.get('role')
+    if role != 'admin':
+        return HttpResponseForbidden("Not allowed")
     selected_year = int(request.GET.get("year", timezone.now().year))
     selected_month = int(request.GET.get("month", timezone.now().month))
 
@@ -110,6 +129,9 @@ def intern_create(request):
 
 #edit intern
 def intern_edit(request, pk):
+    role = request.session.get('role')
+    if role != 'admin':
+        return HttpResponseForbidden("Not allowed")
     intern = get_object_or_404(Intern, pk=pk)
     if request.method == 'POST':
         form = InternForm(request.POST, instance=intern)
@@ -122,6 +144,9 @@ def intern_edit(request, pk):
 
 #delete intern
 def intern_delete(request, pk):
+    role = request.session.get('role')
+    if role != 'admin':
+        return HttpResponseForbidden("Not allowed")
     intern = get_object_or_404(Intern, pk=pk)
     if request.method == 'POST':
         intern.delete()
@@ -132,6 +157,9 @@ def intern_delete(request, pk):
 #navigation-card
 #resources
 def resources(request):
+    role = request.session.get('role')
+    if role not in ['user', 'admin', 'superadmin']:
+        return HttpResponseForbidden("Not allowed")
     current_year = timezone.now().year
     current_month = timezone.now().month
     selected_year = int(request.GET.get("year", current_year))
@@ -169,6 +197,9 @@ def resources(request):
 
 #projects
 def projects(request):
+    role = request.session.get('role')
+    if role not in ['user', 'admin', 'superadmin']:
+        return HttpResponseForbidden("Not allowed")
     current_year = timezone.now().year
     current_month = timezone.now().month
     selected_year = int(request.GET.get("year", current_year))
@@ -225,6 +256,9 @@ def determine_resource_status(poc_count, dev_count):
 
 
 def manage_resources(request):
+    role = request.session.get('role')
+    if role not in ['user', 'admin', 'superadmin']:
+        return HttpResponseForbidden("Not allowed")
     current_year = timezone.now().year
     current_month = timezone.now().month
 
