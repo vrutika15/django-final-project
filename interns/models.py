@@ -49,6 +49,8 @@ class Intern(models.Model):
         null=True,
         help_text="Description of the task assigned to the intern"
     )
+
+    convert_to_resource = models.BooleanField(default=False)
     
     year = models.IntegerField(null=True, blank=True)
 

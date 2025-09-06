@@ -22,25 +22,23 @@ from resources.views import dashboard as dashboard_view
 from projects.views import tree_structure_view
 
 urlpatterns = [
-    # Landing + auth
+    # auth
     path("", core_views.landing, name="landing"),
     path("login/", core_views.login_view, name="login"),
     path("logout/", core_views.logout_view, name="logout"),
 
-    # Role homes
+    # role 
     path("user/", core_views.user_home, name="user_home"),
     path("admin-site/", core_views.admin_home, name="admin_home"),
     path("superadmin/", core_views.superadmin_home, name="superadmin_home"),
 
-    # Dashboard and Tree
+    # dashboard and tree
     path("dashboard/", dashboard_view, name="dashboard"),
     path("admin-dashboard/", dashboard_view, name="admin_dashboard"),
     path("tree/", tree_structure_view, name="tree_structure"),
 
-    # Django admin
     path("admin/", admin.site.urls),
 
-    # Apps
     path("resources/", include("resources.urls")),
     path("projects/", include("projects.urls")),
     path('interns/', include('interns.urls')),

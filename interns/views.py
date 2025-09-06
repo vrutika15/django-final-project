@@ -283,3 +283,23 @@ def manage_resources(request):
         "months": months,
         "month": selected_month,
     })
+
+#convert intern to resource
+def intern_edit(request, pk):
+    intern = get_object_or_404(Intern, pk=pk)
+    if request.method == 'POST':
+        form = InternForm(request.POST, instance=intern)
+        if form.is_valid():
+            intern_instance = form.save()  # Save intern and M2M fields first
+            # Handle conversion to resource
+            if form.cleaned_data.get('convert_to_resource'):
+                Resource.objects.create(
+                    resource_name=intern_instance.name,
+                    join_date=date.today(),
+                    is_active=True
+                )
+                intern_instance.delete()  # now safe to delete the intern
+            return redirect('interns:intern_list')
+    else:
+        form = InternForm(instance=intern)
+    return render(request, 'interns/intern_form.html', {'form': form, 'title': 'Edit Intern'})

@@ -50,7 +50,7 @@ class Command(BaseCommand):
                 user.set_password(password)
                 user.save()
                 self.stdout.write(
-                    self.style.SUCCESS(f'Created user "{username}" with password "{password}"')
+                    self.style.SUCCESS(f'Created user "{username}" "')
                 )
                 created_count += 1
             else:
@@ -61,7 +61,7 @@ class Command(BaseCommand):
                 user.last_name = user_data['last_name']
                 user.save()
                 self.stdout.write(
-                    self.style.SUCCESS(f'Updated existing user "{username}" with new password "{password}"')
+                    self.style.SUCCESS(f'Updated existing user "{username}" "')
                 )
                 updated_count += 1
         
