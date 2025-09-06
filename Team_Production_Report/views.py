@@ -6,11 +6,6 @@ from django.urls import reverse
 
 
 def landing(request):
-    """
-    Landing page with choices: User or Admin.
-    - User: set session role to 'user' and go to user site.
-    - Admin: go to login page.
-    """
     if request.method == 'POST':
         choice = request.POST.get('choice')
         if choice == 'user':
@@ -21,12 +16,6 @@ def landing(request):
 
 
 def login_view(request):
-    """
-    Username-based role login with no signup.
-    - username 'admin' => role=admin
-    - username 'superadmin' => role=superadmin
-    Other usernames are not used here.
-    """
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -43,7 +32,7 @@ def login_view(request):
             request.session['role'] = 'admin'
             return redirect('dashboard')
 
-        # default safeguard
+        # default 
         request.session['role'] = 'user'
         return redirect('dashboard')
 
@@ -57,8 +46,6 @@ def logout_view(request):
 
 
 def user_home(request):
-    # user site entrypoint → project list with limited write actions
-    # Ensure a role exists
     if request.session.get('role') != 'user':
         request.session['role'] = 'user'
     return redirect('dashboard')
@@ -66,14 +53,12 @@ def user_home(request):
 
 @login_required
 def admin_home(request):
-    # Admin has full CRUD access; redirect to dashboard
     request.session['role'] = 'admin'
     return redirect('dashboard')
 
 
 @login_required
 def superadmin_home(request):
-    # Superadmin has read-only access; redirect to dashboard
     request.session['role'] = 'superadmin'
     return redirect('dashboard')
 

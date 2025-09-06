@@ -14,33 +14,10 @@ from django.utils import timezone
 from django.http import HttpResponseForbidden
 
 def resource_list(request):
-    # All roles can view (User/Admin/Superadmin)
-    # year = request.GET.get("year")
-    # month = request.GET.get("month")
-
-    # monthly_qs = ResourceMonthlyData.objects.select_related('resource')
-    # if year:
-    #     monthly_qs = monthly_qs.filter(year=year)
-    # if month:
-    #     monthly_qs = monthly_qs.filter(month=month)
-
-    # years = ResourceMonthlyData.objects.values_list('year', flat=True).distinct().order_by('-year')
-    # months = [(i, month_name[i]) for i in range(1, 13)]
-
-    # context = {
-    #     "monthly_data": monthly_qs,
-    #     "years": years,
-    #     "months": months,
-    #     "selected_year": year,
-    #     "selected_month": month,
-    # }
-
     current_year = timezone.now().year
     current_month = timezone.now().month
     selected_year = int(request.GET.get("year", current_year))
     selected_month = int(request.GET.get("month", current_month))
-    year = request.GET.get("year")
-    month = request.GET.get("month")
 
     resources = Resource.objects.all()
 
@@ -59,10 +36,6 @@ def resource_list(request):
 
 
 def resource_create(request):
-    """
-    Create new Resource and optionally a ResourceMonthlyData record.
-    For simplicity, start with only Resource creation.
-    """
     if request.method == 'POST':
         form = ResourceGlobalForm(request.POST)
         if form.is_valid():
@@ -76,7 +49,6 @@ def resource_create(request):
 
 def resource_update(request, pk):
     role = request.session.get('role')
-    # Admin only
     if role != 'admin':
         return HttpResponseForbidden("Not allowed")
     resource = get_object_or_404(Resource, pk=pk)
@@ -93,7 +65,6 @@ def resource_update(request, pk):
 
 def resource_delete(request, pk):
     role = request.session.get('role')
-    # Admin only
     if role != 'admin':
         return HttpResponseForbidden("Not allowed")
     resource = get_object_or_404(Resource, pk=pk)
@@ -109,9 +80,6 @@ def resource_delete(request, pk):
 
 
 def monthly_data_create(request, resource_id):
-    """
-    Create monthly data for a given resource.
-    """
     resource = get_object_or_404(Resource, pk=resource_id)
 
     if request.method == 'POST':
@@ -134,7 +102,6 @@ def monthly_data_create(request, resource_id):
 
 def monthly_data_update(request, pk):
     role = request.session.get('role')
-    # User and Admin can edit monthly data; Superadmin read-only
     if role not in ['user', 'admin']:
         return HttpResponseForbidden("Not allowed")
     monthly_data = get_object_or_404(ResourceMonthlyData, pk=pk)
