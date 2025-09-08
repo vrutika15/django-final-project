@@ -66,6 +66,14 @@
   <div class="row">
     <div class="col-12">
       <h2 class="mb-2">Attendance</h2>
+
+      <div class="d-flex justify-content-end mb-3">
+      <a href="{% url 'projects:export_attendance_pdf' %}?year={{ year }}&month={{ month }}" 
+      class="btn btn-danger">
+      <i class="fas fa-file-pdf"></i> Export to PDF
+      </a>
+      </div>
+
     </div>
   </div>
 
@@ -110,7 +118,7 @@
                   <td>{{ item.attendance.present_hours|default:"-" }}</td>
                   <td class="text-center">
                     {% if item.attendance %}
-                    <a href="{% url 'projects:edit_resource_attendance' item.resource.id %}" class="btn btn-sm btn-warning" title="Edit Monthly Attendance">
+                    <a href="{% url 'projects:edit_resource_attendance' item.attendance.id %}" class="btn btn-sm btn-warning" title="Edit Monthly Attendance">
                       <i class="fas fa-edit"></i>
                     </a>
                     {% else %}
@@ -214,7 +222,7 @@
                   <td>{{ item.attendance.non_billable_hours | default:0}}</td>
                   <td class="text-center">
                     {% if item.attendance %}
-                    <a href="{%url 'projects:edit_project_attendance' item.project.id %}" class="btn btn-sm btn-warning" title="Edit Monthly Attendance">
+                    <a href="{%url 'projects:edit_project_attendance' item.attendance.id %}" class="btn btn-sm btn-warning" title="Edit Monthly Attendance">
                       <i class="fas fa-edit"></i>
                     </a>
                     {% else %}
@@ -270,7 +278,7 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block js %}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>

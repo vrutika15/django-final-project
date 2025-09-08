@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: sans-serif; font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+    thead tr {
+    background-color: #2f77bb;
+    color: white;
+  }
+    h2 { text-align: center; }
+  </style>
+</head>
+<body>
+
+  <h2>Resource Attendance - {{ month }}/{{ year }}</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Working Days</th>
+        <th>Days Present</th>
+        <th>Hours Present</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in resources_with_attendance %}
+      <tr>
+        <td>{{ item.resource.resource_name }}</td>
+        <td>{{ item.attendance.working_days|default:"-" }}</td>
+        <td>{{ item.attendance.present_day|default:"-" }}</td>
+        <td>{{ item.attendance.present_hours|default:"-" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td><strong>Total</strong></td>
+        <td>{{ total_working_days }}</td>
+        <td>{{ total_present_days_resources }}</td>
+        <td>{{ total_present_hours }}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <h2>Project Attendance - {{ month }}/{{ year }}</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Project Name</th>
+        <th>Project Type</th>
+        <th>Extra Hours</th>
+        <th>Present Days</th>
+        <th>Billable Days</th>
+        <th>Non-Billable Days</th>
+        <th>Billable Hours</th>
+        <th>Non-Billable Hours</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in projects_with_attendance %}
+      <tr>
+        <td>{{ item.project.project_name }}</td>
+        <td>{{ item.project.project_type }}</td>
+        <td>{{ item.attendance.extra_hours|default:0 }}</td>
+        <td>{{ item.attendance.present_day|default:0 }}</td>
+        <td>{{ item.attendance.billable_days|default:0 }}</td>
+        <td>{{ item.attendance.non_billable_days|default:0 }}</td>
+        <td>{{ item.attendance.billable_hours|default:0 }}</td>
+        <td>{{ item.attendance.non_billable_hours|default:0 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3"><strong>Total</strong></td>
+        <td>{{ total_present_days_projects }}</td>
+        <td>{{ total_billable_days }}</td>
+        <td>{{ total_non_billable_days }}</td>
+        <td>{{ total_billable_hours }}</td>
+        <td>{{ total_non_billable_hours }}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+</body>
+</html>
