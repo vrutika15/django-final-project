@@ -18,4 +18,5 @@ urlpatterns = [
     path("attendance/project/<int:pk>/edit/",views.edit_project_attendance,name="edit_project_attendance"),
     path("attendance/resource/<int:pk>/edit/",views.edit_resource_attendance,name="edit_resource_attendance"),
     path('attendance/export/pdf/', views.export_attendance_pdf, name='export_attendance_pdf'),
+    path('attendance/export/excel/',views.export_attendance_excel,name="export_attendance_excel")
 ]

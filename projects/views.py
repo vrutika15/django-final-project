@@ -13,6 +13,7 @@ from projects.forms import ProjectReportForm
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
+import openpyxl
 
 
 def project_list(request):
@@ -128,51 +129,103 @@ def add_resource_attendance(request, resource_id):
     )
 
 
+# def add_project_attendance(request, project_id):
+#     project = get_object_or_404(Project, pk=project_id)
+#     role = request.session.get("role")
+#     if role not in ["user", "admin"]:
+#         return HttpResponseForbidden("Not allowed")
+#     if request.method == "POST":
+#         form = ProjectReportForm(request.POST)
+#         form.fields["project"].queryset = Project.objects.filter(pk=project.pk)
+#         if form.is_valid():
+#             attendance = form.save(commit=False)
+#             attendance.project = project  # force it anyway
+#             attendance.save()
+#             form.save_m2m()
+#             return redirect("projects:attendance_home")
+#     else:
+#         form = ProjectReportForm(initial={"project": project})
+#         form = ProjectReportForm()
+#         form.fields["project"].queryset = Project.objects.filter(pk=project.pk)
+
+#     return render(
+#         request,
+#         "attendance/add_project_attendance.html",
+#         {"form": form, "project": project},
+#     )
+
 def add_project_attendance(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     role = request.session.get("role")
     if role not in ["user", "admin"]:
         return HttpResponseForbidden("Not allowed")
+
     if request.method == "POST":
         form = ProjectReportForm(request.POST)
-        form.fields["project"].queryset = Project.objects.filter(pk=project.pk)
         if form.is_valid():
-            attendance = form.save(commit=False)
-            attendance.project = project  # force it anyway
-            attendance.save()
+            new_report = form.save(commit=False)
+            new_report.project = project  # Assign the project explicitly
+            new_report.save()
             form.save_m2m()
             return redirect("projects:attendance_home")
     else:
-        form = ProjectReportForm(initial={"project": project})
         form = ProjectReportForm()
-        form.fields["project"].queryset = Project.objects.filter(pk=project.pk)
 
     return render(
         request,
         "attendance/add_project_attendance.html",
-        {"form": form, "project": project},
+        {
+            "form": form,
+            "project": project,
+            "title": "Add Project Attendance"
+        }
     )
 
+
+# def edit_project_attendance(request, pk):
+#     project=get_object_or_404(ProjectReport,pk=pk)
+#     role = request.session.get('role')
+#     if role not in ['user', 'admin']:
+#         return HttpResponseForbidden("Not allowed")
+#     if request.method=="POST":
+#         project_form=ProjectReportForm(request.POST,instance=project)
+#         project_form.fields['project'].queryset = ProjectReport.objects.filter(pk=project.pk)
+#         if project_form.is_valid():
+#             project_form.save()
+#             return redirect("projects:attendance_home")
+#     else:
+#         project_form=ProjectReportForm(instance=project)
+#         project_form.fields['project'].queryset = Project.objects.filter(pk=project.project.pk)
+    
+#     return render(request, 'attendance/edit_project_attendance.html', {
+#         'form': project_form,
+#         'title': 'Edit Project Attendance',
+#         'attendance': project
+#     })
+
 def edit_project_attendance(request, pk):
-    project=get_object_or_404(ProjectReport,pk=pk)
+    project_report = get_object_or_404(ProjectReport, pk=pk)
     role = request.session.get('role')
     if role not in ['user', 'admin']:
         return HttpResponseForbidden("Not allowed")
-    if request.method=="POST":
-        project_form=ProjectReportForm(request.POST,instance=project)
-        project_form.fields['project'].queryset = ProjectReport.objects.filter(pk=project.pk)
-        if project_form.is_valid():
-            project_form.save()
+
+    if request.method == "POST":
+        form = ProjectReportForm(request.POST, instance=project_report)
+        if form.is_valid():
+            updated_report = form.save(commit=False)
+            updated_report.project = project_report.project  # Reassign the project
+            updated_report.save()
+            form.save_m2m()
             return redirect("projects:attendance_home")
     else:
-        project_form=ProjectReportForm(instance=project)
-        project_form.fields['project'].queryset = Project.objects.filter(pk=project.project.pk)
-    
+        form = ProjectReportForm(instance=project_report)
+
     return render(request, 'attendance/edit_project_attendance.html', {
-        'form': project_form,
+        'form': form,
         'title': 'Edit Project Attendance',
-        'attendance': project
+        'attendance': project_report
     })
+
 
 def edit_resource_attendance(request, pk):
     resources = get_object_or_404(ResourceMonthlyData, pk=pk)
@@ -505,7 +558,6 @@ def export_attendance_pdf(request):
     total_billable_hours = sum(p.billable_hours for p in projectAttendance)
     total_non_billable_hours = sum(p.non_billable_hours for p in projectAttendance)
 
-    # Prepare context for PDF template
     context = {
         "resources_with_attendance": resources_with_attendance,
         "projects_with_attendance": projects_with_attendance,
@@ -529,4 +581,140 @@ def export_attendance_pdf(request):
 
     response = HttpResponse(pdf_file, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="Attendance_{selected_month}_{selected_year}.pdf"'
+    return response
+
+def export_attendance_excel(request):
+    current_year = timezone.now().year
+    current_month = timezone.now().month
+
+    selected_year = int(request.GET.get("year", current_year))
+    selected_month = int(request.GET.get("month", current_month))
+
+    resources = Resource.objects.all()
+    projects = Project.objects.all()
+
+    resourceAttendance = ResourceMonthlyData.objects.filter(
+        year=selected_year, month=selected_month
+    )
+    projectAttendance = ProjectReport.objects.filter(
+        year=selected_year, month=selected_month
+    )
+
+    resources_with_attendance = []
+    for resource in resources:
+        current_attendance = resource.monthly_data.filter(
+            year=selected_year, month=selected_month
+        ).first()
+        resources_with_attendance.append({
+            "resource": resource,
+            "attendance": current_attendance
+        })
+
+    projects_with_attendance = []
+    for project in projects:
+        current_proj_attendance = project.reports.filter(
+            year=selected_year, month=selected_month
+        ).first()
+        projects_with_attendance.append({
+            "project": project,
+            "attendance": current_proj_attendance
+        })
+
+    # Totals 
+    total_working_days = sum(r.working_days for r in resourceAttendance)
+    total_present_days_resources = sum(r.present_day for r in resourceAttendance)
+    total_present_hours = sum(r.present_hours for r in resourceAttendance)
+    presence_percentage = (
+        (100 * total_present_days_resources) / total_working_days
+        if total_working_days else 0
+    )
+
+    total_present_days_projects = sum(p.present_day for p in projectAttendance)
+    total_billable_days = sum(p.billable_days for p in projectAttendance)
+    total_non_billable_days = sum(p.non_billable_days for p in projectAttendance)
+    total_billable_hours = sum(p.billable_hours for p in projectAttendance)
+    total_non_billable_hours = sum(p.non_billable_hours for p in projectAttendance)
+
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.title = f"Attendance {calendar.month_name[selected_month]} {selected_year}"
+
+    # Project 
+    sheet.append([f"Projects - {calendar.month_name[selected_month]} {selected_year}"])
+    sheet.append([
+        "Project Name", "Project Type", "Project Profile", "POC",
+        "Extra Hours", "Present Days", "Billable Days",
+        "Non-Billable Days", "Billable Hours", "Non-Billable Hours"
+    ])
+
+    for item in projects_with_attendance:
+        project = item["project"]
+        att = item["attendance"]
+        sheet.append([
+            project.project_name,
+            # project.project_type,
+            # att.project_profile,
+            # att.poc,
+            # getattr(project, "project_type", ""),
+            # getattr(att, "project_profile", ""),
+            # getattr(att, "poc", ""),
+            str(getattr(project, "project_type", "") or ""),
+            str(getattr(att, "project_profile", "") or ""),
+            str(getattr(att, "poc", "no poc") or "no poc"),
+            att.extra_hours if att else 0,
+            att.present_day if att else 0,
+            att.billable_days if att else 0,
+            att.non_billable_days if att else 0,
+            att.billable_hours if att else 0,
+            att.non_billable_hours if att else 0,
+        ])
+
+    # Totals row (Projects)
+    sheet.append([
+        "TOTALS", "", "", "",
+        "",  
+        total_present_days_projects,
+        total_billable_days,
+        total_non_billable_days,
+        total_billable_hours,
+        total_non_billable_hours,
+    ])
+
+    sheet.append([])
+    sheet.append([])
+
+    # Resource 
+    sheet.append([f"Resources - {calendar.month_name[selected_month]} {selected_year}"])
+    sheet.append([
+        "Resource Name", "Working Days", "Days Present", "Hours Present", "Presence %"
+    ])
+
+    for item in resources_with_attendance:
+        res = item["resource"]
+        att = item["attendance"]
+        sheet.append([
+            res.resource_name,
+            att.working_days if att else 0,
+            att.present_day if att else 0,
+            att.present_hours if att else 0,
+            round(((att.present_day / att.working_days) * 100), 2) if att and att.working_days else 0,
+        ])
+
+    # Totals row (Resources)
+    sheet.append([
+        "TOTALS",
+        total_working_days,
+        total_present_days_resources,
+        total_present_hours,
+        round(presence_percentage, 2),
+    ])
+
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = (
+        f'attachment; filename="attendance_{selected_month}_{selected_year}.xlsx"'
+    )
+
+    workbook.save(response)
     return response
